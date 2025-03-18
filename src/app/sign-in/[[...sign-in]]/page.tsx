@@ -8,7 +8,7 @@ export default function Page() {
       <div className="relative flex items-center justify-center">
         <div className="absolute inset-0">
           <GlowingEffect
-            blur={2}
+            blur={0}
             borderWidth={3}
             spread={50}
             glow={true}
@@ -24,6 +24,8 @@ export default function Page() {
               baseTheme: [dark],
               variables: {
                 colorBackground: "#000000",
+                colorPrimary: "#f97316",
+                colorText: "#ffff",
               },
             }}
           />
