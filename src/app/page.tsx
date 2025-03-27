@@ -1,13 +1,111 @@
 import { Button } from "@/components/ui/button";
 import { SignOutButton } from "./_components/SignOutButton";
+import Image from "next/image";
+import Link from "next/link";
+import { BackgroundBeams } from "./_components/background-beams";
+import { HoverBorderGradient } from "./_components/hover-border-gradient";
+import { GlowingEffect } from "./_components/glowing-effect";
 
 export default async function Home() {
   // const { signOut } = useClerk();
 
   return (
-    <div className="flex items-center justify-between border text-red-400">
-      <div>Hello world</div>
-      <SignOutButton />
-    </div>
+    <>
+      <>
+        <div className="relative z-[10] flex min-h-screen flex-col items-center bg-black pt-60">
+          <BackgroundBeams />
+          <h1 className="inline-block bg-gradient-to-r from-gray-300 to-orange-300 bg-clip-text text-center text-6xl font-bold text-transparent">
+            Mailyx — A minimalist, <br />
+            AI-powered email client.
+          </h1>
+          <div className="h-4"></div>
+          <p className="mb-8 max-w-xl text-center text-xl text-orange-100">
+            A calm, modern email client designed for clarity, not clutter.
+          </p>
+          <div className="space-x-4">
+            <HoverBorderGradient as="button" duration={1} clockwise={true}>
+              <Link href="/mail"> Start Using Mailyx</Link>
+            </HoverBorderGradient>
+          </div>
+          <div className="mx-auto mt-12 max-w-5xl">
+            <h2 className="mb-8 bg-gradient-to-br from-gray-600 to-gray-200 bg-clip-text text-center text-4xl font-semibold text-transparent">
+              Experience the power of:
+            </h2>
+
+            <div className="grid grid-cols-1 gap-4 px-5 md:grid-cols-3">
+              <div className="rounded-2.5xl relative h-full border border-neutral-500 p-2 md:rounded-3xl md:p-3">
+                <GlowingEffect
+                  spread={40}
+                  glow={true}
+                  disabled={false}
+                  proximity={64}
+                  inactiveZone={0.01}
+                  variant="orange"
+                />
+                <div className="border-0.75 relative flex h-full flex-col justify-between gap-6 overflow-hidden rounded-xl bg-black p-6 shadow-[0px_0px_27px_0px_#2D2D2D] md:p-6">
+                  <div className="relative flex flex-1 flex-col justify-between gap-3">
+                    <div className="space-y-3">
+                      <h3 className="-tracking-4 text-balance pt-0.5 font-sans text-xl font-semibold text-white md:text-2xl/[1.875rem]">
+                        AI-prioritized Inbox
+                      </h3>
+                      <h2 className="font-sans text-sm/[1.125rem] text-gray-600 md:text-base/[1.375rem] [&_b]:md:font-semibold [&_strong]:md:font-semibold">
+                        See what matters first — Mailyx automatically highlights
+                        your most important emails so you stay focused.
+                      </h2>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="rounded-2.5xl relative h-full border border-neutral-500 p-2 md:rounded-3xl md:p-3">
+                <GlowingEffect
+                  spread={40}
+                  glow={true}
+                  disabled={false}
+                  proximity={64}
+                  inactiveZone={0.01}
+                  variant="orange"
+                />
+                <div className="border-0.75 relative flex h-full flex-col justify-between gap-6 overflow-hidden rounded-xl bg-black p-6 shadow-[0px_0px_27px_0px_#2D2D2D] md:p-6">
+                  <div className="relative flex flex-1 flex-col justify-between gap-3">
+                    <div className="space-y-3">
+                      <h3 className="-tracking-4 text-balance pt-0.5 font-sans text-xl font-semibold text-white md:text-2xl/[1.875rem]">
+                        Precision Search
+                      </h3>
+                      <h2 className="font-sans text-sm/[1.125rem] text-gray-600 md:text-base/[1.375rem] [&_b]:md:font-semibold [&_strong]:md:font-semibold">
+                        Instantly search your entire inbox with AI-enhanced
+                        speed, context, and clarity.
+                      </h2>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="rounded-2.5xl border-neutral-500p-2 relative h-full border border-neutral-500 md:rounded-3xl md:p-3">
+                <GlowingEffect
+                  spread={40}
+                  glow={true}
+                  disabled={false}
+                  proximity={64}
+                  inactiveZone={0.01}
+                  variant="orange"
+                />
+                <div className="border-0.75 relative flex h-full flex-col justify-between gap-6 overflow-hidden rounded-xl bg-black p-6 shadow-[0px_0px_27px_0px_#2D2D2D] md:p-6">
+                  <div className="relative flex flex-1 flex-col justify-between gap-3">
+                    <div className="space-y-3">
+                      <h3 className="-tracking-4 text-balance pt-0.5 font-sans text-xl font-semibold text-white md:text-2xl/[1.875rem]">
+                        Keyboard-first Navigation
+                      </h3>
+                      <h2 className="font-sans text-sm/[1.125rem] text-gray-600 md:text-base/[1.375rem] [&_b]:md:font-semibold [&_strong]:md:font-semibold">
+                        Fly through your inbox using intuitive, lightning-fast
+                        shortcuts — no mouse required.
+                      </h2>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </>
+    </>
   );
 }
