@@ -33,13 +33,14 @@ export default async function Home() {
             </h2>
 
             <div className="grid grid-cols-1 gap-4 px-5 md:grid-cols-3">
-              <div className="rounded-2.5xl relative h-full border border-gray-600 p-2 md:rounded-3xl md:p-3">
+              <div className="rounded-2.5xl relative h-full border border-neutral-500 p-2 md:rounded-3xl md:p-3">
                 <GlowingEffect
                   spread={40}
                   glow={true}
                   disabled={false}
                   proximity={64}
                   inactiveZone={0.01}
+                  variant="orange"
                 />
                 <div className="border-0.75 relative flex h-full flex-col justify-between gap-6 overflow-hidden rounded-xl bg-black p-6 shadow-[0px_0px_27px_0px_#2D2D2D] md:p-6">
                   <div className="relative flex flex-1 flex-col justify-between gap-3">
@@ -55,13 +56,14 @@ export default async function Home() {
                   </div>
                 </div>
               </div>
-              <div className="rounded-2.5xl relative h-full border border-gray-800 p-2 md:rounded-3xl md:p-3">
+              <div className="rounded-2.5xl relative h-full border border-neutral-500 p-2 md:rounded-3xl md:p-3">
                 <GlowingEffect
                   spread={40}
                   glow={true}
                   disabled={false}
                   proximity={64}
                   inactiveZone={0.01}
+                  variant="orange"
                 />
                 <div className="border-0.75 relative flex h-full flex-col justify-between gap-6 overflow-hidden rounded-xl bg-black p-6 shadow-[0px_0px_27px_0px_#2D2D2D] md:p-6">
                   <div className="relative flex flex-1 flex-col justify-between gap-3">
@@ -77,13 +79,14 @@ export default async function Home() {
                   </div>
                 </div>
               </div>
-              <div className="rounded-2.5xl relative h-full border border-slate-700 p-2 md:rounded-3xl md:p-3">
+              <div className="rounded-2.5xl border-neutral-500p-2 relative h-full border border-neutral-500 md:rounded-3xl md:p-3">
                 <GlowingEffect
                   spread={40}
                   glow={true}
                   disabled={false}
                   proximity={64}
                   inactiveZone={0.01}
+                  variant="orange"
                 />
                 <div className="border-0.75 relative flex h-full flex-col justify-between gap-6 overflow-hidden rounded-xl bg-black p-6 shadow-[0px_0px_27px_0px_#2D2D2D] md:p-6">
                   <div className="relative flex flex-1 flex-col justify-between gap-3">
