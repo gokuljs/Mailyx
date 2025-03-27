@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { SignOutButton, useClerk } from "@clerk/nextjs";
+import { SignOutButton } from "./_components/SignOutButton";
 
 export default async function Home() {
   // const { signOut } = useClerk();
