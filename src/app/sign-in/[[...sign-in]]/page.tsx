@@ -1,3 +1,4 @@
+"use client";
 import { GlowingEffect } from "@/app/_components/glowing-effect";
 import { SignIn } from "@clerk/nextjs";
 import { dark, neobrutalism } from "@clerk/themes";
