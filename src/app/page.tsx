@@ -66,7 +66,7 @@ export default async function Home() {
                   spread={50}
                   glow={true}
                   disabled={false}
-                  proximity={80} // Responsive to mouse proximity
+                  proximity={80}
                   inactiveZone={0.1}
                   variant="orange"
                 />
