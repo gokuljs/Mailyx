@@ -16,6 +16,7 @@ export default function Page() {
             disabled={false}
             proximity={80} // Responsive to mouse proximity
             inactiveZone={0.1}
+            variant="orange"
           />
         </div>
 
