@@ -20,7 +20,7 @@ export default async function Home() {
           </h1>
           <div className="h-4"></div>
           <p className="mb-8 max-w-xl text-center text-xl text-orange-100">
-            A calm, modern email client designed for clarity, not clutter.
+            A calm, modern email client designed for clarity, not clutter
           </p>
           <div className="h-8"></div>
           <div className="space-x-4">
