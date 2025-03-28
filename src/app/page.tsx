@@ -22,7 +22,7 @@ export default async function Home() {
           <p className="mb-8 max-w-xl text-center text-xl text-orange-100">
             A calm, modern email client designed for clarity, not clutter.
           </p>
-          <div className="h-16"></div>
+          <div className="h-8"></div>
           <div className="space-x-4">
             <HoverBorderGradient as="button" duration={1} clockwise={true}>
               <Link href="/mail"> Start Using Mailyx</Link>
