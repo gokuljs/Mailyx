@@ -16,11 +16,11 @@ export default async function Home() {
           <BackgroundBeams />
           <h1 className="inline-block bg-gradient-to-r from-gray-300 to-orange-300 bg-clip-text text-center text-6xl font-bold text-transparent">
             Mailyx — A minimalist, <br />
-            AI-powered email client.
+            AI-powered email client
           </h1>
           <div className="h-4"></div>
           <p className="mb-8 max-w-xl text-center text-xl text-orange-100">
-            A calm, modern email client designed for clarity, not clutter
+            A calm, modern email client designed for clarity, not clutter.
           </p>
           <div className="h-8"></div>
           <div className="space-x-4">
