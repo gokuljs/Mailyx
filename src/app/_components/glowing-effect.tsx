@@ -130,18 +130,18 @@ const GlowingEffect = memo(
                   )`;
         case "orange":
           return `
-    radial-gradient(circle, rgba(255, 165, 0, 0.9) 10%, rgba(255, 165, 0, 0) 20%),
-    radial-gradient(circle at 40% 40%, rgba(255, 128, 0, 0.7) 5%, rgba(255, 128, 0, 0) 15%),
-    radial-gradient(circle at 60% 60%, rgba(255, 192, 0, 0.6) 10%, rgba(255, 192, 0, 0) 20%), 
-    radial-gradient(circle at 40% 60%, rgba(255, 96, 0, 0.5) 10%, rgba(255, 96, 0, 0) 20%),
-    repeating-conic-gradient(
-      from 236.84deg at 50% 50%,
-      rgba(255, 165, 0, 0.9) 0%,
-      rgba(255, 128, 0, 0.7) calc(25% / var(--repeating-conic-gradient-times)),
-      rgba(255, 192, 0, 0.6) calc(50% / var(--repeating-conic-gradient-times)), 
-      rgba(255, 96, 0, 0.5) calc(75% / var(--repeating-conic-gradient-times)),
-      rgba(255, 165, 0, 0.9) calc(100% / var(--repeating-conic-gradient-times))
-    )
+radial-gradient(circle, rgba(255, 215, 102, 0.9) 10%, rgba(255, 215, 102, 0) 20%),
+radial-gradient(circle at 40% 40%, rgba(255, 180, 60, 0.7) 5%, rgba(255, 180, 60, 0) 15%),
+radial-gradient(circle at 60% 60%, rgba(255, 140, 0, 0.6) 10%, rgba(255, 140, 0, 0) 20%),
+radial-gradient(circle at 40% 60%, rgba(255, 69, 0, 0.5) 10%, rgba(255, 69, 0, 0) 20%),
+repeating-conic-gradient(
+  from 236.84deg at 50% 50%,
+  rgba(255, 215, 102, 0.9) 0%,
+  rgba(255, 180, 60, 0.7) calc(25% / var(--repeating-conic-gradient-times)),
+  rgba(255, 140, 0, 0.6) calc(50% / var(--repeating-conic-gradient-times)),
+  rgba(255, 69, 0, 0.5) calc(75% / var(--repeating-conic-gradient-times)),
+  rgba(255, 215, 102, 0.9) calc(100% / var(--repeating-conic-gradient-times))
+) )
   `;
         default:
           return `radial-gradient(circle, #dd7bbb 10%, #dd7bbb00 20%),
