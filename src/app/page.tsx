@@ -1,10 +1,8 @@
-import { Button } from "@/components/ui/button";
-import { SignOutButton } from "./_components/SignOutButton";
-import Image from "next/image";
 import Link from "next/link";
 import { BackgroundBeams } from "./_components/background-beams";
 import { HoverBorderGradient } from "./_components/hover-border-gradient";
 import { GlowingEffect } from "./_components/glowing-effect";
+import LinkAccountButton from "./_components/link-account-button";
 
 export default async function Home() {
   // const { signOut } = useClerk();
@@ -27,6 +25,7 @@ export default async function Home() {
             <HoverBorderGradient as="button" duration={1} clockwise={true}>
               <Link href="/mail"> Start Using Mailyx</Link>
             </HoverBorderGradient>
+            <LinkAccountButton />
           </div>
           <div className="mx-auto mt-12 max-w-5xl">
             <h2 className="mb-8 bg-gradient-to-br from-gray-600 to-gray-200 bg-clip-text text-center text-4xl font-semibold text-transparent">
