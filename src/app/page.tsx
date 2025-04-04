@@ -25,7 +25,6 @@ export default async function Home() {
             <HoverBorderGradient as="button" duration={1} clockwise={true}>
               <Link href="/mail"> Start Using Mailyx</Link>
             </HoverBorderGradient>
-            <LinkAccountButton />
           </div>
           <div className="mx-auto mt-12 max-w-5xl">
             <h2 className="mb-8 bg-gradient-to-br from-gray-600 to-gray-200 bg-clip-text text-center text-4xl font-semibold text-transparent">
@@ -112,6 +111,7 @@ export default async function Home() {
           </div>
         </div>
       </>
+      <LinkAccountButton />
     </>
   );
 }
