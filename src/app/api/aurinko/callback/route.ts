@@ -54,8 +54,5 @@ export const GET = async (req: NextRequest) => {
     },
   });
 
-  console.log({ userId, accountDetails });
-  return NextResponse.json({
-    message: "hello word",
-  });
+  return NextResponse.redirect(new URL("/mail", req.url));
 };
