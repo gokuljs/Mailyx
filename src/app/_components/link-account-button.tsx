@@ -7,7 +7,7 @@ const LinkAccountButton = () => {
   return (
     <Button
       onClick={async () => {
-        const url = await getAurinkoAuthUrl("Office365");
+        const url = await getAurinkoAuthUrl("Google");
         console.log(url);
         if (url) window.location.href = url;
       }}

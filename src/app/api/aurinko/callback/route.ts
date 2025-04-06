@@ -1,7 +1,9 @@
 import { exchangeCodeForAccessToken, getAccountDetails } from "@/lib/aruinko";
 import { db } from "@/server/db";
 import { auth } from "@clerk/nextjs/server";
+import axios from "axios";
 import { NextRequest, NextResponse } from "next/server";
+import { after } from "next/server";
 
 export const GET = async (req: NextRequest) => {
   const { userId } = await auth();
@@ -52,6 +54,23 @@ export const GET = async (req: NextRequest) => {
       emailAddress: accountDetails?.email || "",
       name: accountDetails?.name || "",
     },
+  });
+
+  //   trigger initial sync
+  //   nextjs function
+  after(async () => {
+    try {
+      const data = await axios.post(
+        `${process.env.NEXT_PUBLIC_URL}/api/initial-sync`,
+        {
+          accountId: token.accountId.toString(),
+          userId,
+        },
+      );
+      console.log("Initial sync triggered", data);
+    } catch (error) {
+      console.log(error);
+    }
   });
 
   return NextResponse.redirect(new URL("/mail", req.url));
