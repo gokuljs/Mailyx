@@ -1,10 +1,8 @@
-import { Button } from "@/components/ui/button";
-import { SignOutButton } from "./_components/SignOutButton";
-import Image from "next/image";
 import Link from "next/link";
 import { BackgroundBeams } from "./_components/background-beams";
 import { HoverBorderGradient } from "./_components/hover-border-gradient";
 import { GlowingEffect } from "./_components/glowing-effect";
+import LinkAccountButton from "./_components/link-account-button";
 
 export default async function Home() {
   // const { signOut } = useClerk();
@@ -113,6 +111,7 @@ export default async function Home() {
           </div>
         </div>
       </>
+      <LinkAccountButton />
     </>
   );
 }
