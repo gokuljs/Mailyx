@@ -1,7 +1,13 @@
-import React from "react";
+import Mail from "./Mail";
 
-const page = () => {
-  return <div>Email Dashboard</div>;
+const Page = () => {
+  return (
+    <Mail
+      defaultLayout={[10, 20, 30]}
+      defaultCollapsed={false}
+      navCollapsedSize={4}
+    />
+  );
 };
 
-export default page;
+export default Page;
