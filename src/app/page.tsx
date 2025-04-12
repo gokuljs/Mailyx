@@ -10,9 +10,9 @@ export default async function Home() {
   return (
     <>
       <>
-        <div className="relative z-[10] flex min-h-screen flex-col items-center bg-black pt-60">
+        <div className="relative z-10 flex min-h-screen flex-col items-center bg-black pt-60">
           <BackgroundBeams />
-          <h1 className="inline-block bg-gradient-to-r from-gray-300 to-orange-300 bg-clip-text text-center text-6xl font-bold text-transparent">
+          <h1 className="inline-block bg-linear-to-r from-gray-300 to-orange-300 bg-clip-text text-center text-6xl font-bold text-transparent">
             Mailyx — A minimalist, <br />
             AI-powered email client
           </h1>
@@ -27,7 +27,7 @@ export default async function Home() {
             </HoverBorderGradient>
           </div>
           <div className="mx-auto mt-12 max-w-5xl">
-            <h2 className="mb-8 bg-gradient-to-br from-gray-600 to-gray-200 bg-clip-text text-center text-4xl font-semibold text-transparent">
+            <h2 className="mb-8 bg-linear-to-br from-gray-600 to-gray-200 bg-clip-text text-center text-4xl font-semibold text-transparent">
               Experience the power of:
             </h2>
 
@@ -49,7 +49,7 @@ export default async function Home() {
                       <h3 className="-tracking-4 text-balance pt-0.5 font-sans text-xl font-semibold text-white md:text-2xl/[1.875rem]">
                         AI-prioritized Inbox
                       </h3>
-                      <h2 className="font-sans text-sm/[1.125rem] text-gray-500 md:text-base/[1.375rem] [&_b]:md:font-semibold [&_strong]:md:font-semibold">
+                      <h2 className="font-sans text-sm/[1.125rem] text-gray-500 md:text-base/[1.375rem] md:[&_b]:font-semibold md:[&_strong]:font-semibold">
                         See what matters first — Mailyx automatically highlights
                         your most important emails so you stay focused.
                       </h2>
@@ -74,7 +74,7 @@ export default async function Home() {
                       <h3 className="-tracking-4 text-balance pt-0.5 font-sans text-xl font-semibold text-white md:text-2xl/[1.875rem]">
                         Precision Search
                       </h3>
-                      <h2 className="font-sans text-sm/[1.125rem] text-gray-500 md:text-base/[1.375rem] [&_b]:md:font-semibold [&_strong]:md:font-semibold">
+                      <h2 className="font-sans text-sm/[1.125rem] text-gray-500 md:text-base/[1.375rem] md:[&_b]:font-semibold md:[&_strong]:font-semibold">
                         Instantly search your entire inbox with AI-enhanced
                         speed, context, and clarity.
                       </h2>
@@ -99,7 +99,7 @@ export default async function Home() {
                       <h3 className="-tracking-4 text-balance pt-0.5 font-sans text-xl font-semibold text-white md:text-2xl/[1.875rem]">
                         Keyboard-first Navigation
                       </h3>
-                      <h2 className="font-sans text-sm/[1.125rem] text-gray-500 md:text-base/[1.375rem] [&_b]:md:font-semibold [&_strong]:md:font-semibold">
+                      <h2 className="font-sans text-sm/[1.125rem] text-gray-500 md:text-base/[1.375rem] md:[&_b]:font-semibold md:[&_strong]:font-semibold">
                         Fly through your inbox using intuitive, lightning-fast
                         shortcuts — no mouse required.
                       </h2>
