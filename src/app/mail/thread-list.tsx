@@ -18,7 +18,7 @@ function getBadgeVariantFromLabel(
 }
 
 const ThreadList = (props: Props) => {
-  const { threads } = useThreads();
+  const { threads, threadId, setThreadId } = useThreads();
   const groupedThread = threads?.reduce(
     (acc, thread) => {
       const date = format(thread.email[0]?.sentAt ?? new Date(), "yyyy-MM-dd");
@@ -43,8 +43,10 @@ const ThreadList = (props: Props) => {
               return (
                 <button
                   key={thread?.id}
+                  onClick={() => setThreadId(thread?.id)}
                   className={cn(
                     "relative flex flex-col items-start gap-2 rounded-lg border p-3 text-left text-sm transition-all",
+                    threadId === thread.id && "bg-accent",
                   )}
                 >
                   <div className="flex w-full flex-col gap-2">

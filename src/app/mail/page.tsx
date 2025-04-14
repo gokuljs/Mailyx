@@ -8,11 +8,13 @@ const Mail = dynamic(() => import("./Mail"), {
 
 const Page = () => {
   return (
-    <Mail
-      defaultLayout={[10, 20, 30]}
-      defaultCollapsed={false}
-      navCollapsedSize={4}
-    />
+    <>
+      <Mail
+        defaultLayout={[10, 20, 30]}
+        defaultCollapsed={false}
+        navCollapsedSize={4}
+      />
+    </>
   );
 };
 
