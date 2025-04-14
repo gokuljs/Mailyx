@@ -15,6 +15,7 @@ import { cn } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TabsContent } from "@radix-ui/react-tabs";
+import AccountSwitcher from "./account-switcher";
 
 type Props = {
   defaultLayout: number[] | undefined;
@@ -60,7 +61,8 @@ function Mail({
                 isCollapsed ? "h-[52px]" : "px-2",
               )}
             >
-              Account Switcher
+              {/* Account Switcher */}
+              <AccountSwitcher isCollapsed={isCollapsed} />
             </div>
             <Separator />
             {/* sidebar */}
