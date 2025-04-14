@@ -64,9 +64,6 @@ export function Nav({ links, isCollapsed }: NavProps) {
               onClick={() => setTab(link.title.toLowerCase())}
               className={cn(
                 buttonVariants({ variant: link.variant, size: "sm" }),
-                link.variant === "default" &&
-                  "dark:bg-muted dark:hover:bg-muted dark:text-white dark:hover:text-white",
-                "cursor-pointer justify-start",
               )}
             >
               <link.icon className="mr-2 h-4 w-4" />

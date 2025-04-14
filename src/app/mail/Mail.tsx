@@ -38,7 +38,7 @@ function Mail({
         onLayout={(sizes: number[]) => {
           console.log(sizes);
         }}
-        className="h-full min-h-screen items-stretch"
+        className="h-full min-h-screen items-stretch dark:bg-[hsl(20_14.3%_4.1%)]"
       >
         <ResizablePanel
           defaultSize={defaultLayout[0]}
