@@ -15,6 +15,9 @@ import { cn } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TabsContent } from "@radix-ui/react-tabs";
+import AccountSwitcher from "./account-switcher";
+import SideBar from "./SideBar";
+import ThreadList from "./thread-list";
 
 type Props = {
   defaultLayout: number[] | undefined;
@@ -60,11 +63,12 @@ function Mail({
                 isCollapsed ? "h-[52px]" : "px-2",
               )}
             >
-              Account Switcher
+              {/* Account Switcher */}
+              <AccountSwitcher isCollapsed={isCollapsed} />
             </div>
             <Separator />
             {/* sidebar */}
-            <div className="flex-1"></div>
+            <SideBar isCollapsed={isCollapsed} />
             {/* Ask Ai */}
           </div>
         </ResizablePanel>
@@ -90,8 +94,14 @@ function Mail({
             </div>
             <Separator />
             {/* search Bar */}
-            <TabsContent value="inbox">inbox</TabsContent>
-            <TabsContent value="done">done</TabsContent>
+            <TabsContent value="inbox">
+              {" "}
+              <ThreadList />
+            </TabsContent>
+            <TabsContent value="done">
+              {" "}
+              <ThreadList />
+            </TabsContent>
           </Tabs>
         </ResizablePanel>
         <ResizableHandle withHandle />

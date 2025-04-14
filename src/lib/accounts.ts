@@ -18,7 +18,7 @@ export class Account {
           Authorization: `Bearer ${this.token}`,
         },
         params: {
-          daysWithin: 2,
+          daysWithin: 1,
           bodyType: "html",
         },
       },
@@ -77,14 +77,14 @@ export class Account {
           storedDeltaToken = updatedResponse?.nextDeltaToken;
         }
       }
-      console.log(
-        "initial Sync completed we have synched",
-        allEmails.length,
-        "emails",
-      );
-      await this.getUpdateEmails({
-        deltaToken: storedDeltaToken,
-      });
+      // console.log(
+      //   "initial Sync completed we have synched",
+      //   allEmails.length,
+      //   "emails",
+      // );
+      // await this.getUpdateEmails({
+      //   deltaToken: storedDeltaToken,
+      // });
       return {
         emails: allEmails,
         deltaToken: storedDeltaToken,
