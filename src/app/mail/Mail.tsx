@@ -17,6 +17,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TabsContent } from "@radix-ui/react-tabs";
 import AccountSwitcher from "./account-switcher";
 import SideBar from "./SideBar";
+import ThreadList from "./thread-list";
 
 type Props = {
   defaultLayout: number[] | undefined;
@@ -93,8 +94,14 @@ function Mail({
             </div>
             <Separator />
             {/* search Bar */}
-            <TabsContent value="inbox">inbox</TabsContent>
-            <TabsContent value="done">done</TabsContent>
+            <TabsContent value="inbox">
+              {" "}
+              <ThreadList />
+            </TabsContent>
+            <TabsContent value="done">
+              {" "}
+              <ThreadList />
+            </TabsContent>
           </Tabs>
         </ResizablePanel>
         <ResizableHandle withHandle />
