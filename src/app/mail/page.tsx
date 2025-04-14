@@ -1,4 +1,10 @@
-import Mail from "./Mail";
+"use client";
+import dynamic from "next/dynamic";
+
+const Mail = dynamic(() => import("./Mail"), {
+  ssr: false,
+  loading: () => <p>Loading...</p>,
+});
 
 const Page = () => {
   return (

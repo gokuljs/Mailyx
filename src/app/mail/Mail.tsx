@@ -16,6 +16,7 @@ import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TabsContent } from "@radix-ui/react-tabs";
 import AccountSwitcher from "./account-switcher";
+import SideBar from "./SideBar";
 
 type Props = {
   defaultLayout: number[] | undefined;
@@ -66,7 +67,7 @@ function Mail({
             </div>
             <Separator />
             {/* sidebar */}
-            <div className="flex-1"></div>
+            <SideBar isCollapsed={isCollapsed} />
             {/* Ask Ai */}
           </div>
         </ResizablePanel>
