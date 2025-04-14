@@ -46,7 +46,7 @@ const ThreadList = (props: Props) => {
                   onClick={() => setThreadId(thread?.id)}
                   className={cn(
                     "relative flex flex-col items-start gap-2 rounded-lg border p-3 text-left text-sm transition-all",
-                    threadId === thread.id && "bg-accent",
+                    threadId === thread.id && "bg-muted",
                   )}
                 >
                   <div className="flex w-full flex-col gap-2">
