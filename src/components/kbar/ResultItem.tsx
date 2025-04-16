@@ -54,7 +54,7 @@ const ResultItem = React.forwardRef(
               <span>{action.name}</span>
             </div>
             {action.subtitle && (
-              <span className="text-sm text-gray-600 dark:text-gray-400">
+              <span className="dark:text-muted-foreground text-sm text-gray-600">
                 {action.subtitle}
               </span>
             )}
