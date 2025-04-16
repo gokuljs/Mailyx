@@ -18,6 +18,7 @@ import { TabsContent } from "@radix-ui/react-tabs";
 import AccountSwitcher from "./account-switcher";
 import SideBar from "./SideBar";
 import ThreadList from "./thread-list";
+import ThreadDisplay from "./ThreadDisplay";
 
 type Props = {
   defaultLayout: number[] | undefined;
@@ -105,10 +106,9 @@ function Mail({
           </Tabs>
         </ResizablePanel>
         <ResizableHandle withHandle />
-        <ResizablePanel
-          defaultSize={defaultLayout[2]}
-          minSize={30}
-        ></ResizablePanel>
+        <ResizablePanel defaultSize={defaultLayout[2]} minSize={30}>
+          <ThreadDisplay />
+        </ResizablePanel>
       </ResizablePanelGroup>
     </TooltipProvider>
   );
