@@ -16,7 +16,7 @@ const useThemeSwitching = () => {
     {
       id: "toggleTheme",
       name: "Toggle Theme",
-      shortcut: ["ctrl", "t"],
+      shortcut: ["t", "t"],
       section: "Theme",
       perform: toggleTheme,
     },
@@ -35,20 +35,6 @@ const useThemeSwitching = () => {
   ];
 
   useRegisterActions(themeAction, [theme, toggleTheme]);
-
-  useEffect(() => {
-    const handleKeyDown = (event) => {
-      if (event.ctrlKey && event.key === "t") {
-        event.preventDefault(); // Prevent new tab
-        toggleTheme();
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [toggleTheme]);
-
-  return null;
 };
 
 export default useThemeSwitching;
