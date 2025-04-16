@@ -19,6 +19,7 @@ import AccountSwitcher from "./account-switcher";
 import SideBar from "./SideBar";
 import ThreadList from "./thread-list";
 import ThreadDisplay from "./ThreadDisplay";
+import { useLocalStorage } from "usehooks-ts";
 
 type Props = {
   defaultLayout: number[] | undefined;
@@ -32,6 +33,7 @@ function Mail({
   defaultCollapsed,
 }: Props) {
   const [isCollapsed, setIsCollapsed] = useState(defaultCollapsed);
+  const [done, setDone] = useLocalStorage("mailyx-done", false);
   return (
     <TooltipProvider delayDuration={0}>
       <ResizablePanelGroup
@@ -75,7 +77,18 @@ function Mail({
         </ResizablePanel>
         <ResizableHandle withHandle />
         <ResizablePanel defaultSize={defaultLayout[1]} minSize={30}>
-          <Tabs defaultValue="inbox" className="gap-0">
+          <Tabs
+            defaultValue="inbox"
+            value={done ? "done" : "inbox"}
+            onValueChange={(tab) => {
+              if (tab === "done") {
+                setDone(true);
+              } else {
+                setDone(false);
+              }
+            }}
+            className="gap-0"
+          >
             <div className="mb-0 flex items-center px-4 py-2">
               <h1 className="text-xl font-bold">Inbox</h1>
               <TabsList className="ml-auto">
