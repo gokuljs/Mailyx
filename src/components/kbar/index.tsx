@@ -10,6 +10,7 @@ import {
 import RenderResults from "./RenderResults";
 import { useLocalStorage } from "usehooks-ts";
 import useThemeSwitching from "./useThemeSwithcing";
+import useAccountSwitching from "./useAccountSwitching";
 export default function Kbar({ children }: { children: React.ReactNode }) {
   const [tab, setTab] = useLocalStorage("mailyx-tab", "");
   const [done, setDone] = useLocalStorage("mailyx-done", false);
@@ -80,6 +81,7 @@ export default function Kbar({ children }: { children: React.ReactNode }) {
 
 const ActualComponent = ({ children }: { children: React.ReactNode }) => {
   useThemeSwitching();
+  useAccountSwitching();
   return (
     <>
       <KBarPortal>
