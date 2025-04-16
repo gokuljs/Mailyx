@@ -15,6 +15,7 @@ import {
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { AvatarFallback } from "@radix-ui/react-avatar";
 import { format } from "date-fns";
+import EmailDisplay from "./EmailDisplay";
 
 type Props = {};
 
@@ -95,6 +96,17 @@ const ThreadDisplay = (props: Props) => {
               </div>
             )}
           </div>
+          <Separator />
+          <div className="flex max-h-[calc(100vh_-_500px)] flex-col overflow-y-auto">
+            <div className="flex flex-col gap-4 p-6">
+              {thread?.email?.map((email) => {
+                return <EmailDisplay key={email?.id} email={email} />;
+              })}
+            </div>
+          </div>
+          <div className="flex-1"></div>
+          <Separator className="ml-auto" />
+          <div>Reply-box</div>
         </div>
       ) : (
         <>
