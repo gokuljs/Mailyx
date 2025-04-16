@@ -200,3 +200,27 @@
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
 }
+
+*::-webkit-scrollbar {
+  display: none;
+}
+
+* {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+/* For Chrome, Safari, Edge */
+.scrollbar-show::-webkit-scrollbar {
+  display: initial;
+}
+
+/* For Firefox */
+.scrollbar-show {
+  scrollbar-width: auto;
+}
+
+/* For IE and Edge */
+.scrollbar-show {
+  -ms-overflow-style: auto;
+}

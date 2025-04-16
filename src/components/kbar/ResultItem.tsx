@@ -32,7 +32,7 @@ const ResultItem = React.forwardRef(
         {active && (
           <motion.div
             layoutId="kbar-result-item"
-            className="absolute inset-0 !z-[-1] border-l-4 border-black bg-gray-200 dark:border-white dark:bg-gray-700"
+            className="dark:bg-muted absolute inset-0 !z-[-1] border-l-4 border-black bg-gray-200 dark:border-orange-500"
             transition={{
               duration: 0.14,
               type: "spring",
@@ -65,7 +65,7 @@ const ResultItem = React.forwardRef(
             {action.shortcut.map((sc, index) => (
               <kbd
                 key={`${sc}+${index}`}
-                className="flex items-center gap-1 rounded-md border border-gray-200 bg-gray-50 px-1.5 py-1 text-xs font-medium text-gray-600 shadow dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400"
+                className="dark:border-muted dark:shadow-accent flex items-center gap-1 rounded-md border border-gray-200 bg-gray-50 px-1.5 py-1 text-xs font-medium text-gray-600 shadow dark:bg-[hsl(20_14.3%_4.1%)] dark:text-white"
               >
                 {sc}
               </kbd>
