@@ -63,7 +63,7 @@ const ThreadDisplay = (props: Props) => {
       </div>
       <Separator />
       {thread ? (
-        <div className="flex flex-1 flex-col overflow-scroll">
+        <div className="scrollbar-hide flex flex-1 flex-col overflow-scroll">
           <div className="flex items-center p-4">
             <div className="flex items-center gap-4 text-sm">
               <Avatar className="bg-muted text-muted-foreground flex items-center justify-center">
@@ -97,7 +97,7 @@ const ThreadDisplay = (props: Props) => {
             )}
           </div>
           <Separator />
-          <div className="flex max-h-[calc(100vh_-_500px)] flex-col overflow-y-auto">
+          <div className="scrollbar-hide flex max-h-[calc(100vh_-_500px)] flex-col overflow-y-auto">
             <div className="flex flex-col gap-4 p-6">
               {thread?.email?.map((email) => {
                 return <EmailDisplay key={email?.id} email={email} />;
