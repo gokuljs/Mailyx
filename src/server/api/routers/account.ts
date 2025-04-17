@@ -1,3 +1,4 @@
+import { EmailAddress } from "./../../../lib/types";
 import { Select } from "@/components/ui/select";
 import { z } from "zod";
 import { createTRPCRouter, privateProcedure, publicProcedure } from "../trpc";
@@ -112,5 +113,84 @@ export const accountRouter = createTRPCRouter({
           lastMessageDate: "desc",
         },
       });
+    }),
+  getSuggestions: privateProcedure
+    .input(
+      z.object({
+        accountId: z.string(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const account = await authorizeAccountAccess(
+        input?.accountId,
+        ctx?.auth?.userId,
+      );
+      return await ctx.db.emailAddress.findMany({
+        where: {
+          accountId: input?.accountId,
+        },
+        select: {
+          address: true,
+          name: true,
+        },
+      });
+    }),
+  getReplyDetails: privateProcedure
+    .input(
+      z.object({
+        accountId: z.string(),
+        threadId: z.string(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const account = await authorizeAccountAccess(
+        input?.accountId,
+        ctx?.auth?.userId,
+      );
+      const thread = await ctx.db.thread.findFirst({
+        where: {
+          id: input?.threadId,
+        },
+        include: {
+          email: {
+            orderBy: {
+              sentAt: "asc",
+            },
+            select: {
+              from: true,
+              to: true,
+              cc: true,
+              bcc: true,
+              sentAt: true,
+              subject: true,
+              internetMessageId: true,
+            },
+          },
+        },
+      });
+      if (!thread || thread.email.length === 0)
+        throw new Error("Email not found");
+      const lastExternalEmail = thread.email
+        .reverse()
+        .find((email) => email.from.address !== account.emailAddress);
+      if (!lastExternalEmail)
+        throw new Error("No external email founds in threads");
+      return {
+        subject: lastExternalEmail?.subject,
+        to: [
+          lastExternalEmail?.from,
+          ...lastExternalEmail?.to?.filter(
+            (item) => item?.address !== account?.emailAddress,
+          ),
+        ],
+        cc: lastExternalEmail?.cc.filter(
+          (item) => item?.address !== account?.emailAddress,
+        ),
+        from: {
+          name: account?.name,
+          address: account?.emailAddress,
+        },
+        id: lastExternalEmail.internetMessageId,
+      };
     }),
 });

@@ -224,3 +224,13 @@
 .scrollbar-show {
   -ms-overflow-style: auto;
 }
+
+.tiptap.proseMirror {
+  outline: none;
+}
+
+.isActive {
+  background-color: #dadada;
+  border-radius: 4px;
+  padding: 0px 2px;
+}

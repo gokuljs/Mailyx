@@ -16,6 +16,7 @@ import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { AvatarFallback } from "@radix-ui/react-avatar";
 import { format } from "date-fns";
 import EmailDisplay from "./EmailDisplay";
+import ReplyBox from "./ReplyBox";
 
 type Props = {};
 
@@ -105,8 +106,9 @@ const ThreadDisplay = (props: Props) => {
             </div>
           </div>
           <div className="flex-1"></div>
-          <Separator className="ml-auto" />
-          <div>Reply-box</div>
+          <Separator />
+
+          <ReplyBox />
         </div>
       ) : (
         <>
