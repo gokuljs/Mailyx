@@ -106,7 +106,8 @@ const ThreadDisplay = (props: Props) => {
             </div>
           </div>
           <div className="flex-1"></div>
-          <Separator className="ml-auto" />
+          <Separator />
+
           <ReplyBox />
         </div>
       ) : (

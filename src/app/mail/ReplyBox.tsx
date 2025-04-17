@@ -5,7 +5,7 @@ type Props = {};
 
 const ReplyBox = (props: Props) => {
   return (
-    <div>
+    <div className="flex-1 px-4 py-1 pt-4">
       <EmailEditor />
     </div>
   );
