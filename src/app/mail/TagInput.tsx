@@ -57,13 +57,11 @@ const TagInput = ({ label, placeholder, onChange, value }: Props) => {
           control: () => {
             return "!border-none !outline-none !ring-0 !shadow-none focus:border-none focus:outline-none focus:ring-0 focus:shadow-none !bg-transparent !dark:bg-transparent";
           },
-          multiValue: () => {
-            return "dark:!bg-gray-700";
-          },
           input: () => "!text-muted-foreground",
-          multiValueLabel: () => {
-            return "dark:text-white dark:bg-gray-700 rounded-md";
-          },
+          multiValue: () => "!bg-orange-400 !rounded-md flex items-center",
+          multiValueLabel: () => "text-white px-2", // no bg here
+          multiValueRemove: () =>
+            "text-muted px-2 hover:!bg-orange-400 hover:!text-white !rounded-r-lg",
         }}
       />
     </div>
