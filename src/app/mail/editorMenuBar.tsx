@@ -28,82 +28,134 @@ const EditorMenuBar = ({ editor }: Props) => {
       <button
         onClick={() => editor.chain().focus().toggleBold().run()}
         disabled={!editor.can().chain().focus().toggleBold().run()}
-        className={editor.isActive("bold") ? "is-active" : ""}
+        className={
+          editor.isActive("bold")
+            ? "is-active cursor-pointer"
+            : "cursor-pointer"
+        }
       >
         <Bold className="text-secondary-foreground size-4" />
       </button>
       <button
         onClick={() => editor.chain().focus().toggleItalic().run()}
         disabled={!editor.can().chain().focus().toggleItalic().run()}
-        className={editor.isActive("italic") ? "is-active" : ""}
+        className={
+          editor.isActive("italic")
+            ? "is-active cursor-pointer"
+            : "cursor-pointer"
+        }
       >
         <Italic className="text-secondary-foreground size-4" />
       </button>
       <button
         onClick={() => editor.chain().focus().toggleStrike().run()}
         disabled={!editor.can().chain().focus().toggleStrike().run()}
-        className={editor.isActive("strike") ? "is-active" : ""}
+        className={
+          editor.isActive("strike")
+            ? "is-active cursor-pointer"
+            : "cursor-pointer"
+        }
       >
         <Strikethrough className="text-secondary-foreground size-4" />
       </button>
       <button
         onClick={() => editor.chain().focus().toggleCode().run()}
         disabled={!editor.can().chain().focus().toggleCode().run()}
-        className={editor.isActive("code") ? "is-active" : ""}
+        className={
+          editor.isActive("code")
+            ? "is-active cursor-pointer"
+            : "cursor-pointer"
+        }
       >
         <Code className="text-secondary-foreground size-4" />
       </button>
       <button
         onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
-        className={editor.isActive("heading", { level: 1 }) ? "is-active" : ""}
+        className={
+          editor.isActive("heading", { level: 1 })
+            ? "is-active cursor-pointer"
+            : "cursor-pointer"
+        }
       >
         <Heading1 className="text-secondary-foreground size-4" />
       </button>
       <button
         onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-        className={editor.isActive("heading", { level: 2 }) ? "is-active" : ""}
+        className={
+          editor.isActive("heading", { level: 2 })
+            ? "is-active cursor-pointer"
+            : "cursor-pointer"
+        }
       >
         <Heading2 className="text-secondary-foreground size-4" />
       </button>
       <button
         onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
-        className={editor.isActive("heading", { level: 3 }) ? "is-active" : ""}
+        className={
+          editor.isActive("heading", { level: 3 })
+            ? "is-active cursor-pointer"
+            : "cursor-pointer"
+        }
       >
         <Heading3 className="text-secondary-foreground size-4" />
       </button>
       <button
         onClick={() => editor.chain().focus().toggleHeading({ level: 4 }).run()}
-        className={editor.isActive("heading", { level: 4 }) ? "is-active" : ""}
+        className={
+          editor.isActive("heading", { level: 4 })
+            ? "is-active cursor-pointer"
+            : "cursor-pointer"
+        }
       >
         <Heading4 className="text-secondary-foreground size-4" />
       </button>
       <button
         onClick={() => editor.chain().focus().toggleHeading({ level: 5 }).run()}
-        className={editor.isActive("heading", { level: 5 }) ? "is-active" : ""}
+        className={
+          editor.isActive("heading", { level: 5 })
+            ? "is-active cursor-pointer"
+            : "cursor-pointer"
+        }
       >
         <Heading5 className="text-secondary-foreground size-4" />
       </button>
       <button
         onClick={() => editor.chain().focus().toggleHeading({ level: 6 }).run()}
-        className={editor.isActive("heading", { level: 6 }) ? "is-active" : ""}
+        className={
+          editor.isActive("heading", { level: 6 })
+            ? "is-active cursor-pointer"
+            : "cursor-pointer"
+        }
       >
         <Heading6 className="text-secondary-foreground size-4" />
       </button>
       <button
         onClick={() => editor.chain().focus().toggleBulletList().run()}
-        className={editor.isActive("bulletList") ? "is-active" : ""}
+        className={
+          editor.isActive("bulletList")
+            ? "is-active cursor-pointer"
+            : "cursor-pointer"
+        }
       >
         <List className="text-secondary-foreground size-4" />
       </button>
       <button
         onClick={() => editor.chain().focus().toggleOrderedList().run()}
-        className={editor.isActive("orderedList") ? "is-active" : ""}
+        className={
+          editor.isActive("orderedList")
+            ? "is-active cursor-pointer"
+            : "cursor-pointer"
+        }
       >
         <ListOrdered className="text-secondary-foreground size-4" />
       </button>
       <button
         onClick={() => editor.chain().focus().toggleBlockquote().run()}
-        className={editor.isActive("blockquote") ? "is-active" : ""}
+        className={
+          editor.isActive("blockquote")
+            ? "is-active cursor-pointer"
+            : "cursor-pointer"
+        }
       >
         <Quote className="text-secondary-foreground size-4" />
       </button>
