@@ -18,7 +18,6 @@ type Props = {
 export default function AccountSwitcher({ isCollapsed }: Props) {
   const { data: accounts } = api.account.getAccounts.useQuery();
   const [accountId, setAccountId] = useLocalStorage("accountId", "");
-  console.log(accountId);
   if (!accounts) return null;
   return (
     <div className="flex w-full items-center gap-2">

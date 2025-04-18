@@ -30,7 +30,7 @@ const ThreadList = (props: Props) => {
     },
     {} as Record<string, typeof threads>,
   );
-  console.log(threads);
+
   return (
     <div className="max-h-[calc(100vh-120px)] max-w-full overflow-y-auto">
       <div className="flex flex-col gap-2 p-4 pt-0">

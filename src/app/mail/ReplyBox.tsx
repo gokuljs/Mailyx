@@ -7,7 +7,6 @@ type Props = {};
 
 const ReplyBox = (props: Props) => {
   const { accountId, threadId } = useThreads();
-  console.log({ accountId, threadId });
   const { data } = api.account.getReplyDetails.useQuery({
     accountId,
     threadId: threadId ?? "",

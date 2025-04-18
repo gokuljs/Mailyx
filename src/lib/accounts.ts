@@ -77,14 +77,7 @@ export class Account {
           storedDeltaToken = updatedResponse?.nextDeltaToken;
         }
       }
-      // console.log(
-      //   "initial Sync completed we have synched",
-      //   allEmails.length,
-      //   "emails",
-      // );
-      // await this.getUpdateEmails({
-      //   deltaToken: storedDeltaToken,
-      // });
+
       return {
         emails: allEmails,
         deltaToken: storedDeltaToken,

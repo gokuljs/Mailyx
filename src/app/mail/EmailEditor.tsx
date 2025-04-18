@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { Text } from "@tiptap/extension-text";
@@ -7,6 +7,11 @@ import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import TagInput from "./TagInput";
 import { Input } from "@/components/ui/input";
+import AiComposer from "./ai-composer";
+import { generate } from "./actions";
+import { readStreamableValue } from "ai/rsc";
+import useThreads from "@/hooks/useThreads";
+import { turndown } from "@/lib/turndown";
 
 type Props = {
   subject: string;
@@ -35,17 +40,21 @@ const EmailEditor = ({
 }: Props) => {
   const [value, setValue] = useState("");
   const [expanded, setExpanded] = useState(defaultToolbarExpanded);
+  const [token, setToken] = useState("");
+  const { threads, threadId, account } = useThreads();
+  const thread = threads?.find((item) => item?.id === threadId);
+  const [generation, setGeneration] = React.useState("");
   const customText = Text.extend({
     addKeyboardShortcuts() {
       return {
         "Meta-j": () => {
-          console.log("cmd-j");
+          const current = this.editor.getText();
+          aiGenerate(current, this.editor);
           return true;
         },
       };
     },
   });
-
   const editor = useEditor({
     autofocus: false,
     extensions: [StarterKit, customText],
@@ -53,6 +62,36 @@ const EmailEditor = ({
       setValue(editor.getHTML());
     },
   });
+  const aiGenerate = async (value: string, editor: any) => {
+    let context = "";
+    for (const email of thread?.email ?? []) {
+      const content = `
+      Subject: ${email.subject}
+      From : ${email.from}
+      Sent: ${new Date(email.sentAt).toLocaleString()}
+      Body: ${turndown.turndown(email?.body ?? email.bodySnippet ?? "")}
+      `;
+      context = context + content;
+    }
+    context =
+      context +
+      `My name is ${account?.name} and my email is ${account?.emailAddress}`;
+    const { output } = await generate(value);
+    let outputTest = "";
+    editor?.commands?.insertContent("");
+    for await (const token of readStreamableValue(output)) {
+      if (token) {
+        console.log({ editor, token });
+        editor?.commands?.insertContent(token);
+        outputTest += token;
+      }
+    }
+    console.log({ outputTest }, "ssss");
+  };
+
+  const onGenerate = (token: String) => {
+    editor?.commands?.insertContent(token);
+  };
 
   if (!editor) return <></>;
 
@@ -95,6 +134,10 @@ const EmailEditor = ({
               <span className="font-medium text-green-600">Draft</span>
               <span className="font-medium"> to {to?.join(", ")}</span>
             </div>
+            <AiComposer
+              isComposing={defaultToolbarExpanded}
+              onGenerate={onGenerate}
+            />
           </div>
         </div>
         <div className="prose w-full flex-1">
