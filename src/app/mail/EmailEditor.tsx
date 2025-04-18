@@ -41,7 +41,8 @@ const EmailEditor = ({
   const [value, setValue] = useState("");
   const [expanded, setExpanded] = useState(defaultToolbarExpanded);
   const [token, setToken] = useState("");
-  const aiGenerate = async () => {
+  const aiGenerate = async (value: string) => {
+    console.log({ value }, "ssss");
     const { output } = await generate(value);
     for await (const token of readStreamableValue(output)) {
       if (token) {
@@ -54,7 +55,8 @@ const EmailEditor = ({
     addKeyboardShortcuts() {
       return {
         "Meta-j": () => {
-          aiGenerate();
+          const current = this.editor.getText();
+          aiGenerate(current);
           return true;
         },
       };
