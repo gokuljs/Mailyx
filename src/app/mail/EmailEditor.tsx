@@ -7,6 +7,7 @@ import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import TagInput from "./TagInput";
 import { Input } from "@/components/ui/input";
+import AiComposer from "./ai-composer";
 
 type Props = {
   subject: string;
@@ -35,6 +36,7 @@ const EmailEditor = ({
 }: Props) => {
   const [value, setValue] = useState("");
   const [expanded, setExpanded] = useState(defaultToolbarExpanded);
+  const [generation, setGeneration] = React.useState("");
   const customText = Text.extend({
     addKeyboardShortcuts() {
       return {
@@ -53,6 +55,8 @@ const EmailEditor = ({
       setValue(editor.getHTML());
     },
   });
+
+  const onGenerate = (token: String) => {};
 
   if (!editor) return <></>;
 
@@ -95,6 +99,7 @@ const EmailEditor = ({
               <span className="font-medium text-green-600">Draft</span>
               <span className="font-medium"> to {to?.join(", ")}</span>
             </div>
+            <AiComposer isComposing={defaultToolbarExpanded} />
           </div>
         </div>
         <div className="prose w-full flex-1">
