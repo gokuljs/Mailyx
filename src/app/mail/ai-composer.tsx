@@ -10,17 +10,34 @@ import {
 import { Button } from "@/components/ui/button";
 import { Bot } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
+import { generateEmail } from "./actions";
+import { readStreamableValue } from "ai/rsc";
 
 type Props = {
   isComposing: boolean;
-  Generate?: (token: string) => void;
+  onGenerate: (token: string) => void;
 };
 
 const AiComposer = (props: Props) => {
   const [open, setOpen] = useState(false);
   const [prompt, setPrompt] = useState("");
+  const aiGenerate = async () => {
+    console.log("Starting Generation");
+    const { output } = await generateEmail("", prompt);
+    for await (const token of readStreamableValue(output)) {
+      if (token) {
+        props.onGenerate(token);
+      }
+    }
+  };
+
   return (
-    <Dialog open={open}>
+    <Dialog
+      open={open}
+      onOpenChange={() => {
+        setOpen(false);
+      }}
+    >
       <Button size="icon" variant={"outline"} onClick={() => setOpen(true)}>
         <Bot className="size-5" />
       </Button>
@@ -39,6 +56,7 @@ const AiComposer = (props: Props) => {
           <div className="h-2"></div>
           <Button
             onClick={() => {
+              aiGenerate();
               setOpen(false);
               setPrompt("");
             }}

@@ -56,7 +56,9 @@ const EmailEditor = ({
     },
   });
 
-  const onGenerate = (token: String) => {};
+  const onGenerate = (token: String) => {
+    editor?.commands?.insertContent(token);
+  };
 
   if (!editor) return <></>;
 
@@ -99,7 +101,10 @@ const EmailEditor = ({
               <span className="font-medium text-green-600">Draft</span>
               <span className="font-medium"> to {to?.join(", ")}</span>
             </div>
-            <AiComposer isComposing={defaultToolbarExpanded} />
+            <AiComposer
+              isComposing={defaultToolbarExpanded}
+              onGenerate={onGenerate}
+            />
           </div>
         </div>
         <div className="prose w-full flex-1">
