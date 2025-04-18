@@ -41,28 +41,20 @@ const EmailEditor = ({
   const [value, setValue] = useState("");
   const [expanded, setExpanded] = useState(defaultToolbarExpanded);
   const [token, setToken] = useState("");
-  const aiGenerate = async (value: string) => {
-    console.log({ value }, "ssss");
-    const { output } = await generate(value);
-    for await (const token of readStreamableValue(output)) {
-      if (token) {
-        setToken(token);
-      }
-    }
-  };
-
+  const { threads, threadId, account } = useThreads();
+  const thread = threads?.find((item) => item?.id === threadId);
+  const [generation, setGeneration] = React.useState("");
   const customText = Text.extend({
     addKeyboardShortcuts() {
       return {
         "Meta-j": () => {
           const current = this.editor.getText();
-          aiGenerate(current);
+          aiGenerate(current, this.editor);
           return true;
         },
       };
     },
   });
-
   const editor = useEditor({
     autofocus: false,
     extensions: [StarterKit, customText],
@@ -70,14 +62,36 @@ const EmailEditor = ({
       setValue(editor.getHTML());
     },
   });
+  const aiGenerate = async (value: string, editor: any) => {
+    let context = "";
+    for (const email of thread?.email ?? []) {
+      const content = `
+      Subject: ${email.subject}
+      From : ${email.from}
+      Sent: ${new Date(email.sentAt).toLocaleString()}
+      Body: ${turndown.turndown(email?.body ?? email.bodySnippet ?? "")}
+      `;
+      context = context + content;
+    }
+    context =
+      context +
+      `My name is ${account?.name} and my email is ${account?.emailAddress}`;
+    const { output } = await generate(value);
+    let outputTest = "";
+    editor?.commands?.insertContent("");
+    for await (const token of readStreamableValue(output)) {
+      if (token) {
+        console.log({ editor, token });
+        editor?.commands?.insertContent(token);
+        outputTest += token;
+      }
+    }
+    console.log({ outputTest }, "ssss");
+  };
 
   const onGenerate = (token: String) => {
     editor?.commands?.insertContent(token);
   };
-
-  useEffect(() => {
-    editor?.commands?.insertContent(token);
-  }, [token, editor]);
 
   if (!editor) return <></>;
 
