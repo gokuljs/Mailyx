@@ -40,10 +40,8 @@ const EmailEditor = ({
 }: Props) => {
   const [value, setValue] = useState("");
   const [expanded, setExpanded] = useState(defaultToolbarExpanded);
-  const [token, setToken] = useState("");
   const { threads, threadId, account } = useThreads();
   const thread = threads?.find((item) => item?.id === threadId);
-  const [generation, setGeneration] = React.useState("");
   const customText = Text.extend({
     addKeyboardShortcuts() {
       return {
@@ -112,7 +110,7 @@ const EmailEditor = ({
               />
               <TagInput
                 label="CC"
-                onChange={console.log}
+                onChange={setCCValues}
                 placeholder="Add Recipients"
                 value={ccValues}
               />

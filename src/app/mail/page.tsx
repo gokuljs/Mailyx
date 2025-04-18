@@ -1,6 +1,8 @@
 "use client";
 import { ModeToggle } from "@/components/ui/ToggleButton";
+import { UserButton } from "@clerk/nextjs";
 import dynamic from "next/dynamic";
+import ComposeButton from "./ComposeButton";
 
 const Mail = dynamic(() => import("./Mail"), {
   ssr: false,
@@ -10,8 +12,12 @@ const Mail = dynamic(() => import("./Mail"), {
 const Page = () => {
   return (
     <>
-      <div className="absolute bottom-4 left-4">
+      <div className="absolute bottom-4 left-4 flex items-center gap-2">
+        <div className="dark:border-muted flex h-fit w-fit items-center justify-center rounded-full border border-slate-600 bg-transparent p-1">
+          <UserButton />
+        </div>
         <ModeToggle />
+        <ComposeButton />
       </div>
       <Mail
         defaultLayout={[10, 20, 30]}
