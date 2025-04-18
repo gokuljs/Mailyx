@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { Text } from "@tiptap/extension-text";
@@ -8,6 +8,10 @@ import { Button } from "@/components/ui/button";
 import TagInput from "./TagInput";
 import { Input } from "@/components/ui/input";
 import AiComposer from "./ai-composer";
+import { generate } from "./actions";
+import { readStreamableValue } from "ai/rsc";
+import useThreads from "@/hooks/useThreads";
+import { turndown } from "@/lib/turndown";
 
 type Props = {
   subject: string;
@@ -36,12 +40,21 @@ const EmailEditor = ({
 }: Props) => {
   const [value, setValue] = useState("");
   const [expanded, setExpanded] = useState(defaultToolbarExpanded);
-  const [generation, setGeneration] = React.useState("");
+  const [token, setToken] = useState("");
+  const aiGenerate = async () => {
+    const { output } = await generate(value);
+    for await (const token of readStreamableValue(output)) {
+      if (token) {
+        setToken(token);
+      }
+    }
+  };
+
   const customText = Text.extend({
     addKeyboardShortcuts() {
       return {
         "Meta-j": () => {
-          console.log("cmd-j");
+          aiGenerate();
           return true;
         },
       };
@@ -59,6 +72,10 @@ const EmailEditor = ({
   const onGenerate = (token: String) => {
     editor?.commands?.insertContent(token);
   };
+
+  useEffect(() => {
+    editor?.commands?.insertContent(token);
+  }, [token, editor]);
 
   if (!editor) return <></>;
 

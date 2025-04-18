@@ -12,6 +12,8 @@ import { Bot } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { generateEmail } from "./actions";
 import { readStreamableValue } from "ai/rsc";
+import useThreads from "@/hooks/useThreads";
+import { turndown } from "@/lib/turndown";
 
 type Props = {
   isComposing: boolean;
@@ -21,9 +23,29 @@ type Props = {
 const AiComposer = (props: Props) => {
   const [open, setOpen] = useState(false);
   const [prompt, setPrompt] = useState("");
+  const { threads, threadId, account } = useThreads();
+  const thread = threads?.find((item) => item?.id === threadId);
   const aiGenerate = async () => {
     console.log("Starting Generation");
-    const { output } = await generateEmail("", prompt);
+    let context = "";
+    if (!props.isComposing) {
+      for (const email of thread?.email ?? []) {
+        const content = `
+        Subject: ${email.subject}
+        From : ${email.from}
+        Sent: ${new Date(email.sentAt).toLocaleString()}
+        Body: ${turndown.turndown(email?.body ?? email.bodySnippet ?? "")}
+        `;
+        context = context + content;
+      }
+    }
+    context =
+      context +
+      `
+      My name is ${account?.name} and my email is ${account?.emailAddress}
+    `;
+    console.log(context, "ssss");
+    const { output } = await generateEmail(context, prompt);
     for await (const token of readStreamableValue(output)) {
       if (token) {
         props.onGenerate(token);
