@@ -56,8 +56,10 @@ const Component = ({
     );
   }, [threadId, data]);
 
+  const sendEmail = api.account.sendEmail.useMutation();
+
   const handleSend = async (value: string) => {
-    console.log(value);
+    if (!data) return;
   };
   return (
     <EmailEditor
