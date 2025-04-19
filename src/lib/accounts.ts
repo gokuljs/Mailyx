@@ -116,6 +116,7 @@ export class Account {
     replyTo?: EmailAddress;
   }) {
     try {
+      console.log(this.token);
       const response = await axios.post(
         "https://api.aurinko.io/v1/email/messages",
         {

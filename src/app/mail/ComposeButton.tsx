@@ -12,6 +12,10 @@ import {
 import { Button } from "@/components/ui/button";
 import { Feather, PencilIcon } from "lucide-react";
 import EmailEditor from "./EmailEditor";
+import { api } from "@/trpc/react";
+import useThreads from "@/hooks/useThreads";
+import { error } from "console";
+import { toast } from "sonner";
 
 type Props = {};
 
@@ -24,9 +28,43 @@ const ComposeButton = (props: Props) => {
   const [ccValue, setCCValues] = useState<{ label: string; value: string }[]>(
     [],
   );
+  const sendEmail = api.account.sendEmail.useMutation();
+  const { account } = useThreads();
 
-  const handleSend = () => {
+  const handleSend = (value: string) => {
     console.log("handle send");
+    if (!account) return;
+    sendEmail.mutate(
+      {
+        accountId: account.id,
+        threadId: undefined,
+        body: value,
+        from: { name: account?.name || "", address: account?.emailAddress },
+        to: toValues?.map((item) => ({
+          name: item?.value,
+          address: item?.value,
+        })),
+        cc: ccValue?.map((item) => ({
+          name: item?.value,
+          address: item?.value,
+        })),
+        replyTo: {
+          name: account?.name,
+          address: account?.emailAddress ?? "me@example.com",
+        },
+        subject: subject,
+        inReplyTo: undefined,
+      },
+      {
+        onSuccess: () => {
+          toast.success("Email sent");
+        },
+        onError: (error) => {
+          console.log(error);
+          toast.error("Error sending email ");
+        },
+      },
+    );
   };
   return (
     <Drawer
