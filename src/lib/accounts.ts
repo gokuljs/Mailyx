@@ -1,8 +1,13 @@
 import axios from "axios";
 import { error } from "console";
 import { headers } from "next/headers";
-import { EmailMessage, SyncResponse, SyncUpdatedResponse } from "./types";
-import { EmailAddress } from "@clerk/nextjs/server";
+import {
+  EmailAddress,
+  EmailMessage,
+  SyncResponse,
+  SyncUpdatedResponse,
+} from "./types";
+
 export class Account {
   private token: string;
   constructor(token: string) {
@@ -82,6 +87,60 @@ export class Account {
         emails: allEmails,
         deltaToken: storedDeltaToken,
       };
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async sendEMail({
+    from,
+    subject,
+    body,
+    inReplyTo,
+    references,
+    to,
+    cc,
+    bcc,
+    replyTo,
+    threadId,
+  }: {
+    from: EmailAddress;
+    subject: string;
+    body: string;
+    inReplyTo?: string;
+    threadId?: string;
+    references?: string;
+    to: EmailAddress[];
+    cc?: EmailAddress[];
+    bcc?: EmailAddress[];
+    replyTo?: EmailAddress;
+  }) {
+    try {
+      const response = await axios.post(
+        "https://api.aurinko.io/v1/email/messages",
+        {
+          from,
+          subject,
+          body,
+          inReplyTo,
+          references,
+          to,
+          threadId,
+          cc,
+          bcc,
+          replyTo: [replyTo],
+        },
+        {
+          params: {
+            returnIds: true,
+          },
+          headers: {
+            Authorization: `Bearer ${this.token}`,
+          },
+        },
+      );
+      console.log("Email sent", response.data);
+      return response.data;
     } catch (error) {
       console.log(error);
     }

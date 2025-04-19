@@ -1,8 +1,10 @@
-import { EmailAddress } from "./../../../lib/types";
+import { EmailAddress, emailAddressSchema } from "./../../../lib/types";
 import { Select } from "@/components/ui/select";
 import { z } from "zod";
 import { createTRPCRouter, privateProcedure, publicProcedure } from "../trpc";
 import { db } from "@/server/db";
+import { threadId } from "worker_threads";
+import { Account } from "@/lib/accounts";
 
 export const authorizeAccountAccess = async (
   accountId: string,
@@ -192,5 +194,38 @@ export const accountRouter = createTRPCRouter({
         },
         id: lastExternalEmail.internetMessageId,
       };
+    }),
+  sendEmail: privateProcedure
+    .input(
+      z.object({
+        accountId: z.string(),
+        body: z.string(),
+        subject: z.string(),
+        from: emailAddressSchema,
+        cc: z.array(emailAddressSchema).optional(),
+        bcc: z.array(emailAddressSchema).optional(),
+        to: z.array(emailAddressSchema),
+        replyTo: emailAddressSchema,
+        threadId: z.string().optional(),
+        inReplyTo: z.string().optional(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const account = await authorizeAccountAccess(
+        input?.accountId,
+        ctx?.auth?.userId,
+      );
+      const acc = new Account(account?.accessToken);
+      await acc.sendEMail({
+        body: input?.body,
+        subject: input?.subject,
+        from: input?.from,
+        to: input?.to,
+        cc: input?.cc,
+        bcc: input?.bcc,
+        replyTo: input?.replyTo,
+        inReplyTo: input?.inReplyTo,
+        threadId: input?.threadId,
+      });
     }),
 });
