@@ -8,6 +8,7 @@ import {
   SyncUpdatedResponse,
 } from "./types";
 import { db } from "@/server/db";
+import { syncEmailsToDatabase } from "./sync-to-db";
 
 export class Account {
   private token: string;
@@ -158,5 +159,37 @@ export class Account {
     let response = await this.getUpdateEmails({
       deltaToken: account?.nextDeltaToken,
     });
+    let storedDeltaToken = account.nextDeltaToken;
+    let allEmails: EmailMessage[] = response?.records;
+    if (response?.nextDeltaToken) {
+      storedDeltaToken = response?.nextDeltaToken;
+    }
+    while (response.nextPageToken) {
+      response = await this.getUpdateEmails({
+        pageToken: response.nextPageToken,
+      });
+      allEmails = allEmails.concat(response.records);
+      if (response?.nextDeltaToken) {
+        storedDeltaToken = response?.nextDeltaToken;
+      }
+    }
+    try {
+      syncEmailsToDatabase(allEmails, account.id);
+    } catch (e) {
+      console.error("Error during sync:", error);
+    }
+
+    await db.account.update({
+      where: {
+        id: account.id,
+      },
+      data: {
+        nextDeltaToken: storedDeltaToken,
+      },
+    });
+    return {
+      allEmails: allEmails,
+      deltaToken: storedDeltaToken,
+    };
   }
 }

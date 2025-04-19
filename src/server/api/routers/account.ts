@@ -80,6 +80,8 @@ export const accountRouter = createTRPCRouter({
         input?.accountId,
         ctx?.auth?.userId,
       );
+      const acc = new Account(account?.accessToken);
+      acc.syncEmails().catch(console.error);
       let filter: any = {};
       if (input?.tab === "inbox") {
         filter.inboxStatus = true;
@@ -170,11 +172,13 @@ export const accountRouter = createTRPCRouter({
           },
         },
       });
+      console.log(JSON.stringify(thread, null, 2), account.emailAddress);
       if (!thread || thread.email.length === 0)
         throw new Error("Email not found");
       const lastExternalEmail = thread.email
         .reverse()
-        .find((email) => email.from.address !== account.emailAddress);
+        .find((email) => email.from.address !== account.emailAddress.trim());
+      console.log({ lastExternalEmail });
       if (!lastExternalEmail)
         throw new Error("No external email founds in threads");
       return {
