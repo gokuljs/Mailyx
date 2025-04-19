@@ -7,6 +7,7 @@ import {
   SyncResponse,
   SyncUpdatedResponse,
 } from "./types";
+import { db } from "@/server/db";
 
 export class Account {
   private token: string;
@@ -145,5 +146,17 @@ export class Account {
     } catch (error) {
       console.log(error);
     }
+  }
+  async syncEmails() {
+    const account = await db.account.findUnique({
+      where: {
+        accessToken: this.token,
+      },
+    });
+    if (!account) throw new Error("Account not found");
+    if (!account.nextDeltaToken) throw new Error("Account not ready for sync");
+    let response = await this.getUpdateEmails({
+      deltaToken: account?.nextDeltaToken,
+    });
   }
 }
