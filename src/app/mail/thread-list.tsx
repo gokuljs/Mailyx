@@ -53,7 +53,9 @@ const ThreadList = (props: Props) => {
                     <div className="flex items-center">
                       <div className="flex items-center gap-2">
                         <div className="font-semibold">
-                          {thread.email.at(-1)?.from?.name || thread?.subject}
+                          {thread.email.at(-1)?.from?.name ||
+                            thread?.subject ||
+                            "(No Subject)"}
                         </div>
                       </div>
                       <div className={cn("ml-auto text-xs")}>
