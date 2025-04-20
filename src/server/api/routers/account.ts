@@ -175,28 +175,56 @@ export const accountRouter = createTRPCRouter({
       console.log(JSON.stringify(thread, null, 2), account.emailAddress);
       if (!thread || thread.email.length === 0)
         throw new Error("Email not found");
-      const lastExternalEmail = thread.email
+      const messages = thread.email;
+      const lastExternal = messages
+        .slice()
         .reverse()
-        .find((email) => email.from.address !== account.emailAddress.trim());
-      console.log({ lastExternalEmail });
-      if (!lastExternalEmail)
-        throw new Error("No external email founds in threads");
-      return {
-        subject: lastExternalEmail?.subject,
-        to: [
-          lastExternalEmail?.from,
-          ...lastExternalEmail?.to?.filter(
-            (item) => item?.address !== account?.emailAddress,
+        .find((e) => e.from.address.trim() !== account.emailAddress.trim());
+      const lastSent = messages
+        .slice()
+        .reverse()
+        .find((e) => e.from.address.trim() === account.emailAddress.trim());
+      const email = lastExternal ?? lastSent;
+      if (!email) {
+        throw new Error("No emails in this thread to reply to");
+      }
+      let toRecipients: typeof email.to = [];
+      let ccRecipients: typeof email.cc = [];
+      if (lastExternal) {
+        // incoming: reply TO the sender, and CC anyone else you already had in the thread
+        toRecipients = [
+          lastExternal.from,
+          ...lastExternal.to.filter(
+            (r) => r.address !== account.emailAddress.trim(),
           ),
-        ],
-        cc: lastExternalEmail?.cc.filter(
-          (item) => item?.address !== account?.emailAddress,
-        ),
+        ];
+        ccRecipients = lastExternal.cc.filter(
+          (r) => r.address !== account.emailAddress.trim(),
+        );
+      } else {
+        // no incoming: “reply” to your own last sent → just re‑use its recipients
+        toRecipients = lastSent!.to.filter(
+          (r) => r.address !== account.emailAddress.trim(),
+        );
+        ccRecipients = lastSent!.cc.filter(
+          (r) => r.address !== account.emailAddress.trim(),
+        );
+      }
+
+      let subject = email.subject || "";
+      if (!/^Re:/i.test(subject)) {
+        subject = `Re: ${subject}`;
+      }
+
+      return {
+        subject: subject,
+        to: toRecipients,
+        cc: ccRecipients,
         from: {
           name: account?.name,
           address: account?.emailAddress,
         },
-        id: lastExternalEmail.internetMessageId,
+        id: email.internetMessageId,
       };
     }),
   sendEmail: privateProcedure
