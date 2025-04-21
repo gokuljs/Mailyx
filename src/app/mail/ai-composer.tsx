@@ -8,7 +8,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Bot } from "lucide-react";
+import { Bot, Sparkle, SparklesIcon } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { generateEmail } from "./actions";
 import { readStreamableValue } from "ai/rsc";
@@ -60,8 +60,13 @@ const AiComposer = (props: Props) => {
         setOpen(false);
       }}
     >
-      <Button size="icon" variant={"outline"} onClick={() => setOpen(true)}>
-        <Bot className="size-5" />
+      <Button
+        size="icon"
+        className="rounded-4xlFi cursor-pointer"
+        variant={"ghost"}
+        onClick={() => setOpen(true)}
+      >
+        <SparklesIcon className="size-4 text-amber-500" />
       </Button>
       <DialogContent>
         <DialogHeader>
