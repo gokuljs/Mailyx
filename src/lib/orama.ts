@@ -13,7 +13,7 @@ export class OramaClient {
 
   async saveIndex() {
     const index = await persist(this.orama, "json");
-    const account = db.account.update({
+    const account = await db.account.update({
       where: {
         id: this.accountId,
       },
@@ -24,6 +24,7 @@ export class OramaClient {
   }
 
   async init() {
+    console.log("Orama inti");
     const account = await db.account.findUnique({
       where: {
         id: this.accountId,
