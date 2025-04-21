@@ -21,6 +21,7 @@ import ThreadList from "./thread-list";
 import ThreadDisplay from "./ThreadDisplay";
 import { useLocalStorage } from "usehooks-ts";
 import SearchBar from "./SearchBar";
+import AskAi from "./AskAi";
 
 type Props = {
   defaultLayout: number[] | undefined;
@@ -74,6 +75,7 @@ function Mail({
             {/* sidebar */}
             <SideBar isCollapsed={isCollapsed} />
             {/* Ask Ai */}
+            <AskAi isCollapsed={isCollapsed} />
           </div>
         </ResizablePanel>
         <ResizableHandle withHandle />
