@@ -27,6 +27,7 @@
         "@trpc/client": "^11.0.0-rc.446",
         "@trpc/react-query": "^11.0.0-rc.446",
         "@trpc/server": "^11.0.0-rc.446",
+        "@types/date-fns": "^2.6.3",
         "@types/dompurify": "^3.2.0",
         "@types/turndown": "^5.0.5",
         "@vercel/functions": "^2.0.0",
@@ -445,6 +446,8 @@
     "@trpc/react-query": ["@trpc/react-query@11.0.0-rc.828", "", { "peerDependencies": { "@tanstack/react-query": "^5.67.1", "@trpc/client": "11.0.0-rc.828+322552736", "@trpc/server": "11.0.0-rc.828+322552736", "react": ">=18.2.0", "react-dom": ">=18.2.0", "typescript": ">=5.7.2" } }, "sha512-oir4OikvCEqbheswHZhKrXSz1hKvFcDFlc/NZ9zShMlosJtO585az0XRrGuwFvjVShP5YCRvzFb4shiJjw5PXA=="],
 
     "@trpc/server": ["@trpc/server@11.0.0-rc.828", "", { "peerDependencies": { "typescript": ">=5.7.2" } }, "sha512-+dvcIcE5QPy52cz4rqwfUqk+WQDYAH3Xri+u2t0NdzIoo78fnL14if8oSZXAPU1bCmWGyR1k/0m5rSQ7AZaKlQ=="],
+
+    "@types/date-fns": ["@types/date-fns@2.6.3", "", { "dependencies": { "date-fns": "*" } }, "sha512-Ke1lw2Ni1t/wMUoLtKFmSNCLozcTBd6vmMqFP4hRzXn6qzkNt97bPAX0x5Y/c15DP43kKvwW1ycStD5+43jVQA=="],
 
     "@types/diff-match-patch": ["@types/diff-match-patch@1.0.36", "", {}, "sha512-xFdR6tkm0MWvBfO8xXCSsinYxHcqkQUlcHeSpMC2ukzOb6lwQAfDmW+Qt0AvlGd8HpsS28qKsB+oPeJn9I39jg=="],
 

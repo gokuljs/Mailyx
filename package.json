@@ -44,6 +44,7 @@
     "@trpc/client": "^11.0.0-rc.446",
     "@trpc/react-query": "^11.0.0-rc.446",
     "@trpc/server": "^11.0.0-rc.446",
+    "@types/date-fns": "^2.6.3",
     "@types/dompurify": "^3.2.0",
     "@types/turndown": "^5.0.5",
     "@vercel/functions": "^2.0.0",
