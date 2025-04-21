@@ -17,12 +17,16 @@ import { AvatarFallback } from "@radix-ui/react-avatar";
 import { format } from "date-fns";
 import EmailDisplay from "./EmailDisplay";
 import ReplyBox from "./ReplyBox";
+import { useAtom } from "jotai";
+import { isSearchingAtom } from "./SearchBar";
+import SearchDisplay from "./SearchDisplay";
 
 type Props = {};
 
 const ThreadDisplay = (props: Props) => {
   const { threadId, threads } = useThreads();
   const thread = threads?.find((item) => item?.id === threadId);
+  const [isSearching] = useAtom(isSearchingAtom);
   return (
     <div className="flex h-full flex-col">
       <div className="col-2 flex items-center p-2">
@@ -63,6 +67,19 @@ const ThreadDisplay = (props: Props) => {
         </div>
       </div>
       <Separator />
+      {isSearching ? (
+        <SearchDisplay />
+      ) : (
+        <>
+          {thread ? (
+            <></>
+          ) : (
+            <div className="text-muted-foreground p-8 text-center">
+              <div>No message deleted</div>
+            </div>
+          )}
+        </>
+      )}
       {thread ? (
         <div className="scrollbar-hide flex flex-1 flex-col overflow-scroll">
           <div className="flex items-center p-4">

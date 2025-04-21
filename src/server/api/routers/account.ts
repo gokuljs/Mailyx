@@ -5,6 +5,7 @@ import { createTRPCRouter, privateProcedure, publicProcedure } from "../trpc";
 import { db } from "@/server/db";
 import { threadId } from "worker_threads";
 import { Account } from "@/lib/accounts";
+import { OramaClient } from "@/lib/orama";
 
 export const authorizeAccountAccess = async (
   accountId: string,
@@ -259,5 +260,25 @@ export const accountRouter = createTRPCRouter({
         inReplyTo: input?.inReplyTo,
         threadId: input?.threadId,
       });
+    }),
+
+  searchEmails: privateProcedure
+    .input(
+      z.object({
+        accountId: z.string(),
+        query: z.string(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const account = await authorizeAccountAccess(
+        input?.accountId,
+        ctx?.auth?.userId,
+      );
+      const orama = new OramaClient(account?.id);
+      await orama.init();
+      const result = await orama.search({
+        term: input.query,
+      });
+      return result;
     }),
 });

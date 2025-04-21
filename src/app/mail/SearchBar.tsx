@@ -5,12 +5,12 @@ import { atom, useAtom } from "jotai";
 import { Loader2, Search, X } from "lucide-react";
 import React from "react";
 
-const searchValueAtom = atom("");
-const isSearchingAtom = atom(false);
+export const searchValueAtom = atom("");
+export const isSearchingAtom = atom(false);
 
 const SearchBar = () => {
   const [searchValue, setSearchValue] = useAtom(searchValueAtom);
-  const [searching, setIsSearching] = useAtom(isSearchingAtom);
+  const [isSearching, setIsSearching] = useAtom(isSearchingAtom);
   const { isFetching } = useThreads();
   const handleBlur = () => {
     if (searchValue !== "") return;
@@ -38,6 +38,7 @@ const SearchBar = () => {
           <X
             onClick={() => {
               setSearchValue("");
+              setIsSearching(false);
             }}
             className="size-4 text-gray-400"
           />
