@@ -5,6 +5,7 @@ import { isSearchingAtom, searchValueAtom } from "./SearchBar";
 import { api } from "@/trpc/react";
 import { useDebounceValue } from "usehooks-ts";
 import useThreads from "@/hooks/useThreads";
+import DOMPurify from "dompurify";
 
 const SearchDisplay = () => {
   const [searchValue] = useAtom(searchValueAtom);
@@ -34,7 +35,7 @@ const SearchDisplay = () => {
             {search.data?.hits.map((hit) => (
               <li
                 key={hit.id}
-                className="cursor-pointer rounded-md border p-4 transition-all hover:bg-gray-100 dark:hover:bg-gray-900"
+                className="dark:hover:bg-muted cursor-pointer rounded-md border p-4 transition-all hover:bg-orange-100"
               >
                 <h3 className="text-base font-medium">{hit.document.title}</h3>
                 <p className="text-sm text-gray-500">
@@ -43,14 +44,14 @@ const SearchDisplay = () => {
                 <p className="text-sm text-gray-500">
                   To: {hit.document.to.join(", ")}
                 </p>
-                {/* <p
+                <p
                   className="mt-2 text-sm"
                   dangerouslySetInnerHTML={{
                     __html: DOMPurify.sanitize(hit.document.rawBody, {
                       USE_PROFILES: { html: true },
                     }),
                   }}
-                /> */}
+                />
               </li>
             ))}
           </ul>
