@@ -3,7 +3,7 @@ import { useChat } from "@ai-sdk/react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { AnimatePresence } from "framer-motion";
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { Send, SparklesIcon } from "lucide-react";
 import { useLocalStorage } from "usehooks-ts";
 import { cn } from "@/lib/utils";
@@ -19,6 +19,8 @@ const transitionDebug = {
 };
 const AskAI = ({ isCollapsed }: { isCollapsed: boolean }) => {
   const [accountId] = useLocalStorage("accountId", "");
+  const containerRef = useRef<HTMLDivElement>(null);
+
   const { input, handleInputChange, handleSubmit, messages } = useChat({
     api: "/api/chat",
     body: {
@@ -34,6 +36,15 @@ const AskAI = ({ isCollapsed }: { isCollapsed: boolean }) => {
     initialMessages: [],
   });
 
+  useEffect(() => {
+    const el = containerRef.current;
+    if (el) {
+      el.scrollTo({
+        top: el.scrollHeight,
+        behavior: "smooth", // or 'auto' if you don’t want animation
+      });
+    }
+  }, [messages]);
   console.log(messages);
 
   if (isCollapsed) return null;
@@ -42,6 +53,7 @@ const AskAI = ({ isCollapsed }: { isCollapsed: boolean }) => {
       <div className="h-4"></div>
       <motion.div className="flex flex-1 flex-col items-end justify-end rounded-lg border bg-white p-2 pb-4 shadow-zinc-950 dark:bg-zinc-950">
         <div
+          ref={containerRef}
           className="flex max-h-[50vh] w-full flex-col gap-2 overflow-y-scroll"
           id="message-container"
         >
