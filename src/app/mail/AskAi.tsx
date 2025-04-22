@@ -7,6 +7,8 @@ import React from "react";
 import { Send, SparklesIcon } from "lucide-react";
 import { useLocalStorage } from "usehooks-ts";
 import { cn } from "@/lib/utils";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
@@ -61,7 +63,9 @@ const AskAI = ({ isCollapsed }: { isCollapsed: boolean }) => {
                 transition={transitionDebug}
               >
                 <div className="px-1 py-2 text-[15px] leading-[15px]">
-                  {message.content}
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                    {message.content}
+                  </ReactMarkdown>
                 </div>
               </motion.div>
             ))}
