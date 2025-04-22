@@ -1,10 +1,15 @@
 import { api } from "@/trpc/react";
+import { useUser } from "@clerk/nextjs";
 import { useRegisterActions } from "kbar";
 import React from "react";
 import { useLocalStorage } from "usehooks-ts";
 
 const useAccountSwitching = () => {
-  const { data: accounts } = api.account.getAccounts.useQuery();
+  const { isSignedIn } = useUser();
+  const { data: accounts } = api.account.getAccounts.useQuery(undefined, {
+    enabled: !!isSignedIn,
+  });
+
   const [_, setAccountId] = useLocalStorage("accountId", "");
 
   const mainAction = [
@@ -38,7 +43,6 @@ const useAccountSwitching = () => {
     ),
     [accounts],
   );
-
   return <div>useAccountSwitching</div>;
 };
 

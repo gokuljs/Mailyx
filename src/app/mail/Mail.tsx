@@ -26,6 +26,7 @@ import { api } from "@/trpc/react";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { EmptyAccounts } from "./EmptyAccounts";
+import { useUser } from "@clerk/nextjs";
 
 type Props = {
   defaultLayout: number[] | undefined;
@@ -40,7 +41,10 @@ function Mail({
 }: Props) {
   const [isCollapsed, setIsCollapsed] = useState(defaultCollapsed);
   const [done, setDone] = useLocalStorage("mailyx-done", false);
-  const { data: accounts } = api.account.getAccounts.useQuery();
+  const { isSignedIn } = useUser();
+  const { data: accounts } = api.account.getAccounts.useQuery(undefined, {
+    enabled: isSignedIn,
+  });
   console.log({ accounts });
 
   return (

@@ -5,6 +5,7 @@ import { Nav } from "./Nav";
 import { useLocalStorage } from "usehooks-ts";
 import { api } from "@/trpc/react";
 import useThreads from "@/hooks/useThreads";
+import { useUser } from "@clerk/nextjs";
 
 type Props = {
   isCollapsed: boolean;
@@ -12,7 +13,10 @@ type Props = {
 
 const SideBar = ({ isCollapsed }: Props) => {
   const [accountId] = useLocalStorage("accountId", "");
-  const { data: accounts } = api.account.getAccounts.useQuery();
+  const { isSignedIn } = useUser();
+  const { data: accounts } = api.account.getAccounts.useQuery(undefined, {
+    enabled: isSignedIn,
+  });
   const [tab] = useLocalStorage<"inbox" | "draft" | "sent">(
     "mailyx-tab",
     "inbox",

@@ -3,11 +3,14 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { getAurinkoAuthUrl } from "@/lib/aruinko";
 import { api } from "@/trpc/react";
+import { useUser } from "@clerk/nextjs";
 import { Plus, Inbox } from "lucide-react";
 
 export function EmptyAccounts() {
-  const { data: accounts } = api.account.getAccounts.useQuery();
-  console.log({ accounts });
+  const { isSignedIn } = useUser();
+  const { data: accounts } = api.account.getAccounts.useQuery(undefined, {
+    enabled: isSignedIn,
+  });
   return (
     <div className="flex h-[calc(100vh-60px)] items-center justify-center bg-transparent">
       <Card className="max-w-sm text-center dark:bg-[hsl(20_14.3%_4.1%)]">
