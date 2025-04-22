@@ -85,10 +85,8 @@ const AskAI = ({ isCollapsed }: { isCollapsed: boolean }) => {
                 <span
                   onClick={() =>
                     handleInputChange({
-                      target: {
-                        value: "What can I ask?",
-                      },
-                    })
+                      target: { value: "What can I ask?" } as HTMLInputElement,
+                    } as React.ChangeEvent<HTMLInputElement>)
                   }
                   className="rounded-md bg-gray-800 px-2 py-1 text-xs text-gray-200"
                 >
@@ -99,8 +97,8 @@ const AskAI = ({ isCollapsed }: { isCollapsed: boolean }) => {
                     handleInputChange({
                       target: {
                         value: "When is my next flight?",
-                      },
-                    })
+                      } as HTMLInputElement,
+                    } as React.ChangeEvent<HTMLInputElement>)
                   }
                   className="rounded-md bg-gray-800 px-2 py-1 text-xs text-gray-200"
                 >
@@ -111,8 +109,8 @@ const AskAI = ({ isCollapsed }: { isCollapsed: boolean }) => {
                     handleInputChange({
                       target: {
                         value: "When is my next meeting?",
-                      },
-                    })
+                      } as HTMLInputElement,
+                    } as React.ChangeEvent<HTMLInputElement>)
                   }
                   className="rounded-md bg-gray-800 px-2 py-1 text-xs text-gray-200"
                 >
