@@ -36,7 +36,7 @@ const AskAI = ({ isCollapsed }: { isCollapsed: boolean }) => {
   return (
     <div className="mb-14 p-1">
       <div className="h-4"></div>
-      <motion.div className="flex flex-1 flex-col items-end justify-end rounded-lg border bg-gray-100 p-2 pb-4 shadow-inner dark:bg-gray-900">
+      <motion.div className="flex flex-1 flex-col items-end justify-end rounded-lg border bg-white p-2 pb-4 shadow-zinc-950 dark:bg-zinc-950">
         <div
           className="flex max-h-[50vh] w-full flex-col gap-2 overflow-y-scroll"
           id="message-container"
@@ -70,12 +70,12 @@ const AskAI = ({ isCollapsed }: { isCollapsed: boolean }) => {
           {messages.length === 0 && (
             <div className="mb-4">
               <div className="flex items-center gap-4">
-                <SparklesIcon className="size-6 text-gray-500" />
+                <SparklesIcon className="size-6 text-zinc-700 dark:text-zinc-500" />
                 <div>
-                  <p className="text-gray-900 dark:text-gray-100">
+                  <p className="text-black dark:text-zinc-300">
                     Ask AI anything about your emails
                   </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                  <p className="dark:text-muted-foreground text-xs text-zinc-700">
                     Get answers to your questions about your emails
                   </p>
                 </div>
@@ -88,7 +88,7 @@ const AskAI = ({ isCollapsed }: { isCollapsed: boolean }) => {
                       target: { value: "What can I ask?" } as HTMLInputElement,
                     } as React.ChangeEvent<HTMLInputElement>)
                   }
-                  className="rounded-md bg-gray-800 px-2 py-1 text-xs text-gray-200"
+                  className="rounded-md bg-zinc-900 px-2 py-1 text-xs text-gray-200 dark:bg-amber-600 dark:text-zinc-950"
                 >
                   What can I ask?
                 </span>
@@ -100,7 +100,7 @@ const AskAI = ({ isCollapsed }: { isCollapsed: boolean }) => {
                       } as HTMLInputElement,
                     } as React.ChangeEvent<HTMLInputElement>)
                   }
-                  className="rounded-md bg-gray-800 px-2 py-1 text-xs text-gray-200"
+                  className="rounded-md bg-zinc-900 px-2 py-1 text-xs text-gray-200 dark:bg-amber-600 dark:text-zinc-950"
                 >
                   When is my next flight?
                 </span>
@@ -112,7 +112,7 @@ const AskAI = ({ isCollapsed }: { isCollapsed: boolean }) => {
                       } as HTMLInputElement,
                     } as React.ChangeEvent<HTMLInputElement>)
                   }
-                  className="rounded-md bg-gray-800 px-2 py-1 text-xs text-gray-200"
+                  className="rounded-md bg-zinc-900 px-2 py-1 text-xs text-gray-200 dark:bg-amber-600 dark:text-zinc-950"
                 >
                   When is my next meeting?
                 </span>
@@ -124,7 +124,7 @@ const AskAI = ({ isCollapsed }: { isCollapsed: boolean }) => {
               type="text"
               onChange={handleInputChange}
               value={input}
-              className="l relative h-9 w-[calc(100%-35px)] flex-grow border border-gray-200 bg-white px-3 text-[15px] outline-none placeholder:text-[13px] placeholder:text-gray-400 focus-visible:ring-0 focus-visible:ring-blue-500/20 focus-visible:ring-offset-1 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-400 dark:focus-visible:ring-blue-500/20 dark:focus-visible:ring-offset-1 dark:focus-visible:ring-offset-gray-700"
+              className="relative h-9 w-[calc(100%-35px)] flex-grow rounded-sm border border-zinc-300 bg-white px-3 text-[15px] outline-zinc-800 outline-none placeholder:text-[13px] placeholder:text-gray-400 focus-visible:ring-0 focus-visible:ring-blue-500/20 focus-visible:ring-offset-1 dark:border-zinc-500 dark:bg-zinc-900 dark:text-zinc-200 dark:placeholder-zinc-400 dark:focus-visible:ring-blue-500/20 dark:focus-visible:ring-offset-1 dark:focus-visible:ring-offset-gray-700"
               placeholder="Ask AI anything about your emails"
             />
             <motion.div
@@ -143,11 +143,10 @@ const AskAI = ({ isCollapsed }: { isCollapsed: boolean }) => {
             </motion.div>
             <Button
               size={"icon"}
-              variant={"ghost"}
               type="submit"
-              className="flex h-[35px] w-[35px] items-center justify-center rounded-full"
+              className="flex h-[35px] w-[35px] cursor-pointer items-center justify-center rounded-full bg-zinc-950 hover:!bg-zinc-700"
             >
-              <Send className="size-4 text-gray-500 dark:text-gray-300" />
+              <Send className="size-4 text-amber-500 dark:text-gray-300" />
             </Button>
           </form>
         </div>
