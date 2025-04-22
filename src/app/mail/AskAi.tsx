@@ -1,5 +1,5 @@
 "use client";
-import { useChat } from "ai/react";
+import { useChat } from "@ai-sdk/react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { AnimatePresence } from "framer-motion";
@@ -32,6 +32,8 @@ const AskAI = ({ isCollapsed }: { isCollapsed: boolean }) => {
     initialMessages: [],
   });
 
+  console.log(messages);
+
   if (isCollapsed) return null;
   return (
     <div className="mb-14 p-1">
@@ -47,11 +49,11 @@ const AskAI = ({ isCollapsed }: { isCollapsed: boolean }) => {
                 key={message.id}
                 layout="position"
                 className={cn(
-                  "z-10 mt-2 max-w-[250px] rounded-2xl bg-gray-200 break-words dark:bg-gray-800",
+                  "z-10 mt-2 max-w-[250px] rounded-lg break-words",
                   {
-                    "self-end text-gray-900 dark:text-gray-100":
+                    "self-end bg-zinc-900 text-white dark:bg-zinc-600":
                       message.role === "user",
-                    "self-start bg-blue-500 text-white":
+                    "self-start bg-amber-400 text-zinc-900":
                       message.role === "assistant",
                   },
                 )}
