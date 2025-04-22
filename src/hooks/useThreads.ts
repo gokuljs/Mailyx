@@ -11,6 +11,7 @@ const useThreads = () => {
   const [done] = useLocalStorage("mailyx-done", false);
   const { data: accounts } = api.account.getAccounts.useQuery();
   const [threadId, setThreadId] = useAtom(threadIdAtom);
+  console.log({ accountId }, "ssss");
   const {
     data: threads,
     isFetching,
@@ -22,7 +23,7 @@ const useThreads = () => {
       done,
     },
     {
-      enabled: !!accountId && !!tab,
+      enabled: !!accountId && !!tab && accounts && accounts.length > 0,
       placeholderData: (e) => e,
       refetchInterval: 5000,
     },
