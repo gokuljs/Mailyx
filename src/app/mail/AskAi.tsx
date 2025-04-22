@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { AnimatePresence } from "framer-motion";
 import React, { useEffect, useRef } from "react";
-import { Send, SparklesIcon } from "lucide-react";
+import { Loader, Send, SparklesIcon } from "lucide-react";
 import { useLocalStorage } from "usehooks-ts";
 import { cn } from "@/lib/utils";
 import ReactMarkdown from "react-markdown";
@@ -21,20 +21,22 @@ const AskAI = ({ isCollapsed }: { isCollapsed: boolean }) => {
   const [accountId] = useLocalStorage("accountId", "");
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const { input, handleInputChange, handleSubmit, messages } = useChat({
-    api: "/api/chat",
-    body: {
-      accountId,
-    },
-    onError: (error) => {
-      if (error.message.includes("Limit reached")) {
-        toast.error(
-          "You have reached the limit for today. Please upgrade to pro to ask as many questions as you want",
-        );
-      }
-    },
-    initialMessages: [],
-  });
+  const { input, handleInputChange, handleSubmit, messages, isLoading } =
+    useChat({
+      api: "/api/chat",
+      body: {
+        accountId,
+      },
+      onError: (error) => {
+        if (error.message.includes("Limit reached")) {
+          toast.error(
+            "You have reached the limit for today. Please upgrade to pro to ask as many questions as you want",
+          );
+        }
+      },
+
+      initialMessages: [],
+    });
 
   useEffect(() => {
     const el = containerRef.current;
@@ -137,7 +139,8 @@ const AskAI = ({ isCollapsed }: { isCollapsed: boolean }) => {
               </div>
             </div>
           )}
-          <form onSubmit={handleSubmit} className="flex w-full gap-2">
+          {isLoading && <div className="text-muted-foreground">Loading...</div>}
+          <form onSubmit={handleSubmit} className="mt-1 flex w-full gap-2">
             <Input
               type="text"
               onChange={handleInputChange}
