@@ -3,6 +3,8 @@ import { type AnyOrama, create, insert, search } from "@orama/orama";
 import { restore, persist } from "@orama/plugin-data-persistence";
 import { json } from "stream/consumers";
 import { threadId } from "worker_threads";
+import { getEmbeddings } from "./embedding";
+import { Search } from "lucide-react";
 export class OramaClient {
   private orama!: AnyOrama;
   private accountId: string;
@@ -13,7 +15,7 @@ export class OramaClient {
 
   async saveIndex() {
     const index = await persist(this.orama, "json");
-    const account = await db.account.update({
+    await db.account.update({
       where: {
         id: this.accountId,
       },
@@ -42,10 +44,26 @@ export class OramaClient {
           body: "string",
           sentAt: "string",
           threadId: "string",
+          embeddings: "vector[1536]",
         },
       });
       await this.saveIndex();
     }
+  }
+
+  async vectorSearch({ term }: { term: string }) {
+    const embedding = await getEmbeddings(term);
+    const result = await search(this.orama, {
+      mode: "hybrid",
+      term: term,
+      vector: {
+        value: embedding,
+        property: "embeddings",
+      },
+      similarity: 0.8,
+      limit: 50,
+    });
+    return result;
   }
 
   async search({ term }: { term: string }) {

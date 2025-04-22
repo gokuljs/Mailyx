@@ -2,6 +2,7 @@ import { db } from "@/server/db";
 
 export const POST = async (req: Request) => {
   try {
+    console.log("webhook call");
     const { data } = await req.json();
     const emailAddress = data?.email_addresses?.[0]?.email_address;
     const firstName = data?.first_name;
@@ -13,7 +14,7 @@ export const POST = async (req: Request) => {
       console.error("Missing required fields", { id, emailAddress });
       return new Response("Missing required user fields", { status: 400 });
     }
-
+    console.log("Creating a new User", emailAddress, "-", firstName);
     await db.user.create({
       data: {
         id,
