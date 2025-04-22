@@ -1,61 +1,68 @@
-import React from "react";
-import { AnimatePresence, motion, spring } from "framer-motion";
-import { cn } from "@/lib/utils";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { icons, SendIcon, SparklesIcon } from "lucide-react";
+"use client";
 import { useChat } from "ai/react";
-import useThreads from "@/hooks/useThreads";
-import { error } from "console";
+import { motion } from "framer-motion";
+import { Button } from "@/components/ui/button";
+import { AnimatePresence } from "framer-motion";
+import React from "react";
+import { Send, SparklesIcon } from "lucide-react";
+import { useLocalStorage } from "usehooks-ts";
+import { cn } from "@/lib/utils";
 
-type Props = {
-  isCollapsed: boolean;
+import { toast } from "sonner";
+import { Input } from "@/components/ui/input";
+
+const transitionDebug = {
+  type: "easeOut",
+  duration: 0.2,
 };
-
-const AskAi = ({ isCollapsed }: Props) => {
-  const { accountId } = useThreads();
+const AskAI = ({ isCollapsed }: { isCollapsed: boolean }) => {
+  const [accountId] = useLocalStorage("accountId", "");
   const { input, handleInputChange, handleSubmit, messages } = useChat({
     api: "/api/chat",
     body: {
-      accountId: "",
+      accountId,
     },
     onError: (error) => {
-      console.log(error);
+      if (error.message.includes("Limit reached")) {
+        toast.error(
+          "You have reached the limit for today. Please upgrade to pro to ask as many questions as you want",
+        );
+      }
     },
+    initialMessages: [],
   });
+
   if (isCollapsed) return null;
   return (
-    <div className="mb-14 p-4">
-      <motion.div className="flex flex-1 flex-col items-end rounded-xl bg-white p-4 pb-4 shadow shadow-zinc-800 dark:bg-zinc-950">
+    <div className="mb-14 p-1">
+      <div className="h-4"></div>
+      <motion.div className="flex flex-1 flex-col items-end justify-end rounded-lg border bg-gray-100 p-2 pb-4 shadow-inner dark:bg-gray-900">
         <div
           className="flex max-h-[50vh] w-full flex-col gap-2 overflow-y-scroll"
           id="message-container"
         >
           <AnimatePresence mode="wait">
-            {messages.map((message) => {
-              return (
-                <motion.div
-                  key={message.id}
-                  layout="position"
-                  className={cn(
-                    "z-10 mt-2 max-w-[250px] rounded-2xl bg-gray-200 break-words dark:bg-gray-800",
-                    {
-                      "self-end text-gray-900 dark:text-gray-100":
-                        message.role === "user",
-                    },
-                  )}
-                  layoutId={`container-${messages.length}`}
-                  transition={{
-                    type: "spring",
-                    duration: 0.2,
-                  }}
-                >
-                  <div className="px-3 py-2 text-[15px] leading-[15px]">
-                    {message.content}
-                  </div>
-                </motion.div>
-              );
-            })}
+            {messages.map((message) => (
+              <motion.div
+                key={message.id}
+                layout="position"
+                className={cn(
+                  "z-10 mt-2 max-w-[250px] rounded-2xl bg-gray-200 break-words dark:bg-gray-800",
+                  {
+                    "self-end text-gray-900 dark:text-gray-100":
+                      message.role === "user",
+                    "self-start bg-blue-500 text-white":
+                      message.role === "assistant",
+                  },
+                )}
+                layoutId={`container-[${messages.length - 1}]`}
+                transition={transitionDebug}
+              >
+                <div className="px-1 py-2 text-[15px] leading-[15px]">
+                  {message.content}
+                </div>
+              </motion.div>
+            ))}
           </AnimatePresence>
         </div>
         {messages.length > 0 && <div className="h-4"></div>}
@@ -114,45 +121,35 @@ const AskAi = ({ isCollapsed }: Props) => {
               </div>
             </div>
           )}
-          <form className="flex w-full px-1 py-2" onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} className="flex w-full gap-2">
             <Input
-              className="relative h-9 flex-grow rounded-md border border-gray-200 bg-white px-3 py-1 text-[15px] text-black outline-none placeholder:text-[13px] dark:text-white"
-              placeholder="Ask Ai"
-              value={input}
+              type="text"
               onChange={handleInputChange}
+              value={input}
+              className="l relative h-9 w-[calc(100%-35px)] flex-grow border border-gray-200 bg-white px-3 text-[15px] outline-none placeholder:text-[13px] placeholder:text-gray-400 focus-visible:ring-0 focus-visible:ring-blue-500/20 focus-visible:ring-offset-1 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-400 dark:focus-visible:ring-blue-500/20 dark:focus-visible:ring-offset-1 dark:focus-visible:ring-offset-gray-700"
+              placeholder="Ask AI anything about your emails"
             />
             <motion.div
-              className="break-word pointer-events-none absolute z-10 h-9 w-[250px] items-center overflow-hidden rounded-md bg-green-200 break-words [word-break:break-word] dark:bg-gray-800"
               key={messages.length}
-              layout={"position"}
-              layoutId={`container-${messages.length}`}
-              transition={{
-                type: spring,
-                duration: 0.2,
-              }}
-              initial={{
-                opacity: 0.6,
-                zIndex: -1,
-              }}
-              animate={{
-                opacity: 0.6,
-                zIndex: -1,
-              }}
-              exit={{
-                opacity: 1,
-                zIndex: 1,
-              }}
+              layout="position"
+              className="pointer-events-none absolute z-10 flex h-9 w-[250px] items-center overflow-hidden rounded-full bg-gray-200 break-words [word-break:break-word] dark:bg-gray-800"
+              layoutId={`container-[${messages.length}]`}
+              transition={transitionDebug}
+              initial={{ opacity: 0.6, zIndex: -1 }}
+              animate={{ opacity: 0.6, zIndex: -1 }}
+              exit={{ opacity: 1, zIndex: 1 }}
             >
-              <div className="px-2 py-2 text-[15px] leading-[15px] text-gray-900 dark:text-gray-100">
+              <div className="px-3 py-2 text-[15px] leading-[15px] text-gray-900 dark:text-gray-100">
                 {input}
               </div>
             </motion.div>
             <Button
-              variant={"secondary"}
               size={"icon"}
-              className="ml-1 rounded-full bg-zinc-700 hover:border hover:border-amber-600 hover:shadow-amber-400"
+              variant={"ghost"}
+              type="submit"
+              className="flex h-[35px] w-[35px] items-center justify-center rounded-full"
             >
-              <SendIcon className="size-4 text-orange-500" />
+              <Send className="size-4 text-gray-500 dark:text-gray-300" />
             </Button>
           </form>
         </div>
@@ -161,4 +158,4 @@ const AskAi = ({ isCollapsed }: Props) => {
   );
 };
 
-export default AskAi;
+export default AskAI;
