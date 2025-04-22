@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   ResizableHandle,
   ResizablePanel,
@@ -22,6 +22,10 @@ import ThreadDisplay from "./ThreadDisplay";
 import { useLocalStorage } from "usehooks-ts";
 import SearchBar from "./SearchBar";
 import AskAi from "./AskAi";
+import { api } from "@/trpc/react";
+import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
+import { EmptyAccounts } from "./EmptyAccounts";
 
 type Props = {
   defaultLayout: number[] | undefined;
@@ -36,6 +40,9 @@ function Mail({
 }: Props) {
   const [isCollapsed, setIsCollapsed] = useState(defaultCollapsed);
   const [done, setDone] = useLocalStorage("mailyx-done", false);
+  const { data: accounts } = api.account.getAccounts.useQuery();
+  console.log({ accounts });
+
   return (
     <TooltipProvider delayDuration={0}>
       <ResizablePanelGroup
@@ -111,15 +118,23 @@ function Mail({
             </div>
             <Separator />
             {/* search Bar */}
-            <SearchBar />
-            <TabsContent value="inbox">
-              {" "}
-              <ThreadList />
-            </TabsContent>
-            <TabsContent value="done">
-              {" "}
-              <ThreadList />
-            </TabsContent>
+            {accounts && accounts.length > 0 && <SearchBar />}
+
+            {accounts && accounts.length === 0 ? (
+              <EmptyAccounts />
+            ) : (
+              <>
+                {" "}
+                <TabsContent value="inbox">
+                  {" "}
+                  <ThreadList />
+                </TabsContent>
+                <TabsContent value="done">
+                  {" "}
+                  <ThreadList />
+                </TabsContent>
+              </>
+            )}
           </Tabs>
         </ResizablePanel>
         <ResizableHandle withHandle />
