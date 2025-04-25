@@ -10,13 +10,17 @@ import { cn } from "@/lib/utils";
 import { api } from "@/trpc/react";
 import React, { useState } from "react";
 import { useLocalStorage } from "usehooks-ts";
+import { useUser } from "@clerk/clerk-react";
 
 type Props = {
   isCollapsed: boolean;
 };
 
 export default function AccountSwitcher({ isCollapsed }: Props) {
-  const { data: accounts } = api.account.getAccounts.useQuery();
+  const { isSignedIn } = useUser();
+  const { data: accounts } = api.account.getAccounts.useQuery(undefined, {
+    enabled: isSignedIn,
+  });
   const [accountId, setAccountId] = useLocalStorage("accountId", "");
   if (!accounts) return null;
   return (
