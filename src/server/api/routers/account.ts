@@ -138,7 +138,7 @@ export const accountRouter = createTRPCRouter({
                 },
               },
             },
-            take: 15,
+            take: 50,
             orderBy: {
               lastMessageDate: "desc",
             },
