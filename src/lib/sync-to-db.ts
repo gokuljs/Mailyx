@@ -5,6 +5,8 @@ import { EmailAddress } from "@prisma/client";
 import { OramaClient } from "./orama";
 import { turndown } from "./turndown";
 import { getEmbeddings } from "./embedding";
+import { auth } from "@clerk/nextjs/server";
+import redisHandler from "./redis";
 
 export async function syncEmailsToDatabase(
   emails: EmailMessage[],
@@ -29,12 +31,33 @@ export async function syncEmailsToDatabase(
         embeddings,
       });
       await upsertEmail(email, accountId, 0);
+      await invalidatedUserThreadCache(accountId);
     }
+
     // await Promise.all(
     //   emails?.map((email, index) => upsertEmail(email, accountId, index)),
     // );
   } catch (error) {
     console.log("Error");
+  }
+}
+
+async function invalidatedUserThreadCache(accountId: string) {
+  console.log("Invalidating Thread Cache");
+  const { userId } = await auth();
+  const tabs = ["inbox", "draft", "sent"];
+  const doneStates = ["true", "false", "all"];
+  const keys: string[] = [];
+  for (const tab of tabs) {
+    for (const done of doneStates) {
+      keys.push(
+        `threads:user:${userId}:account:${accountId}:tab:${tab}:done:${done}`,
+      );
+    }
+  }
+
+  for (const key of keys) {
+    await redisHandler.del(key);
   }
 }
 
