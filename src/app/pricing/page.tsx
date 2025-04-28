@@ -1,4 +1,5 @@
 import React from "react";
+import { GlowingEffect } from "../_components/glowing-effect";
 
 const Pricing = () => {
   const plans = [
@@ -46,7 +47,7 @@ const Pricing = () => {
   ];
 
   return (
-    <div className="flex min-h-screen flex-col items-center bg-[size:20px_20px] py-20 pt-52 text-white">
+    <div className="flex min-h-screen flex-col items-center bg-[size:20px_20px] py-20 pt-40 text-white">
       <h2 className="mb-4 flex justify-center bg-gradient-to-b from-white to-gray-400 bg-clip-text text-center text-6xl font-bold text-transparent">
         Simple and Affordable <br /> Pricing Plans
       </h2>
@@ -54,35 +55,49 @@ const Pricing = () => {
         Start managing your inbox smarter with AI-enhanced tools.
       </p>
 
-      <div className="grid w-full max-w-6xl grid-cols-1 gap-8 px-6 md:grid-cols-3">
+      <div className="grid w-full max-w-7xl grid-cols-1 gap-8 px-4 md:grid-cols-3">
         {plans.map((plan) => (
           <div
             key={plan.name}
-            className="bg-opacity-30 relative flex flex-col items-center rounded-2xl border border-gray-700 bg-black p-8 backdrop-blur-md transition-transform hover:scale-105"
+            className="bg-grey/5 relative flex flex-col items-center rounded-2xl border border-white/10 bg-gradient-to-b from-white/5 to-white/2 p-8 text-white backdrop-blur-md"
           >
-            {plan.highlighted && (
-              <div className="absolute top-4 right-4 rounded-full bg-orange-500 px-3 py-1 text-xs text-white">
-                Most Popular
-              </div>
-            )}
-            <h3 className="mb-4 text-2xl font-semibold">{plan.name}</h3>
-            <p className="mb-2 text-4xl font-bold">{plan.price}</p>
-            <p className="mb-6 text-center text-sm text-gray-400">
-              {plan.description}
-            </p>
-            <ul className="mb-6 w-full space-y-3">
-              {plan.features.map((feature, idx) => (
-                <li key={idx} className="flex items-center gap-2 text-gray-300">
-                  <span className="text-green-400">✔</span>
-                  <span>{feature}</span>
-                </li>
-              ))}
-            </ul>
-            <button
-              className={`w-full ${plan.buttonColor} mt-auto rounded-xl px-6 py-2 text-white hover:opacity-90`}
-            >
-              {plan.buttonText}
-            </button>
+            <GlowingEffect
+              borderWidth={2}
+              spread={50}
+              glow={true}
+              disabled={false}
+              proximity={100} // Responsive to mouse proximity
+              inactiveZone={0.1}
+              variant="white"
+            />
+            <div className="flex flex-1 flex-col justify-between bg-transparent">
+              <h3 className="mb-4 flex items-center justify-between text-2xl font-semibold">
+                {plan.name}
+                {plan.highlighted && (
+                  <div className="rounded-full bg-orange-500 px-3 py-1 text-xs text-white">
+                    Most Popular
+                  </div>
+                )}
+              </h3>
+              <p className="mb-2 text-4xl font-bold">{plan.price}</p>
+              <p className="mb-6 text-sm text-gray-400">{plan.description}</p>
+              <ul className="mb-6 w-full space-y-3">
+                {plan.features.map((feature, idx) => (
+                  <li
+                    key={idx}
+                    className="flex items-center gap-2 text-gray-300"
+                  >
+                    <span className="text-green-400">✔</span>
+                    <span>{feature}</span>
+                  </li>
+                ))}
+              </ul>
+              <button
+                className={`w-full ${plan.buttonColor} mt-auto rounded-xl px-6 py-2 text-white hover:opacity-90`}
+              >
+                {plan.buttonText}
+              </button>
+            </div>
           </div>
         ))}
       </div>

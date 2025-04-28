@@ -46,7 +46,7 @@ export default async function Home() {
                 <div className="border-0.75 relative flex h-full flex-col justify-between gap-6 overflow-hidden rounded-xl bg-black p-6 shadow-[0px_0px_27px_0px_#2D2D2D] md:p-6">
                   <div className="relative flex flex-1 flex-col justify-between gap-3">
                     <div className="space-y-3">
-                      <h3 className="-tracking-4 text-balance pt-0.5 font-sans text-xl font-semibold text-white md:text-2xl/[1.875rem]">
+                      <h3 className="-tracking-4 pt-0.5 font-sans text-xl font-semibold text-balance text-white md:text-2xl/[1.875rem]">
                         AI-prioritized Inbox
                       </h3>
                       <h2 className="font-sans text-sm/[1.125rem] text-gray-500 md:text-base/[1.375rem] md:[&_b]:font-semibold md:[&_strong]:font-semibold">
@@ -71,7 +71,7 @@ export default async function Home() {
                 <div className="border-0.75 relative flex h-full flex-col justify-between gap-6 overflow-hidden rounded-xl bg-black p-6 shadow-[0px_0px_27px_0px_#2D2D2D] md:p-6">
                   <div className="relative flex flex-1 flex-col justify-between gap-3">
                     <div className="space-y-3">
-                      <h3 className="-tracking-4 text-balance pt-0.5 font-sans text-xl font-semibold text-white md:text-2xl/[1.875rem]">
+                      <h3 className="-tracking-4 pt-0.5 font-sans text-xl font-semibold text-balance text-white md:text-2xl/[1.875rem]">
                         Precision Search
                       </h3>
                       <h2 className="font-sans text-sm/[1.125rem] text-gray-500 md:text-base/[1.375rem] md:[&_b]:font-semibold md:[&_strong]:font-semibold">
@@ -96,7 +96,7 @@ export default async function Home() {
                 <div className="border-0.75 relative flex h-full flex-col justify-between gap-6 overflow-hidden rounded-xl bg-black p-6 shadow-[0px_0px_27px_0px_#2D2D2D] md:p-6">
                   <div className="relative flex flex-1 flex-col justify-between gap-3">
                     <div className="space-y-3">
-                      <h3 className="-tracking-4 text-balance pt-0.5 font-sans text-xl font-semibold text-white md:text-2xl/[1.875rem]">
+                      <h3 className="-tracking-4 pt-0.5 font-sans text-xl font-semibold text-balance text-white md:text-2xl/[1.875rem]">
                         Keyboard-first Navigation
                       </h3>
                       <h2 className="font-sans text-sm/[1.125rem] text-gray-500 md:text-base/[1.375rem] md:[&_b]:font-semibold md:[&_strong]:font-semibold">
