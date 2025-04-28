@@ -1,5 +1,6 @@
 import React from "react";
 import { GlowingEffect } from "../_components/glowing-effect";
+import { HoverBorderGradient } from "../_components/hover-border-gradient";
 
 const Pricing = () => {
   const plans = [
@@ -58,11 +59,11 @@ const Pricing = () => {
         Start managing your inbox smarter with AI-enhanced tools.
       </p>
 
-      <div className="grid w-full max-w-7xl grid-cols-1 gap-8 px-4 md:grid-cols-3">
+      <div className="grid w-full max-w-[1200px] grid-cols-1 gap-8 px-4 md:grid-cols-3">
         {plans.map((plan) => (
           <div
             key={plan.name}
-            className="bg-grey/5 relative flex flex-col items-center rounded-2xl border border-white/10 bg-gradient-to-b from-white/5 to-white/2 p-8 text-white backdrop-blur-md"
+            className="bg-grey-900/11 relative flex flex-col items-center rounded-2xl border border-gray-200/9 bg-gradient-to-b from-white/5 to-white/2 px-6 py-8 text-white backdrop-blur-md"
           >
             <GlowingEffect
               borderWidth={2}
@@ -73,13 +74,20 @@ const Pricing = () => {
               inactiveZone={0.1}
               variant="white"
             />
-            <div className="flex flex-1 flex-col justify-between bg-transparent">
+            <div className="flex flex-1 flex-col justify-between border bg-transparent">
               <h3 className="mb-4 flex items-center justify-between text-2xl font-semibold">
                 {plan.name}
                 {plan.highlighted && (
-                  <div className="rounded-full bg-orange-500 px-3 py-1 text-xs text-white">
-                    Most Popular
-                  </div>
+                  <HoverBorderGradient
+                    as="button"
+                    duration={1}
+                    clockwise={true}
+                    className="!bg-white/11 px-2 py-1"
+                  >
+                    <div className="rounded-full bg-transparent text-xs">
+                      Most Popular
+                    </div>
+                  </HoverBorderGradient>
                 )}
               </h3>
               <p className="mb-2 text-4xl font-bold">{plan.price}</p>
