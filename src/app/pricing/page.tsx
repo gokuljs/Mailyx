@@ -16,7 +16,7 @@ const Pricing = () => {
       ],
       buttonText: "Start for Free",
       highlighted: false,
-      buttonColor: "bg-gray-700",
+      buttonColor: "bg-gray-400/20",
     },
     {
       name: "Pro Plan",
@@ -30,7 +30,8 @@ const Pricing = () => {
       ],
       buttonText: "Subscribe to Pro",
       highlighted: true,
-      buttonColor: "bg-orange-500",
+      buttonColor: "bg-orange-600",
+      borderColor: "border-orange-300",
     },
     {
       name: "Pro Plan Yearly",
@@ -46,7 +47,7 @@ const Pricing = () => {
       ],
       buttonText: "Subscribe Yearly",
       highlighted: false,
-      buttonColor: "bg-gray-700",
+      buttonColor: "bg-gray-400/20",
     },
   ];
 
@@ -108,7 +109,7 @@ const Pricing = () => {
               </div>
               {/* Button pushed to bottom using mt-auto inside flex */}
               <button
-                className={`w-full ${plan.buttonColor} mt-auto rounded-xl px-6 py-2 text-white hover:opacity-90`}
+                className={`w-full ${plan.buttonColor} mt-auto cursor-pointer rounded-xl border border-transparent px-6 py-2 text-white transition-all duration-150 hover:border hover:${plan?.borderColor ?? "border-gray-100"} hover:opacity-70`}
               >
                 {plan.buttonText}
               </button>
