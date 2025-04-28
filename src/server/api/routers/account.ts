@@ -6,6 +6,7 @@ import { db } from "@/server/db";
 import { threadId } from "worker_threads";
 import { Account } from "@/lib/accounts";
 import { OramaClient } from "@/lib/orama";
+import { catchFirst } from "@/lib/redisCatchFetch";
 
 export const authorizeAccountAccess = async (
   accountId: string,
@@ -29,16 +30,25 @@ export const authorizeAccountAccess = async (
 
 export const accountRouter = createTRPCRouter({
   getAccounts: privateProcedure.query(async ({ ctx }) => {
-    return ctx.db.account.findMany({
-      where: {
-        userId: ctx?.auth?.userId,
+    const userId = ctx?.auth?.userId;
+    const key = `accounts:user:${userId}`;
+    const accounts = await catchFirst(
+      key,
+      async () => {
+        return ctx.db.account.findMany({
+          where: {
+            userId,
+          },
+          select: {
+            id: true,
+            emailAddress: true,
+            name: true,
+          },
+        });
       },
-      select: {
-        id: true,
-        emailAddress: true,
-        name: true,
-      },
-    });
+      5000,
+    );
+    return accounts;
   }),
   getNumThreads: privateProcedure
     .input(
