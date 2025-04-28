@@ -91,43 +91,62 @@ export const accountRouter = createTRPCRouter({
         input?.accountId,
         ctx?.auth?.userId,
       );
+      const userId = ctx?.auth?.userId;
+      const key = `threads:user:${userId}:account:${input.accountId}:tab:${input.tab}:done:${input.done ?? "all"}`;
+
       const acc = new Account(account?.accessToken);
       acc.syncEmails().catch(console.error);
-      let filter: any = {};
-      if (input?.tab === "inbox") {
-        filter.inboxStatus = true;
-      } else if (input?.tab === "draft") {
-        filter.draftStatus = true;
-      } else {
-        filter.sentStatus = true;
-      }
-      filter.done = {
-        equals: input?.done,
-      };
-      return await ctx.db.thread.findMany({
-        where: filter,
-        include: {
-          email: {
+      const threads = await catchFirst(
+        key,
+        async () => {
+          const account = await authorizeAccountAccess(input.accountId, userId);
+
+          const acc = new Account(account?.accessToken);
+          acc.syncEmails().catch(console.error);
+
+          let filter: any = {};
+          if (input.tab === "inbox") {
+            filter.inboxStatus = true;
+          } else if (input.tab === "draft") {
+            filter.draftStatus = true;
+          } else {
+            filter.sentStatus = true;
+          }
+          filter.done = {
+            equals: input.done,
+          };
+
+          return ctx.db.thread.findMany({
+            where: {
+              accountId: account.id,
+              ...filter,
+            },
+            include: {
+              email: {
+                orderBy: {
+                  sentAt: "asc",
+                },
+                select: {
+                  from: true,
+                  body: true,
+                  bodySnippet: true,
+                  emailLabel: true,
+                  subject: true,
+                  sysLabels: true,
+                  id: true,
+                  sentAt: true,
+                },
+              },
+            },
+            take: 15,
             orderBy: {
-              sentAt: "asc",
+              lastMessageDate: "desc",
             },
-            select: {
-              from: true,
-              body: true,
-              bodySnippet: true,
-              emailLabel: true,
-              subject: true,
-              sysLabels: true,
-              id: true,
-              sentAt: true,
-            },
-          },
+          });
         },
-        take: 15,
-        orderBy: {
-          lastMessageDate: "desc",
-        },
-      });
+        3600,
+      );
+      return threads;
     }),
   getSuggestions: privateProcedure
     .input(
