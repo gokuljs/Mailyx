@@ -1,4 +1,5 @@
 import { exchangeCodeForAccessToken, getAccountDetails } from "@/lib/aruinko";
+import redisHandler from "@/lib/redis";
 import { db } from "@/server/db";
 import { auth } from "@clerk/nextjs/server";
 import axios from "axios";
@@ -55,6 +56,8 @@ export const GET = async (req: NextRequest) => {
       name: accountDetails?.name || "",
     },
   });
+  const key = `accounts:user:${userId}`;
+  await redisHandler.del(key);
 
   //   trigger initial sync
   //   nextjs function
