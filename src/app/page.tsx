@@ -3,6 +3,7 @@ import { BackgroundBeams } from "./_components/background-beams";
 import { HoverBorderGradient } from "./_components/hover-border-gradient";
 import { GlowingEffect } from "./_components/glowing-effect";
 import LinkAccountButton from "./_components/link-account-button";
+import ParticlesBackground from "./_components/Particles";
 
 export default async function Home() {
   // const { signOut } = useClerk();
@@ -11,6 +12,7 @@ export default async function Home() {
     <>
       <>
         <div className="relative z-10 flex min-h-screen flex-col items-center bg-black pt-60">
+          <ParticlesBackground />
           <BackgroundBeams />
           <h1 className="inline-block bg-linear-to-r from-gray-300 to-orange-300 bg-clip-text text-center text-6xl font-bold text-transparent">
             Mailyx — A minimalist, <br />

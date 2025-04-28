@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { GlowingEffect } from "../_components/glowing-effect";
 import { HoverBorderGradient } from "../_components/hover-border-gradient";
+import ParticlesBackground from "../_components/Particles";
 
 const Pricing = () => {
   const plans = [
@@ -53,6 +54,7 @@ const Pricing = () => {
 
   return (
     <div className="flex min-h-screen flex-col items-center bg-[size:20px_20px] py-20 pt-40 text-white">
+      <ParticlesBackground />
       <h2 className="mb-4 flex justify-center bg-gradient-to-b from-white to-gray-400 bg-clip-text text-center text-6xl font-bold text-transparent">
         Simple and Affordable <br /> Pricing Plans
       </h2>
@@ -64,7 +66,7 @@ const Pricing = () => {
         {plans.map((plan) => (
           <div
             key={plan.name}
-            className="bg-grey-900/11 relative flex flex-col rounded-2xl border border-gray-200/9 bg-gradient-to-b from-white/5 to-white/2 px-6 py-8 text-white backdrop-blur-md"
+            className="relative flex flex-col rounded-2xl border border-gray-200/9 bg-gradient-to-b from-white/5 to-transparent px-6 py-8 text-white backdrop-blur-3xl"
           >
             <GlowingEffect
               borderWidth={2}
