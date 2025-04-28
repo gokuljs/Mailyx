@@ -63,46 +63,50 @@ const Pricing = () => {
         {plans.map((plan) => (
           <div
             key={plan.name}
-            className="bg-grey-900/11 relative flex flex-col items-center rounded-2xl border border-gray-200/9 bg-gradient-to-b from-white/5 to-white/2 px-6 py-8 text-white backdrop-blur-md"
+            className="bg-grey-900/11 relative flex flex-col rounded-2xl border border-gray-200/9 bg-gradient-to-b from-white/5 to-white/2 px-6 py-8 text-white backdrop-blur-md"
           >
             <GlowingEffect
               borderWidth={2}
               spread={50}
               glow={true}
               disabled={false}
-              proximity={100} // Responsive to mouse proximity
+              proximity={100}
               inactiveZone={0.1}
               variant="white"
             />
-            <div className="flex flex-1 flex-col justify-between border bg-transparent">
-              <h3 className="mb-4 flex items-center justify-between text-2xl font-semibold">
-                {plan.name}
-                {plan.highlighted && (
-                  <HoverBorderGradient
-                    as="button"
-                    duration={1}
-                    clockwise={true}
-                    className="!bg-white/11 px-2 py-1"
-                  >
-                    <div className="rounded-full bg-transparent text-xs">
-                      Most Popular
-                    </div>
-                  </HoverBorderGradient>
-                )}
-              </h3>
-              <p className="mb-2 text-4xl font-bold">{plan.price}</p>
-              <p className="mb-6 text-sm text-gray-400">{plan.description}</p>
-              <ul className="mb-6 w-full space-y-3">
-                {plan.features.map((feature, idx) => (
-                  <li
-                    key={idx}
-                    className="flex items-center gap-2 text-gray-300"
-                  >
-                    <span className="text-green-400">✔</span>
-                    <span>{feature}</span>
-                  </li>
-                ))}
-              </ul>
+            {/* Notice: 'flex flex-col flex-1' to ensure stretch */}
+            <div className="flex flex-1 flex-col justify-between bg-transparent">
+              <div>
+                <h3 className="mb-4 flex items-center justify-between text-2xl font-semibold">
+                  {plan.name}
+                  {plan.highlighted && (
+                    <HoverBorderGradient
+                      as="button"
+                      duration={1}
+                      clockwise={true}
+                      className="!bg-white/11 px-2 py-1"
+                    >
+                      <div className="rounded-full bg-transparent text-xs">
+                        Most Popular
+                      </div>
+                    </HoverBorderGradient>
+                  )}
+                </h3>
+                <p className="mb-2 text-4xl font-bold">{plan.price}</p>
+                <p className="mb-6 text-sm text-gray-400">{plan.description}</p>
+                <ul className="mb-6 w-full space-y-3">
+                  {plan.features.map((feature, idx) => (
+                    <li
+                      key={idx}
+                      className="flex items-center gap-2 text-gray-300"
+                    >
+                      <span className="text-green-400">✔</span>
+                      <span>{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              {/* Button pushed to bottom using mt-auto inside flex */}
               <button
                 className={`w-full ${plan.buttonColor} mt-auto rounded-xl px-6 py-2 text-white hover:opacity-90`}
               >
