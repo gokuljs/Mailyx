@@ -78,7 +78,7 @@ const Pricing = () => {
             {/* Notice: 'flex flex-col flex-1' to ensure stretch */}
             <div className="flex flex-1 flex-col justify-between bg-transparent">
               <div>
-                <h3 className="mb-4 flex items-center justify-between text-2xl font-semibold">
+                <h3 className="mb-4 flex items-center justify-between bg-gradient-to-b from-white to-gray-400 bg-clip-text text-2xl font-semibold text-transparent">
                   {plan.name}
                   {plan.highlighted && (
                     <HoverBorderGradient
@@ -93,7 +93,11 @@ const Pricing = () => {
                     </HoverBorderGradient>
                   )}
                 </h3>
-                <p className="mb-2 text-4xl font-bold">{plan.price}</p>
+
+                <p className="mb-2 bg-gradient-to-b from-white to-gray-400 bg-clip-text text-4xl font-bold text-transparent">
+                  {plan.price}
+                </p>
+
                 <p className="mb-6 text-sm text-gray-400">{plan.description}</p>
                 <ul className="mb-6 w-full space-y-3">
                   {plan.features.map((feature, idx) => (
@@ -101,7 +105,7 @@ const Pricing = () => {
                       key={idx}
                       className="flex items-center gap-2 text-gray-300"
                     >
-                      <span className="text-green-400">✔</span>
+                      <span className="text-white/40">✔</span>
                       <span>{feature}</span>
                     </li>
                   ))}
