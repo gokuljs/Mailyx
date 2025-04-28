@@ -36,7 +36,10 @@ const Pricing = () => {
       price: "$250/yr",
       description: "Best value - save 2 months on annual billing.",
       features: [
-        "Everything in Pro Plan",
+        "Sync up to 3 email accounts",
+        "Unlimited AI Assistant",
+        "Full AI Precision Search",
+        "Priority Support",
         "2 months free",
         "Best for power users",
       ],
