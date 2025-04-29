@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import ParticlesBackground from "../_components/Particles";
+import { GlowingEffect } from "../_components/glowing-effect";
 
 interface FormData {
   email: string;
@@ -67,6 +68,15 @@ export default function ContactUs() {
         Contact Us
       </h2>
       <div className="w-full max-w-3xl rounded-2xl border border-white/10 bg-white/5 p-10 shadow-xl backdrop-blur-md">
+        <GlowingEffect
+          borderWidth={2}
+          spread={50}
+          glow={true}
+          disabled={false}
+          proximity={100}
+          inactiveZone={0.1}
+          variant="white"
+        />
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <label
