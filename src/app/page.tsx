@@ -4,6 +4,7 @@ import { HoverBorderGradient } from "./_components/hover-border-gradient";
 import { GlowingEffect } from "./_components/glowing-effect";
 import LinkAccountButton from "./_components/link-account-button";
 import ParticlesBackground from "./_components/Particles";
+import StartMailyxButton from "./_components/StartMailyxButton";
 
 export default async function Home() {
   // const { signOut } = useClerk();
@@ -14,7 +15,7 @@ export default async function Home() {
         <div className="relative z-10 flex min-h-screen flex-col items-center bg-black pt-60">
           <ParticlesBackground />
           <BackgroundBeams />
-          <h1 className="inline-block bg-linear-to-r from-gray-300 to-orange-300 bg-clip-text text-center text-6xl font-bold text-transparent">
+          <h1 className="inline-block bg-linear-to-b from-white to-orange-300 bg-clip-text text-center text-6xl font-bold text-transparent">
             Mailyx — A minimalist, <br />
             AI-powered email client
           </h1>
@@ -24,12 +25,10 @@ export default async function Home() {
           </p>
           <div className="h-8"></div>
           <div className="space-x-4">
-            <HoverBorderGradient as="button" duration={1} clockwise={true}>
-              <Link href="/mail"> Start Using Mailyx</Link>
-            </HoverBorderGradient>
+            <StartMailyxButton />
           </div>
           <div className="mx-auto mt-12 max-w-5xl">
-            <h2 className="mb-8 bg-linear-to-br from-gray-600 to-gray-200 bg-clip-text text-center text-4xl font-semibold text-transparent">
+            <h2 className="mb-8 bg-linear-to-b from-white to-gray-600 bg-clip-text text-center text-4xl font-semibold text-transparent">
               Experience the power of:
             </h2>
 
