@@ -41,7 +41,6 @@ export default function ContactUs() {
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-
     const validationErrors: FormErrors = {};
     if (!formData.email) {
       validationErrors.email = "Email is required.";
@@ -58,7 +57,7 @@ export default function ContactUs() {
       return;
     }
 
-    console.log(formData);
+    console.log(formData, "ssss");
   };
 
   return (
@@ -67,7 +66,7 @@ export default function ContactUs() {
       <h2 className="mt-14 mb-12 bg-gradient-to-b from-white to-gray-500 bg-clip-text text-6xl font-bold text-transparent">
         Contact Us
       </h2>
-      <div className="w-full max-w-3xl rounded-2xl border border-white/10 bg-white/5 p-10 shadow-xl backdrop-blur-md">
+      <div className="w-full max-w-3xl rounded-2xl border border-white/9 bg-gradient-to-b from-white/5 to-transparent px-6 py-8 text-white backdrop-blur-sm">
         <GlowingEffect
           borderWidth={2}
           spread={50}
@@ -138,12 +137,12 @@ export default function ContactUs() {
             )}
           </div>
 
-          <Button
+          <button
             type="submit"
-            className="w-full bg-gradient-to-r from-orange-500 to-yellow-400 font-semibold text-black hover:opacity-90"
+            className="w-full cursor-pointer bg-white/15 py-2 font-semibold text-white"
           >
             Send Message
-          </Button>
+          </button>
         </form>
       </div>
     </div>
