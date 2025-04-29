@@ -26,7 +26,7 @@ export default function ContactUs() {
     message: "",
   });
   const mutation = api.contact.sendMessage.useMutation();
-
+  const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
 
   const validateEmail = (email: string) => {
@@ -43,6 +43,7 @@ export default function ContactUs() {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    setLoading(true);
     const validationErrors: FormErrors = {};
     if (!formData.email) {
       validationErrors.email = "Email is required.";
@@ -61,11 +62,12 @@ export default function ContactUs() {
 
     try {
       await mutation.mutateAsync(formData);
-      alert("Message sent successfully!");
+
       setFormData({ email: "", subject: "", message: "" });
     } catch (error) {
       console.error("Failed to send message:", error);
-      alert("Failed to send message. Please try again later.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -148,9 +150,10 @@ export default function ContactUs() {
 
           <button
             type="submit"
+            disabled={loading}
             className="w-full cursor-pointer bg-white/15 py-2 font-semibold text-white"
           >
-            Send Message
+            {loading ? "Sending..." : "Send Message"}
           </button>
         </form>
       </div>
