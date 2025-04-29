@@ -17,6 +17,17 @@ const ParticlesBackground = () => {
     fullScreen: {
       enable: false, // very important! we manually control the area
     },
+    particles: {
+      color: {
+        value: ["#ffffff", "#ffd700", "#00ffff"], // white, gold, cyan
+      },
+      size: {
+        value: { min: 0.3, max: 1.2 }, // smaller stars
+      },
+      opacity: {
+        value: 1,
+      },
+    },
   };
   return (
     <Particles
