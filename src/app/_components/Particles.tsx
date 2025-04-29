@@ -19,7 +19,7 @@ const ParticlesBackground = () => {
     },
     particles: {
       color: {
-        value: ["#ffffff", "#ffd700", "#00ffff"], // white, gold, cyan
+        value: ["#ffffff"], // white, gold, cyan
       },
       size: {
         value: { min: 0.3, max: 1.2 }, // smaller stars
