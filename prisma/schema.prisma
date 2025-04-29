@@ -126,6 +126,15 @@ model EmailAttachment {
     emailId         String
 }
 
+model ContactMessage {
+    id        String   @id @default(cuid())
+    fromEmail String   @db.VarChar(255)
+    subject   String   @default("No subject") @db.VarChar(255)
+    message   String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
 enum Sensitivity {
     normal
     private

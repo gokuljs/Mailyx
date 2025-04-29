@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import ParticlesBackground from "../_components/Particles";
 import { GlowingEffect } from "../_components/glowing-effect";
+import { api } from "@/trpc/react";
 
 interface FormData {
   email: string;
@@ -24,6 +25,7 @@ export default function ContactUs() {
     subject: "",
     message: "",
   });
+  const mutation = api.contact.sendMessage.useMutation();
 
   const [errors, setErrors] = useState<FormErrors>({});
 
@@ -39,7 +41,7 @@ export default function ContactUs() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     const validationErrors: FormErrors = {};
     if (!formData.email) {
@@ -57,7 +59,14 @@ export default function ContactUs() {
       return;
     }
 
-    console.log(formData, "ssss");
+    try {
+      await mutation.mutateAsync(formData);
+      alert("Message sent successfully!");
+      setFormData({ email: "", subject: "", message: "" });
+    } catch (error) {
+      console.error("Failed to send message:", error);
+      alert("Failed to send message. Please try again later.");
+    }
   };
 
   return (
