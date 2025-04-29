@@ -36,14 +36,13 @@ export default async function Home() {
             <div className="grid grid-cols-1 gap-4 px-5 md:grid-cols-3">
               <div className="rounded-2.5xl relative h-full border border-neutral-500 p-2 md:rounded-3xl md:p-3">
                 <GlowingEffect
-                  blur={2}
-                  borderWidth={3}
+                  borderWidth={2}
                   spread={100}
                   glow={true}
                   disabled={false}
                   proximity={180} // Responsive to mouse proximity
                   inactiveZone={0.1}
-                  variant="orange"
+                  variant="white"
                 />
                 <div className="border-0.75 relative flex h-full flex-col justify-between gap-6 overflow-hidden rounded-xl bg-black p-6 shadow-[0px_0px_27px_0px_#2D2D2D] md:p-6">
                   <div className="relative flex flex-1 flex-col justify-between gap-3">
@@ -61,14 +60,13 @@ export default async function Home() {
               </div>
               <div className="rounded-2.5xl relative h-full border border-neutral-500 p-2 md:rounded-3xl md:p-3">
                 <GlowingEffect
-                  blur={2}
                   borderWidth={3}
                   spread={50}
                   glow={true}
                   disabled={false}
                   proximity={80}
                   inactiveZone={0.1}
-                  variant="orange"
+                  variant="white"
                 />
                 <div className="border-0.75 relative flex h-full flex-col justify-between gap-6 overflow-hidden rounded-xl bg-black p-6 shadow-[0px_0px_27px_0px_#2D2D2D] md:p-6">
                   <div className="relative flex flex-1 flex-col justify-between gap-3">
@@ -86,14 +84,13 @@ export default async function Home() {
               </div>
               <div className="rounded-2.5xl border-neutral-500p-2 relative h-full border border-neutral-500 md:rounded-3xl md:p-3">
                 <GlowingEffect
-                  blur={2}
                   borderWidth={3}
                   spread={50}
                   glow={true}
                   disabled={false}
                   proximity={80} // Responsive to mouse proximity
                   inactiveZone={0.1}
-                  variant="orange"
+                  variant="white"
                 />
                 <div className="border-0.75 relative flex h-full flex-col justify-between gap-6 overflow-hidden rounded-xl bg-black p-6 shadow-[0px_0px_27px_0px_#2D2D2D] md:p-6">
                   <div className="relative flex flex-1 flex-col justify-between gap-3">
