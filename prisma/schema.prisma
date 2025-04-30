@@ -3,8 +3,9 @@ generator client {
 }
 
 datasource db {
-    provider = "postgresql"
-    url      = env("DATABASE_URL")
+    provider  = "postgresql"
+    url       = env("DATABASE_URL")
+    directUrl = env("DIRECT_URL") // required for prisma migrate, db pull
 }
 
 model User {
@@ -124,6 +125,15 @@ model EmailAttachment {
     contentLocation String?
     Email           Email   @relation(fields: [emailId], references: [id])
     emailId         String
+}
+
+model ContactMessage {
+    id        String   @id @default(cuid())
+    fromEmail String   @db.VarChar(255)
+    subject   String   @default("No subject") @db.VarChar(255)
+    message   String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 }
 
 enum Sensitivity {
