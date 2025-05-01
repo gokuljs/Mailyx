@@ -12,6 +12,7 @@ import remarkGfm from "remark-gfm";
 
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
+import PremiumBanner from "./PremiumBanner";
 
 const transitionDebug = {
   type: "easeOut",
@@ -52,8 +53,9 @@ const AskAI = ({ isCollapsed }: { isCollapsed: boolean }) => {
   if (isCollapsed) return null;
   return (
     <div className="mb-14 p-1">
+      <PremiumBanner />
       <div className="h-4"></div>
-      <motion.div className="flex flex-1 flex-col items-end justify-end rounded-lg border bg-white p-2 pb-4 shadow-zinc-950 dark:bg-zinc-950">
+      <motion.div className="flex max-h-[420px] flex-1 flex-col items-end justify-end rounded-lg border bg-white p-2 pb-4 shadow-zinc-950 dark:bg-zinc-950">
         <div
           ref={containerRef}
           className="flex max-h-[50vh] w-full flex-col gap-2 overflow-y-scroll"

@@ -248,3 +248,8 @@ html,
 body {
   font-family: "Inter", sans-serif;
 }
+
+.premium-card {
+  background: HSL(20_14.3%_4.1%);
+  background: linear-gradient(153deg, rgba(0, 0, 0, 1) 50%, #fb923c 100%);
+}
