@@ -20,7 +20,7 @@ const Page = () => {
         <ComposeButton />
       </div>
       <Mail
-        defaultLayout={[10, 20, 30]}
+        defaultLayout={[20, 40, 40]}
         defaultCollapsed={false}
         navCollapsedSize={4}
       />
