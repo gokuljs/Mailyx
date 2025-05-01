@@ -13,7 +13,7 @@ const PremiumBanner = () => {
           Ask as many questions has you want
         </div>
       </div>
-      <Button className="w-[40%] cursor-pointer bg-gradient-to-br from-zinc-900 to-orange-400/50 transition-all duration-150">
+      <Button className="w-[40%] cursor-pointer bg-gradient-to-br from-zinc-900 to-orange-400/50 transition-all duration-150 outline-none">
         Subscribe
       </Button>
       <Image
