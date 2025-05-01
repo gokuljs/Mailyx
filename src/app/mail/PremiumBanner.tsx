@@ -1,6 +1,5 @@
 import Image from "next/image";
 import React from "react";
-import ParticlesBackground from "../_components/Particles";
 import { Button } from "@/components/ui/button";
 
 const PremiumBanner = () => {
