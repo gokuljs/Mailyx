@@ -93,9 +93,6 @@ export const accountRouter = createTRPCRouter({
       );
       const userId = ctx?.auth?.userId;
       const key = `threads:user:${userId}:account:${input.accountId}:tab:${input.tab}:done:${input.done ?? "all"}`;
-
-      const acc = new Account(account?.accessToken);
-      acc.syncEmails().catch(console.error);
       const threads = await catchFirst(
         key,
         async () => {
@@ -144,7 +141,7 @@ export const accountRouter = createTRPCRouter({
             },
           });
         },
-        3600,
+        5000,
       );
       return threads;
     }),
