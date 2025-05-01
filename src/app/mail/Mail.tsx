@@ -23,8 +23,7 @@ import { useLocalStorage } from "usehooks-ts";
 import SearchBar from "./SearchBar";
 import AskAi from "./AskAi";
 import { api } from "@/trpc/react";
-import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+
 import { EmptyAccounts } from "./EmptyAccounts";
 import { useUser } from "@clerk/nextjs";
 

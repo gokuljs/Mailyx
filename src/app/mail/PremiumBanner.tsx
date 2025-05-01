@@ -2,18 +2,20 @@ import Image from "next/image";
 import React from "react";
 import { Button } from "@/components/ui/button";
 import PaddleButton from "./PaddleButton";
+import BannerContent from "./BannerContent";
+import { FREE_CREDITS_PER_DAY } from "@/lib/Constants";
 
 const PremiumBanner = () => {
+  const isSubScribed = false;
+  const remainIngCredits = 5;
   return (
     <div className="premium-card relative flex h-40 flex-1 flex-col justify-between overflow-hidden rounded-xl p-2">
-      <div className="z-40">
-        <h2 className="bg-gradient-to-r from-white to-gray-400 bg-clip-text text-xl font-semibold text-transparent">
-          Premium Plus
-        </h2>
-        <div className="mt-1 w-[70%] text-xs text-zinc-400">
-          Ask as many questions has you want
-        </div>
-      </div>
+      <BannerContent
+        heading="Basic Plan"
+        credits={remainIngCredits}
+        total={FREE_CREDITS_PER_DAY}
+        subtext="Upgrade to Pro to ask as many questions..."
+      />
       <PaddleButton />
       <Image
         src={"/bg-image.png"}
