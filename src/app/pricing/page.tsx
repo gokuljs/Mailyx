@@ -1,73 +1,14 @@
-import React, { useCallback } from "react";
+"use client";
+import React from "react";
 import { GlowingEffect } from "../_components/glowing-effect";
 import { HoverBorderGradient } from "../_components/hover-border-gradient";
 import ParticlesBackground from "../_components/Particles";
+import { plans } from "@/lib/Constants";
 
-export interface Tier {
-  name: string;
-  id: "free" | "monthly" | "annual";
-  price: string;
-  description: string;
-  features: string[];
-  buttonText: string;
-  highlighted: boolean;
-  buttonColor: string;
-  priceId?: string;
-  borderColor?: string;
-}
+import usePaddleOverlayCheck from "@/hooks/usePaddleOverlayCheck";
+
 const Pricing = () => {
-  const plans: Tier[] = [
-    {
-      id: "free",
-      name: "Free Tier",
-      price: "$0",
-      description: "Great for getting started and trying basic features.",
-      features: [
-        "Sync 1 email account",
-        "15 chats/day",
-        "Last 30 days search",
-        "Basic keyboard shortcuts",
-      ],
-      buttonText: "Start for Free",
-      highlighted: false,
-      buttonColor: "bg-gray-400/20",
-    },
-    {
-      id: "monthly",
-      name: "Pro Plan",
-      price: "$25/mo",
-      description: "Perfect for growing users needing unlimited access.",
-      features: [
-        "Sync up to 3 email accounts",
-        "Unlimited AI Assistant",
-        "Full AI Precision Search",
-        "Priority Support",
-      ],
-      buttonText: "Subscribe to Pro",
-      highlighted: true,
-      buttonColor: "bg-orange-600",
-      borderColor: "border-orange-300",
-      priceId: process.env.PADDLE_MONTHLY_PRICE_ID,
-    },
-    {
-      id: "annual",
-      name: "Pro Plan Yearly",
-      price: "$250/yr",
-      description: "Best value - save 2 months on annual billing.",
-      features: [
-        "Sync up to 3 email accounts",
-        "Unlimited AI Assistant",
-        "Full AI Precision Search",
-        "Priority Support",
-        "2 months free",
-        "Best for power users",
-      ],
-      buttonText: "Subscribe Yearly",
-      highlighted: false,
-      buttonColor: "bg-gray-400/20",
-      priceId: process.env.PADDLE_YEARLY_PRICE_ID,
-    },
-  ];
+  const { handleCheckout } = usePaddleOverlayCheck();
 
   return (
     <div className="flex min-h-screen flex-col items-center bg-[size:20px_20px] py-20 pt-40 text-white">
@@ -132,6 +73,10 @@ const Pricing = () => {
               </div>
               {/* Button pushed to bottom using mt-auto inside flex */}
               <button
+                onClick={() => {
+                  console.log("clicked", plan?.priceId);
+                  plan?.priceId && handleCheckout(plan.priceId);
+                }}
                 className={`w-full ${plan.buttonColor} mt-auto cursor-pointer rounded-xl border border-transparent px-6 py-2 text-white transition-all duration-150 hover:border hover:${plan?.borderColor ?? "border-gray-100"} hover:opacity-70`}
               >
                 {plan.buttonText}

@@ -35,7 +35,7 @@ export const plans: Tier[] = [
     highlighted: true,
     buttonColor: "bg-orange-600",
     borderColor: "border-orange-300",
-    priceId: process.env.PADDLE_MONTHLY_PRICE_ID,
+    priceId: process.env.NEXT_PUBLIC_PADDLE_MONTHLY_PRICE_ID,
   },
   {
     id: "annual",
@@ -53,6 +53,6 @@ export const plans: Tier[] = [
     buttonText: "Subscribe Yearly",
     highlighted: false,
     buttonColor: "bg-gray-400/20",
-    priceId: process.env.PADDLE_YEARLY_PRICE_ID,
+    priceId: process.env.NEXT_PUBLIC_PADDLE_YEARLY_PRICE_ID,
   },
 ];
