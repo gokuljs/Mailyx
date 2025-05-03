@@ -4,7 +4,7 @@ import React from "react";
 type Props = {};
 
 const PaddleButton = (props: Props) => {
-  const isSubscribed = true;
+  const isSubscribed = false;
   const handleClick = () => {
     console.log("Handle Subscription click");
   };
