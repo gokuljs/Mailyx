@@ -3,15 +3,28 @@ import { GlowingEffect } from "../_components/glowing-effect";
 import { HoverBorderGradient } from "../_components/hover-border-gradient";
 import ParticlesBackground from "../_components/Particles";
 
+export interface Tier {
+  name: string;
+  id: "free" | "monthly" | "annual";
+  price: string;
+  description: string;
+  features: string[];
+  buttonText: string;
+  highlighted: boolean;
+  buttonColor: string;
+  priceId?: string;
+  borderColor?: string;
+}
 const Pricing = () => {
-  const plans = [
+  const plans: Tier[] = [
     {
+      id: "free",
       name: "Free Tier",
       price: "$0",
       description: "Great for getting started and trying basic features.",
       features: [
         "Sync 1 email account",
-        "20 chats/month",
+        "15 chats/day",
         "Last 30 days search",
         "Basic keyboard shortcuts",
       ],
@@ -20,6 +33,7 @@ const Pricing = () => {
       buttonColor: "bg-gray-400/20",
     },
     {
+      id: "monthly",
       name: "Pro Plan",
       price: "$25/mo",
       description: "Perfect for growing users needing unlimited access.",
@@ -33,8 +47,10 @@ const Pricing = () => {
       highlighted: true,
       buttonColor: "bg-orange-600",
       borderColor: "border-orange-300",
+      priceId: process.env.PADDLE_MONTHLY_PRICE_ID,
     },
     {
+      id: "annual",
       name: "Pro Plan Yearly",
       price: "$250/yr",
       description: "Best value - save 2 months on annual billing.",
@@ -49,6 +65,7 @@ const Pricing = () => {
       buttonText: "Subscribe Yearly",
       highlighted: false,
       buttonColor: "bg-gray-400/20",
+      priceId: process.env.PADDLE_YEARLY_PRICE_ID,
     },
   ];
 
