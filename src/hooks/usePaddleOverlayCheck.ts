@@ -20,9 +20,16 @@ const usePaddleOverlayCheck = () => {
   }, [isLoaded, isSignedIn, user]);
 
   const handleCheckout = (priceId: string) => {
-    if (!paddle) return alert("Paddle not initialized");
+    if (!paddle || !user) return alert("Paddle not initialized");
+
+    const emailAddress = user?.emailAddresses?.[0]?.emailAddress;
+    if (!emailAddress) return;
+
     paddle.Checkout.open({
       items: [{ priceId: priceId, quantity: 1 }],
+      customer: {
+        email: emailAddress,
+      },
       settings: {
         displayMode: "overlay",
         theme: "dark",
