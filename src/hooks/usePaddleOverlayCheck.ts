@@ -21,7 +21,7 @@ const usePaddleOverlayCheck = () => {
 
   const handleCheckout = (priceId: string) => {
     if (!paddle || !user) return alert("Paddle not initialized");
-
+    console.log(user);
     const emailAddress = user?.emailAddresses?.[0]?.emailAddress;
     if (!emailAddress) return;
 
