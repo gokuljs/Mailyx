@@ -5,7 +5,7 @@ const paddle = new Paddle(process.env.PADDLE_API_KEY as string, {
   environment: process.env.PADDLE_ENV as Environment,
 });
 
-export async function POST(req: NextRequest) {
+export const POST = async (req: NextRequest) => {
   console.log("Paddle Webhook initiated");
   const signature = req.headers.get("paddle-signature") || "";
   // req.body should be of type `buffer`, convert to string before passing it to `unmarshal`.
@@ -43,4 +43,4 @@ export async function POST(req: NextRequest) {
   }
   // Return a response to acknowledge
   return new NextResponse("Processed webhook event");
-}
+};
