@@ -82,7 +82,7 @@ const Pricing = () => {
                     router.push("/mail");
                   } else {
                     if (isSignedIn && plan.priceId) {
-                      handleCheckout(plan.priceId);
+                      handleCheckout(plan.priceId, plan.id);
                     } else {
                       router.push("/sign-in");
                     }

@@ -20,7 +20,7 @@ const usePaddleOverlayCheck = () => {
     });
   }, [isLoaded, isSignedIn, user]);
 
-  const handleCheckout = (priceId: string) => {
+  const handleCheckout = (priceId: string, planType: string) => {
     if (!paddle || !user) {
       toast.error("Unable to initialize checkout. Please try again.");
       return;
@@ -43,6 +43,7 @@ const usePaddleOverlayCheck = () => {
       customData: {
         userId: user.id,
         emailAddress: emailAddress,
+        planType: planType,
       },
     });
   };

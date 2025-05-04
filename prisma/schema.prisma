@@ -9,12 +9,13 @@ datasource db {
 }
 
 model User {
-    id           String    @id @default(cuid())
-    emailAddress String    @unique
+    id           String        @id @default(cuid())
+    emailAddress String        @unique
     firstName    String?
     lastName     String?
     imageUrl     String?
     Account      Account[]
+    Subscription Subscription?
 }
 
 model Account {
@@ -149,4 +150,33 @@ enum MeetingMessageMethod {
     cancel
     counter
     other
+}
+
+model Subscription {
+    id                   String             @id @default(cuid())
+    userId               String             @unique
+    user                 User               @relation(fields: [userId], references: [id])
+    paddleSubscriptionId String             @unique
+    customerID           String
+    addressId            String
+    businessId           String?
+    createdAt            DateTime           @default(now())
+    updatedAt            DateTime           @updatedAt
+    startedAt            DateTime
+    endedAt              DateTime?
+    nextBilledAt         DateTime?
+    pausedAt             DateTime?
+    canceledAt           DateTime?
+    status               SubscriptionStatus
+    billingInterval      String
+    billingFrequency     Int
+    planId               String
+}
+
+enum SubscriptionStatus {
+    ACTIVE
+    PAUSED
+    CANCELLED
+    EXPIRED
+    PAST_DUE
 }

@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Environment, EventName, Paddle } from "@paddle/paddle-node-sdk";
+import { db } from "@/server/db";
+import { SubscriptionStatus } from "@prisma/client";
 
 const paddle = new Paddle(process.env.PADDLE_API_KEY as string, {
   environment: process.env.PADDLE_ENV as Environment,
@@ -23,14 +25,10 @@ export const POST = async (req: NextRequest) => {
         signature,
       );
       switch (eventData.eventType) {
-        case EventName.ProductUpdated:
-          console.log(`Product ${eventData.data.id} was updated`);
+        case EventName.SubscriptionCreated:
+          await handleSubscriptionCreated(eventData.data);
+          console.log("subscription created", eventData.data);
           break;
-        case EventName.SubscriptionUpdated:
-          console.log(`Subscription ${eventData.data.id} was updated`);
-          break;
-        case EventName.TransactionPaid:
-          console.log(`Transaction ${eventData.data.id} was paid`);
         default:
           console.log(eventData.eventType);
       }
@@ -43,4 +41,56 @@ export const POST = async (req: NextRequest) => {
   }
   // Return a response to acknowledge
   return new NextResponse("Processed webhook event");
+};
+
+const handleSubscriptionCreated = async (data: any) => {
+  try {
+    const userId = data.customData?.userId;
+    console.log("created subscription for", userId);
+    if (!userId) {
+      console.error("No userId found in subscription data");
+      return;
+    }
+
+    await db.subscription.upsert({
+      where: {
+        paddleSubscriptionId: data.id,
+      },
+      update: {
+        customerID: data.customerId,
+        addressId: data.addressId,
+        businessId: data.businessId,
+        startedAt: new Date(data.currentBillingPeriod.startsAt),
+        endedAt: new Date(data.currentBillingPeriod.endsAt),
+        nextBilledAt: data.nextBilledAt ? new Date(data.nextBilledAt) : null,
+        pausedAt: data.pausedAt ? new Date(data.pausedAt) : null,
+        canceledAt: data.canceledAt ? new Date(data.canceledAt) : null,
+        status: data.status.toUpperCase() as SubscriptionStatus,
+        billingInterval: data.billingCycle.interval,
+        billingFrequency: data.billingCycle.frequency,
+        updatedAt: new Date(),
+        planId: data.customData?.planType || "",
+      },
+      create: {
+        userId,
+        paddleSubscriptionId: data.id,
+        customerID: data.customerId,
+        addressId: data.addressId,
+        businessId: data.businessId,
+        startedAt: new Date(data.currentBillingPeriod.startsAt),
+        endedAt: new Date(data.currentBillingPeriod.endsAt),
+        nextBilledAt: data.nextBilledAt ? new Date(data.nextBilledAt) : null,
+        pausedAt: data.pausedAt ? new Date(data.pausedAt) : null,
+        canceledAt: data.canceledAt ? new Date(data.canceledAt) : null,
+        status: data.status.toUpperCase() as SubscriptionStatus,
+        billingInterval: data.billingCycle.interval,
+        billingFrequency: data.billingCycle.frequency,
+        planId: data.customData?.planType || "",
+      },
+    });
+
+    console.log(`Subscription created for user ${userId}`);
+  } catch (error) {
+    console.error("Error creating subscription:", error);
+  }
 };
