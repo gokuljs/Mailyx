@@ -29,6 +29,10 @@ export const POST = async (req: NextRequest) => {
           await handleSubscriptionCreated(eventData.data);
           console.log("subscription created", eventData.data);
           break;
+        case EventName.SubscriptionUpdated:
+          await handleSubscriptionUpdated(eventData.data);
+          console.log("subscription updated", eventData.data);
+          break;
         default:
           console.log(eventData.eventType);
       }
@@ -54,9 +58,10 @@ const handleSubscriptionCreated = async (data: any) => {
 
     await db.subscription.upsert({
       where: {
-        paddleSubscriptionId: data.id,
+        userId: userId,
       },
       update: {
+        paddleSubscriptionId: data.id,
         customerID: data.customerId,
         addressId: data.addressId,
         businessId: data.businessId,
@@ -92,5 +97,43 @@ const handleSubscriptionCreated = async (data: any) => {
     console.log(`Subscription created for user ${userId}`);
   } catch (error) {
     console.error("Error creating subscription:", error);
+  }
+};
+
+const handleSubscriptionUpdated = async (data: any) => {
+  try {
+    console.log("updated subscription data", data);
+    const paddleSubscriptionId = data.id;
+    if (!paddleSubscriptionId) {
+      console.error(
+        "No paddleSubscriptionId found in updated subscription data",
+      );
+      return;
+    }
+
+    await db.subscription.update({
+      where: {
+        paddleSubscriptionId: paddleSubscriptionId,
+      },
+      data: {
+        customerID: data.customerId,
+        addressId: data.addressId,
+        businessId: data.businessId,
+        startedAt: new Date(data.currentBillingPeriod.startsAt),
+        endedAt: new Date(data.currentBillingPeriod.endsAt),
+        nextBilledAt: data.nextBilledAt ? new Date(data.nextBilledAt) : null,
+        pausedAt: data.pausedAt ? new Date(data.pausedAt) : null,
+        canceledAt: data.canceledAt ? new Date(data.canceledAt) : null,
+        status: data.status.toUpperCase() as SubscriptionStatus,
+        billingInterval: data.billingCycle.interval,
+        billingFrequency: data.billingCycle.frequency,
+        updatedAt: new Date(),
+        planId: data.customData?.planType || "",
+      },
+    });
+
+    console.log(`Subscription updated for ${paddleSubscriptionId}`);
+  } catch (error) {
+    console.error("Error updating subscription:", error);
   }
 };
