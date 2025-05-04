@@ -6,9 +6,13 @@ import ParticlesBackground from "../_components/Particles";
 import { plans } from "@/lib/Constants";
 
 import usePaddleOverlayCheck from "@/hooks/usePaddleOverlayCheck";
+import { useRouter } from "next/navigation";
+import { useUser } from "@clerk/nextjs";
 
 const Pricing = () => {
+  const { isLoaded, isSignedIn, user } = useUser();
   const { handleCheckout } = usePaddleOverlayCheck();
+  const router = useRouter();
 
   return (
     <div className="flex min-h-screen flex-col items-center bg-[size:20px_20px] py-20 pt-40 text-white">
@@ -74,8 +78,15 @@ const Pricing = () => {
               {/* Button pushed to bottom using mt-auto inside flex */}
               <button
                 onClick={() => {
-                  console.log("clicked", plan?.priceId);
-                  plan?.priceId && handleCheckout(plan.priceId);
+                  if (plan.id === "free") {
+                    router.push("/mail");
+                  } else {
+                    if (isSignedIn && plan.priceId) {
+                      handleCheckout(plan.priceId);
+                    } else {
+                      router.push("/sign-in");
+                    }
+                  }
                 }}
                 className={`w-full ${plan.buttonColor} mt-auto cursor-pointer rounded-xl border border-transparent px-6 py-2 text-white transition-all duration-150 hover:border hover:${plan?.borderColor ?? "border-gray-100"} hover:opacity-70`}
               >
