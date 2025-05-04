@@ -3,6 +3,7 @@
 import { useUser } from "@clerk/nextjs";
 import React, { useEffect, useState } from "react";
 import { Environments, initializePaddle, Paddle } from "@paddle/paddle-js";
+import { toast } from "sonner";
 
 const usePaddleOverlayCheck = () => {
   const { isLoaded, isSignedIn, user } = useUser();
@@ -20,7 +21,10 @@ const usePaddleOverlayCheck = () => {
   }, [isLoaded, isSignedIn, user]);
 
   const handleCheckout = (priceId: string) => {
-    if (!paddle || !user) return alert("Paddle not initialized");
+    if (!paddle || !user) {
+      toast.error("Unable to initialize checkout. Please try again.");
+      return;
+    }
     console.log(user);
     const emailAddress = user?.emailAddresses?.[0]?.emailAddress;
     if (!emailAddress) return;
