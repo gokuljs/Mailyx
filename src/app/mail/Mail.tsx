@@ -44,7 +44,6 @@ function Mail({
   const { data: accounts } = api.account.getAccounts.useQuery(undefined, {
     enabled: isSignedIn,
   });
-  console.log({ accounts });
 
   return (
     <TooltipProvider delayDuration={0}>

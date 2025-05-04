@@ -197,7 +197,7 @@ export const accountRouter = createTRPCRouter({
           },
         },
       });
-      console.log(JSON.stringify(thread, null, 2), account.emailAddress);
+
       if (!thread || thread.email.length === 0)
         throw new Error("Email not found");
       const messages = thread.email;

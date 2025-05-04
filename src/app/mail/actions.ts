@@ -46,7 +46,6 @@ export async function generateEmail(context: string, prompt: string) {
 }
 
 export async function generate(input: string) {
-  console.log({ input }, "ssssf");
   const stream = createStreamableValue();
   (async () => {
     const { textStream } = await streamText({

@@ -1,10 +1,11 @@
 import { Button } from "@/components/ui/button";
 import React from "react";
 
-type Props = {};
+type Props = {
+  isSubscribed: boolean;
+};
 
-const PaddleButton = (props: Props) => {
-  const isSubscribed = false;
+const PaddleButton = ({ isSubscribed }: Props) => {
   const handleClick = () => {
     console.log("Handle Subscription click");
   };
