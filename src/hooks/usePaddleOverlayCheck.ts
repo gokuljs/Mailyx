@@ -33,7 +33,12 @@ const usePaddleOverlayCheck = () => {
       settings: {
         displayMode: "overlay",
         theme: "dark",
+        variant: "one-page",
         successUrl: `${process.env.NEXT_PUBLIC_URL}/mail`,
+      },
+      customData: {
+        userId: user.id,
+        emailAddress: emailAddress,
       },
     });
   };
