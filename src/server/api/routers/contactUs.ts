@@ -1,6 +1,7 @@
 import { z } from "zod";
 import nodemailer from "nodemailer";
 import { createTRPCRouter, publicProcedure } from "../trpc";
+import * as schema from "@/server/db/schema";
 import { error } from "console";
 
 export const contactRouter = createTRPCRouter({
@@ -15,12 +16,10 @@ export const contactRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const { email, message, subject } = input;
       try {
-        await ctx.db.contactMessage.create({
-          data: {
-            fromEmail: email,
-            subject,
-            message,
-          },
+        await ctx.db.insert(schema.contactMessages).values({
+          fromEmail: email,
+          subject: subject,
+          message: message,
         });
 
         const transporter = nodemailer.createTransport({

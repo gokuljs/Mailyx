@@ -1,12 +1,26 @@
-import { EmailAttachment, EmailMessage } from "./types";
+import {
+  EmailAttachment,
+  EmailMessage,
+  EmailAddress as EmailAddressType,
+} from "./types";
 import pLimit from "p-limit";
 import { db } from "@/server/db";
-import { EmailAddress } from "@prisma/client";
+import * as schema from "@/server/db/schema";
+import { eq, and } from "drizzle-orm";
 import { OramaClient } from "./orama";
 import { turndown } from "./turndown";
 import { getEmbeddings } from "./embedding";
-import { auth } from "@clerk/nextjs/server";
-import redisHandler from "./redis";
+import { clerkClient, auth } from "@clerk/nextjs/server";
+import {
+  EmailLabel,
+  Sensitivity,
+  MeetingMessageMethod,
+} from "@/server/db/schema/emails";
+
+// Define types based on schema for clarity
+type EmailAddressDb = typeof schema.emailAddresses.$inferSelect;
+type ThreadDb = typeof schema.threads.$inferSelect;
+type EmailDb = typeof schema.emails.$inferSelect;
 
 export async function syncEmailsToDatabase(
   emails: EmailMessage[],
@@ -44,7 +58,6 @@ export async function syncEmailsToDatabase(
     async function syncToDB() {
       for (const [index, email] of emails.entries()) {
         await upsertEmail(email, accountId, index);
-        await invalidatedUserThreadCache(accountId);
       }
     }
     await Promise.all([syncToOrama(), syncToDB()]);
@@ -58,25 +71,6 @@ export async function syncEmailsToDatabase(
   }
 }
 
-async function invalidatedUserThreadCache(accountId: string) {
-  console.log("Invalidating Thread Cache");
-  const { userId } = await auth();
-  const tabs = ["inbox", "draft", "sent"];
-  const doneStates = ["true", "false", "all"];
-  const keys: string[] = [];
-  for (const tab of tabs) {
-    for (const done of doneStates) {
-      keys.push(
-        `threads:user:${userId}:account:${accountId}:tab:${tab}:done:${done}`,
-      );
-    }
-  }
-
-  for (const key of keys) {
-    await redisHandler.del(key);
-  }
-}
-
 async function upsertEmail(
   email: EmailMessage,
   accountId: string,
@@ -85,7 +79,7 @@ async function upsertEmail(
   console.log("Upsert Email", index);
 
   try {
-    let emailLabelType: "inbox" | "draft" | "sent" = "inbox";
+    let emailLabelType: EmailLabel = "inbox"; // Use imported Drizzle enum type
     if (
       email?.sysLabels?.includes("inbox") ||
       email?.sysLabels?.includes("important")
@@ -96,203 +90,293 @@ async function upsertEmail(
     } else if (email?.sysLabels?.includes("draft")) {
       emailLabelType = "draft";
     }
-    const addressToUpsert = new Map();
+    const addressToUpsert = new Map<string, EmailAddressType>();
     for (const address of [
       email?.from,
       ...email.to,
       ...email.cc,
       ...email.bcc,
       ...email.replyTo,
-    ]) {
-      addressToUpsert.set(address.address, address);
+    ].filter((a): a is EmailAddressType => !!a)) {
+      // Ensure address is not null/undefined
+      if (address.address) {
+        addressToUpsert.set(address.address, address);
+      }
     }
-    const upsertedAddresses: Awaited<ReturnType<typeof upsertEmailAddress>>[] =
-      [];
-    for (const address of addressToUpsert?.values()) {
-      const upsertAddress = await upsertEmailAddress(address, accountId);
-      upsertedAddresses.push(upsertAddress);
-    }
-    const addressMap = new Map(
-      upsertedAddresses
-        .filter(Boolean)
-        ?.map((address) => [address!.address, address]),
+
+    const upsertedAddresses: (EmailAddressDb | null)[] = await Promise.all(
+      Array.from(addressToUpsert.values()).map((addr) =>
+        upsertEmailAddress(addr, accountId),
+      ),
     );
-    const fromAddress = addressMap?.get(email?.from?.address);
+
+    const addressMap = new Map<string, EmailAddressDb>(
+      upsertedAddresses
+        .filter((a): a is EmailAddressDb => !!a)
+        .map((address) => [address.address, address]),
+    );
+
+    const fromAddress = email.from?.address
+      ? addressMap.get(email.from.address)
+      : undefined;
     if (!fromAddress) {
       console.log(
-        `Failed to upsert from address to email"${email.bodySnippet}`,
+        `Failed to find/upsert 'from' address (${email.from?.address}) for email snippet: "${email.bodySnippet}"`,
       );
       return;
     }
     const toAddresses = email.to
-      .map((addr) => addressMap.get(addr.address))
-      .filter(Boolean);
+      .map((addr) => (addr.address ? addressMap.get(addr.address) : undefined))
+      .filter((a): a is EmailAddressDb => !!a);
     const ccAddresses = email.cc
-      .map((addr) => addressMap.get(addr.address))
-      .filter(Boolean);
+      .map((addr) => (addr.address ? addressMap.get(addr.address) : undefined))
+      .filter((a): a is EmailAddressDb => !!a);
     const bccAddresses = email.bcc
-      .map((addr) => addressMap.get(addr.address))
-      .filter(Boolean);
+      .map((addr) => (addr.address ? addressMap.get(addr.address) : undefined))
+      .filter((a): a is EmailAddressDb => !!a);
     const replyToAddresses = email.replyTo
-      .map((addr) => addressMap.get(addr.address))
-      .filter(Boolean);
+      .map((addr) => (addr.address ? addressMap.get(addr.address) : undefined))
+      .filter((a): a is EmailAddressDb => !!a);
 
-    // 2 upsert thread
-    const thread = await db.thread.upsert({
-      where: { id: email.threadId },
-      update: {
-        subject: email.subject,
-        accountId,
-        lastMessageDate: new Date(email.sentAt),
-        done: false,
-        participantsIds: [
-          ...new Set([
-            fromAddress.id,
-            ...toAddresses.map((a) => a!.id),
-            ...ccAddresses.map((a) => a!.id),
-            ...bccAddresses.map((a) => a!.id),
-          ]),
-        ],
-      },
-      create: {
-        id: email.threadId,
-        accountId,
-        subject: email.subject,
-        done: false,
-        draftStatus: emailLabelType === "draft",
-        inboxStatus: emailLabelType === "inbox",
-        sentStatus: emailLabelType === "sent",
-        lastMessageDate: new Date(email.sentAt),
-        participantsIds: [
-          ...new Set([
-            fromAddress.id,
-            ...toAddresses.map((a) => a!.id),
-            ...ccAddresses.map((a) => a!.id),
-            ...bccAddresses.map((a) => a!.id),
-          ]),
-        ],
-      },
-    });
-    // 3. Upsert Email
-    await db.email.upsert({
-      where: { id: email.id },
-      update: {
-        threadId: thread.id,
-        createdTime: new Date(email.createdTime),
-        lastModifiedTime: new Date(),
-        sentAt: new Date(email.sentAt),
-        receivedAt: new Date(email.receivedAt),
-        internetMessageId: email.internetMessageId,
-        subject: email.subject,
-        sysLabels: email.sysLabels,
-        keywords: email.keywords,
-        sysClassifications: email.sysClassifications,
-        sensitivity: email.sensitivity,
-        meetingMessageMethod: email.meetingMessageMethod,
-        fromId: fromAddress.id,
-        to: { set: toAddresses.map((a) => ({ id: a!.id })) },
-        cc: { set: ccAddresses.map((a) => ({ id: a!.id })) },
-        bcc: { set: bccAddresses.map((a) => ({ id: a!.id })) },
-        replyTo: { set: replyToAddresses.map((a) => ({ id: a!.id })) },
-        hasAttachments: email.hasAttachments,
-        internetHeaders: email.internetHeaders as any,
-        body: email.body,
-        bodySnippet: email.bodySnippet,
-        inReplyTo: email.inReplyTo,
-        references: email.references,
-        threadIndex: email.threadIndex,
-        nativeProperties: email.nativeProperties as any,
-        folderId: email.folderId,
-        omitted: email.omitted,
-        emailLabel: emailLabelType,
-      },
-      create: {
-        id: email.id,
-        emailLabel: emailLabelType,
-        threadId: thread.id,
-        createdTime: new Date(email.createdTime),
-        lastModifiedTime: new Date(),
-        sentAt: new Date(email.sentAt),
-        receivedAt: new Date(email.receivedAt),
-        internetMessageId: email.internetMessageId,
-        subject: email.subject,
-        sysLabels: email.sysLabels,
-        internetHeaders: email.internetHeaders as any,
-        keywords: email.keywords,
-        sysClassifications: email.sysClassifications,
-        sensitivity: email.sensitivity,
-        meetingMessageMethod: email.meetingMessageMethod,
-        fromId: fromAddress.id,
-        to: { connect: toAddresses.map((a) => ({ id: a!.id })) },
-        cc: { connect: ccAddresses.map((a) => ({ id: a!.id })) },
-        bcc: { connect: bccAddresses.map((a) => ({ id: a!.id })) },
-        replyTo: { connect: replyToAddresses.map((a) => ({ id: a!.id })) },
-        hasAttachments: email.hasAttachments,
-        body: email.body,
-        bodySnippet: email.bodySnippet,
-        inReplyTo: email.inReplyTo,
-        references: email.references,
-        threadIndex: email.threadIndex,
-        nativeProperties: email.nativeProperties as any,
-        folderId: email.folderId,
-        omitted: email.omitted,
-      },
-    });
-    const threadEmails = await db.email.findMany({
-      where: { threadId: thread.id },
-      orderBy: { receivedAt: "asc" },
-    });
-    let threadFolderType = "sent";
+    // --- 2. Upsert Thread ---
+    const threadValues = {
+      id: email.threadId,
+      subject: email.subject,
+      accountId,
+      lastMessageDate: new Date(email.sentAt),
+      done: false,
+      participantsIds: [
+        ...new Set([
+          fromAddress.id,
+          ...toAddresses.map((a) => a.id),
+          ...ccAddresses.map((a) => a.id),
+          ...bccAddresses.map((a) => a.id),
+        ]),
+      ],
+      // Set initial status based on the first email encountered for this thread
+      draftStatus: emailLabelType === "draft",
+      inboxStatus: emailLabelType === "inbox",
+      sentStatus: emailLabelType === "sent",
+    };
+
+    const upsertedThread = await db
+      .insert(schema.threads)
+      .values(threadValues)
+      .onConflictDoUpdate({
+        target: schema.threads.id,
+        set: {
+          // Only update fields that should change if thread exists
+          subject: threadValues.subject, // Keep subject potentially updated
+          lastMessageDate: threadValues.lastMessageDate, // Always update last message date
+          participantsIds: threadValues.participantsIds, // Update participants
+          // Don't update accountId or initial status flags on conflict
+          done: false, // Reset done status on new message? Review logic
+        },
+      })
+      .returning(); // Return the inserted/updated thread
+
+    const thread = upsertedThread[0];
+    if (!thread) {
+      console.error(`Failed to upsert thread ${email.threadId}`);
+      return;
+    }
+
+    // --- 3. Upsert Email ---
+    const emailValues = {
+      id: email.id,
+      threadId: thread.id,
+      createdTime: new Date(email.createdTime),
+      lastModifiedTime: new Date(), // Use DB default? Check schema
+      sentAt: new Date(email.sentAt),
+      receivedAt: new Date(email.receivedAt),
+      internetMessageId: email.internetMessageId,
+      subject: email.subject,
+      sysLabels: email.sysLabels,
+      keywords: email.keywords,
+      sysClassifications: email.sysClassifications,
+      sensitivity: email.sensitivity as Sensitivity, // Use imported enum type
+      meetingMessageMethod:
+        email.meetingMessageMethod as MeetingMessageMethod | null, // Use imported enum type
+      fromId: fromAddress.id,
+      hasAttachments: email.hasAttachments,
+      internetHeaders: email.internetHeaders as any, // JSON type handling
+      body: email.body,
+      bodySnippet: email.bodySnippet,
+      inReplyTo: email.inReplyTo,
+      references: email.references,
+      threadIndex: email.threadIndex,
+      nativeProperties: email.nativeProperties as any, // JSON type handling
+      folderId: email.folderId,
+      omitted: email.omitted,
+      emailLabel: emailLabelType,
+    };
+
+    await db
+      .insert(schema.emails)
+      .values(emailValues)
+      .onConflictDoUpdate({
+        target: schema.emails.id,
+        set: {
+          // Update most fields on conflict, except immutable ones like id, threadId, createdTime?
+          lastModifiedTime: new Date(),
+          sentAt: emailValues.sentAt,
+          receivedAt: emailValues.receivedAt,
+          internetMessageId: emailValues.internetMessageId,
+          subject: emailValues.subject,
+          sysLabels: emailValues.sysLabels,
+          keywords: emailValues.keywords,
+          sysClassifications: emailValues.sysClassifications,
+          sensitivity: emailValues.sensitivity,
+          meetingMessageMethod: emailValues.meetingMessageMethod,
+          fromId: emailValues.fromId,
+          hasAttachments: emailValues.hasAttachments,
+          internetHeaders: emailValues.internetHeaders,
+          body: emailValues.body,
+          bodySnippet: emailValues.bodySnippet,
+          inReplyTo: emailValues.inReplyTo,
+          references: emailValues.references,
+          threadIndex: emailValues.threadIndex,
+          nativeProperties: emailValues.nativeProperties,
+          folderId: emailValues.folderId,
+          omitted: emailValues.omitted,
+          emailLabel: emailValues.emailLabel,
+        },
+      });
+
+    // --- Handle M2M Relations (To, Cc, Bcc, ReplyTo) ---
+    // Strategy: Delete existing relations for this email, then insert new ones.
+
+    // Delete existing relations
+    await Promise.all([
+      db
+        .delete(schema.emailsToEmailAddressesTo)
+        .where(eq(schema.emailsToEmailAddressesTo.emailId, email.id)),
+      db
+        .delete(schema.emailsToEmailAddressesCc)
+        .where(eq(schema.emailsToEmailAddressesCc.emailId, email.id)),
+      db
+        .delete(schema.emailsToEmailAddressesBcc)
+        .where(eq(schema.emailsToEmailAddressesBcc.emailId, email.id)),
+      db
+        .delete(schema.emailsToEmailAddressesReplyTo)
+        .where(eq(schema.emailsToEmailAddressesReplyTo.emailId, email.id)),
+    ]);
+
+    // Prepare new relation data
+    const toInsertData = toAddresses.map((addr) => ({
+      emailId: email.id,
+      emailAddressId: addr.id,
+    }));
+    const ccInsertData = ccAddresses.map((addr) => ({
+      emailId: email.id,
+      emailAddressId: addr.id,
+    }));
+    const bccInsertData = bccAddresses.map((addr) => ({
+      emailId: email.id,
+      emailAddressId: addr.id,
+    }));
+    const replyToInsertData = replyToAddresses.map((addr) => ({
+      emailId: email.id,
+      emailAddressId: addr.id,
+    }));
+
+    // Insert new relations (ignore if empty)
+    const insertPromises = [];
+    if (toInsertData.length > 0) {
+      insertPromises.push(
+        db.insert(schema.emailsToEmailAddressesTo).values(toInsertData),
+      );
+    }
+    if (ccInsertData.length > 0) {
+      insertPromises.push(
+        db.insert(schema.emailsToEmailAddressesCc).values(ccInsertData),
+      );
+    }
+    if (bccInsertData.length > 0) {
+      insertPromises.push(
+        db.insert(schema.emailsToEmailAddressesBcc).values(bccInsertData),
+      );
+    }
+    if (replyToInsertData.length > 0) {
+      insertPromises.push(
+        db
+          .insert(schema.emailsToEmailAddressesReplyTo)
+          .values(replyToInsertData),
+      );
+    }
+    await Promise.all(insertPromises);
+
+    // --- Update Thread Status based on all emails in thread ---
+    const threadEmails = await db
+      .select({ emailLabel: schema.emails.emailLabel })
+      .from(schema.emails)
+      .where(eq(schema.emails.threadId, thread.id));
+    // .orderBy(asc(schema.emails.receivedAt)); // Order might not be needed just for status check
+
+    let threadFolderType: EmailLabel = "sent"; // Default if no inbox/draft
     for (const threadEmail of threadEmails) {
       if (threadEmail.emailLabel === "inbox") {
         threadFolderType = "inbox";
-        break; // If any email is in inbox, the whole thread is in inbox
+        break; // Inbox takes precedence
       } else if (threadEmail.emailLabel === "draft") {
-        threadFolderType = "draft"; // Set to draft, but continue checking for inbox
+        threadFolderType = "draft"; // Draft is lower precedence than inbox
       }
     }
-    await db.thread.update({
-      where: { id: thread.id },
-      data: {
+
+    await db
+      .update(schema.threads)
+      .set({
         draftStatus: threadFolderType === "draft",
         inboxStatus: threadFolderType === "inbox",
         sentStatus: threadFolderType === "sent",
-      },
-    });
+      })
+      .where(eq(schema.threads.id, thread.id));
 
-    // 4. Upsert Attachments
+    // --- 4. Upsert Attachments (already refactored) ---
     for (const attachment of email.attachments) {
       await upsertAttachment(email.id, attachment);
     }
   } catch (error) {
-    console.log(error);
+    console.log(`Error upserting email index ${index}:`, error);
   }
 }
 
-async function upsertEmailAddress(address: EmailAddress, accountId: string) {
+async function upsertEmailAddress(
+  address: EmailAddressType,
+  accountId: string,
+) {
   try {
-    const existingAddress = await db.emailAddress.findUnique({
-      where: {
-        accountId_address: {
-          accountId: accountId,
-          address: address.address ?? "",
-        },
-      },
-    });
-    if (existingAddress) {
-      return await db.emailAddress.findUnique({
-        where: { id: existingAddress?.id },
+    const values = {
+      address: address?.address ?? "",
+      name: address?.name,
+      raw: address?.raw,
+      accountId,
+    };
+
+    // Attempt to insert, do nothing if conflict on unique index (accountId, address)
+    await db
+      .insert(schema.emailAddresses)
+      .values(values)
+      .onConflictDoNothing({
+        target: [
+          schema.emailAddresses.accountId,
+          schema.emailAddresses.address,
+        ],
       });
-    } else {
-      return await db.emailAddress.create({
-        data: {
-          address: address?.address ?? "",
-          name: address?.name,
-          raw: address?.raw,
-          accountId,
-        },
-      });
-    }
+
+    // Select the (potentially) newly inserted or existing address
+    const result = await db
+      .select()
+      .from(schema.emailAddresses)
+      .where(
+        and(
+          eq(schema.emailAddresses.accountId, accountId),
+          eq(schema.emailAddresses.address, values.address),
+        ),
+      )
+      .limit(1);
+
+    return result[0] ?? null;
   } catch (error) {
     console.log("Failed to upsert Email Address", error);
     return null;
@@ -301,29 +385,35 @@ async function upsertEmailAddress(address: EmailAddress, accountId: string) {
 
 async function upsertAttachment(emailId: string, attachment: EmailAttachment) {
   try {
-    await db.emailAttachment.upsert({
-      where: { id: attachment.id ?? "" },
-      update: {
-        name: attachment.name,
-        mimeType: attachment.mimeType,
-        size: attachment.size,
-        inline: attachment.inline,
-        contentId: attachment.contentId,
-        content: attachment.content,
-        contentLocation: attachment.contentLocation,
-      },
-      create: {
-        id: attachment.id,
-        emailId,
-        name: attachment.name,
-        mimeType: attachment.mimeType,
-        size: attachment.size,
-        inline: attachment.inline,
-        contentId: attachment.contentId,
-        content: attachment.content,
-        contentLocation: attachment.contentLocation,
-      },
-    });
+    const values = {
+      id: attachment.id,
+      emailId,
+      name: attachment.name,
+      mimeType: attachment.mimeType,
+      size: attachment.size,
+      inline: attachment.inline,
+      contentId: attachment.contentId,
+      content: attachment.content,
+      contentLocation: attachment.contentLocation,
+    };
+
+    // Insert or update the attachment based on its ID
+    await db
+      .insert(schema.emailAttachments)
+      .values(values)
+      .onConflictDoUpdate({
+        target: schema.emailAttachments.id,
+        set: {
+          // Only update fields that might change, assuming ID/emailId don't
+          name: values.name,
+          mimeType: values.mimeType,
+          size: values.size,
+          inline: values.inline,
+          contentId: values.contentId,
+          content: values.content,
+          contentLocation: values.contentLocation,
+        },
+      });
   } catch (error) {
     console.log(`Failed to upsert attachment for email ${emailId}: ${error}`);
   }

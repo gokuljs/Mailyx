@@ -1,7 +1,7 @@
 import useThreads from "@/hooks/useThreads";
 import React, { ComponentProps } from "react";
 import { format, formatDistance, formatDistanceToNow } from "date-fns";
-import { Thread } from "@prisma/client";
+import * as schema from "@/server/db/schema"; // Import schema for type inference
 import { cn } from "@/lib/utils";
 import DOMPurify from "dompurify";
 import { Badge } from "@/components/ui/badge";
@@ -17,18 +17,28 @@ function getBadgeVariantFromLabel(
   return "secondary";
 }
 
+// Infer Thread type based on Drizzle schema (adjust if hook returns different shape)
+type ThreadWithEmails = typeof schema.threads.$inferSelect & {
+  email: (typeof schema.emails.$inferSelect & {
+    from: typeof schema.emailAddresses.$inferSelect | null;
+  })[]; // Assuming email relation includes from address
+};
+
 const ThreadList = (props: Props) => {
-  const { threads, threadId, setThreadId } = useThreads();
-  const groupedThread = threads?.reduce(
+  const { threads, threadId, setThreadId } = useThreads(); // threads should match ThreadWithEmails type
+  const groupedThread = (threads as ThreadWithEmails[] | undefined)?.reduce(
     (acc, thread) => {
-      const date = format(thread.email[0]?.sentAt ?? new Date(), "yyyy-MM-dd");
+      // Access email data carefully, assuming it exists and has the expected structure
+      const firstEmail = thread.email?.[0];
+      const lastEmail = thread.email?.at(-1);
+      const date = format(firstEmail?.sentAt ?? new Date(), "yyyy-MM-dd");
       if (!acc[date]) {
         acc[date] = [];
       }
       acc[date].push(thread);
       return acc;
     },
-    {} as Record<string, typeof threads>,
+    {} as Record<string, ThreadWithEmails[]>,
   );
 
   return (
@@ -40,49 +50,49 @@ const ThreadList = (props: Props) => {
               {date}
             </div>
             {threads?.map((thread) => {
+              // Explicitly type thread here for clarity within the map
+              const currentThread = thread as ThreadWithEmails;
+              const firstEmail = currentThread.email?.[0];
+              const lastEmail = currentThread.email?.at(-1);
               return (
                 <button
-                  key={thread?.id}
-                  onClick={() => setThreadId(thread?.id)}
+                  key={currentThread?.id}
+                  onClick={() => setThreadId(currentThread?.id)}
                   className={cn(
                     "relative flex flex-col items-start gap-2 rounded-lg border p-3 text-left text-sm transition-all",
-                    threadId === thread.id && "bg-muted",
+                    threadId === currentThread.id && "bg-muted",
                   )}
                 >
                   <div className="flex w-full flex-col gap-2">
                     <div className="flex items-center">
                       <div className="flex items-center gap-2">
                         <div className="font-semibold">
-                          {thread.email.at(-1)?.from?.name ||
-                            thread?.subject ||
+                          {lastEmail?.from?.name ||
+                            currentThread?.subject ||
                             "(No Subject)"}
                         </div>
                       </div>
                       <div className={cn("ml-auto text-xs")}>
-                        {formatDistanceToNow(
-                          thread.email.at(-1)?.sentAt ?? new Date(),
-                          {
-                            addSuffix: true,
-                          },
-                        )}
+                        {formatDistanceToNow(lastEmail?.sentAt ?? new Date(), {
+                          addSuffix: true,
+                        })}
                       </div>
                     </div>
-                    <div className="text-xs font-medium">{thread?.subject}</div>
+                    <div className="text-xs font-medium">
+                      {currentThread?.subject}
+                    </div>
                   </div>
                   <div
                     className="text-muted-foreground line-clamp-2 text-xs"
                     dangerouslySetInnerHTML={{
-                      __html: DOMPurify.sanitize(
-                        thread.email?.at(-1)?.bodySnippet ?? "",
-                        {
-                          USE_PROFILES: { html: true },
-                        },
-                      ),
+                      __html: DOMPurify.sanitize(lastEmail?.bodySnippet ?? "", {
+                        USE_PROFILES: { html: true },
+                      }),
                     }}
                   ></div>
-                  {thread.email[0]?.sysLabels?.length && (
+                  {firstEmail?.sysLabels?.length && (
                     <div className="flex items-center gap-2">
-                      {thread.email[0]?.sysLabels.map((label) => (
+                      {firstEmail?.sysLabels.map((label) => (
                         <Badge
                           key={label}
                           variant={getBadgeVariantFromLabel(label)}

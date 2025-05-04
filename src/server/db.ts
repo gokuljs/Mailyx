@@ -1,16 +1,33 @@
-import { PrismaClient } from "@prisma/client";
+import { drizzle } from "drizzle-orm/node-postgres";
+import { Client } from "pg";
+import * as schema from "./db/schema";
 
 import { env } from "@/env";
 
-const createPrismaClient = () =>
-  new PrismaClient({
-    log: env.NODE_ENV === "development" ? ["error", "warn"] : ["error"],
+const createDbClient = () => {
+  // Use the standard Node 'pg' client
+  const client = new Client({
+    connectionString: env.DATABASE_URL, // Use standard DATABASE_URL from Supabase
   });
+  // Consider connecting the client here if needed for immediate checks,
+  // though Drizzle typically handles connection pooling.
+  // await client.connect();
 
-const globalForPrisma = globalThis as unknown as {
-  prisma: ReturnType<typeof createPrismaClient> | undefined;
+  // Pass the schema and the pg client instance to drizzle
+  return drizzle(client, { schema, logger: env.NODE_ENV === "development" });
 };
 
-export const db = globalForPrisma.prisma ?? createPrismaClient();
+// Define the type for the global object
+type GlobalDbClient = {
+  db: ReturnType<typeof createDbClient> | undefined;
+};
 
-if (env.NODE_ENV !== "production") globalForPrisma.prisma = db;
+const globalForDb = globalThis as unknown as GlobalDbClient;
+
+// Use the existing global instance or create a new one
+export const db = globalForDb.db ?? createDbClient();
+
+// Store the instance in the global object in development
+if (env.NODE_ENV !== "production") {
+  globalForDb.db = db;
+}
