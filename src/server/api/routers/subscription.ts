@@ -125,7 +125,7 @@ export const subscriptionRouter = createTRPCRouter({
         const response = await axios.patch(
           `${process.env.PADDLE_API_BASE_URL}/subscriptions/${subscription.paddleSubscriptionId}`,
           {
-            proration_billing_mode: "prorated_next_billing_period",
+            proration_billing_mode: "prorated_immediately",
             items: [
               {
                 price_id: newPriceId,

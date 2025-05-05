@@ -50,6 +50,7 @@ export default function ChangePlanModal({
     }
     try {
       await changePlan({ newPriceId: selectedPlanId });
+      onClose();
     } catch (error) {
       console.error(error);
     }
@@ -70,12 +71,12 @@ export default function ChangePlanModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent className="sm:max-w-lg dark:dark:bg-[hsl(20_14.3%_4.1%)]">
         <DialogHeader>
           <DialogTitle>Change Subscription Plan</DialogTitle>
           <DialogDescription>
-            Select the plan you want to switch to. Changes will take effect at
-            the start of your next billing cycle.
+            Select the plan you want to switch to. Changes will take effect
+            immediately and will be prorated.
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-2 py-4">
