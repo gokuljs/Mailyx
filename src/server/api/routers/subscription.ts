@@ -3,6 +3,7 @@ import nodemailer from "nodemailer";
 import { createTRPCRouter, privateProcedure } from "../trpc";
 import { error } from "console";
 import axios from "axios";
+import { plans } from "@/lib/Constants";
 
 export const subscriptionRouter = createTRPCRouter({
   getSubscriptionInfo: privateProcedure.query(async ({ ctx, input }) => {
@@ -47,7 +48,7 @@ export const subscriptionRouter = createTRPCRouter({
       }
 
       const response = await axios.post(
-        `https://sandbox-api.paddle.com/customers/${subscription.customerID}/portal-sessions`,
+        `${process.env.PADDLE_API_BASE_URL}/customers/${subscription.customerID}/portal-sessions`,
         {
           subscription_ids: [subscription.paddleSubscriptionId],
         },
@@ -67,6 +68,37 @@ export const subscriptionRouter = createTRPCRouter({
       console.log(JSON.stringify(e, null, 2));
       // Re-throw the error or handle it more specifically
       throw new Error("Failed to create customer portal session");
+    }
+  }),
+  getSubscriptionPlans: privateProcedure.query(async ({ ctx }) => {
+    try {
+      const subscription = await ctx.db.subscription.findFirst({
+        where: {
+          userId: ctx.auth.userId,
+        },
+        select: {
+          paddleSubscriptionId: true,
+        },
+      });
+      if (!subscription?.paddleSubscriptionId) {
+        throw new Error("Subscription not found");
+      }
+
+      const response = await axios.get(
+        `${process.env.PADDLE_API_BASE_URL}/subscriptions/${subscription.paddleSubscriptionId}`,
+
+        {
+          headers: {
+            Authorization: `Bearer ${process.env.PADDLE_API_KEY}`,
+          },
+        },
+      );
+      if (!response.data?.data?.items?.[0]?.price?.id) {
+        throw new Error("price id not found");
+      }
+      return response.data?.data?.items?.[0]?.price?.id;
+    } catch (e) {
+      console.log(JSON.stringify(e, null, 2));
     }
   }),
 });

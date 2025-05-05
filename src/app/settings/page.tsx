@@ -16,10 +16,13 @@ import { ArrowLeft, Loader2 } from "lucide-react";
 import useSubscriptionInfo from "@/hooks/useSubscriptionInfo";
 import { api } from "@/trpc/react";
 import { toast } from "sonner";
+import { useState } from "react";
+import ChangePlanModal from "@/components/settings/ChangePlanModal";
 
 export default function SettingsPage() {
   const router = useRouter();
-  const { subInfo, isLoading } = useSubscriptionInfo();
+  const { subInfo, isLoading, isSubscribed } = useSubscriptionInfo();
+  const [isChangePlanModalOpen, setIsChangePlanModalOpen] = useState(false);
   const { mutate, isPending } =
     api.subscription.getCustomerPortalInfo.useMutation({
       onSuccess: (data) => {
@@ -108,15 +111,26 @@ export default function SettingsPage() {
               Need more features or different limits? Explore our plans and find
               the best fit for you.
             </p>
-            {/* TODO: Implement plan change flow/link */}
-            <Button disabled variant="outline">
-              Change Subscription Plan (Coming Soon)
+            <Button
+              disabled={!isSubscribed}
+              variant="outline"
+              className="cursor-pointer"
+              onClick={() => setIsChangePlanModalOpen(true)}
+            >
+              Change Subscription Plan
             </Button>
             {/* Or link to pricing page:
              <Button asChild variant="outline">
                <Link href="/pricing">View Plans</Link>
              </Button>
              */}
+            {/* TODO: Add ChangePlanModal component here */}
+            {isChangePlanModalOpen && subInfo && (
+              <ChangePlanModal
+                isOpen={isChangePlanModalOpen}
+                onClose={() => setIsChangePlanModalOpen(false)}
+              />
+            )}
           </div>
         </CardContent>
         {/* Optional Footer */}
