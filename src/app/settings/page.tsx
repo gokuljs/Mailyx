@@ -12,11 +12,37 @@ import {
 import { Separator } from "@/components/ui/separator";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Loader2 } from "lucide-react";
+import useSubscriptionInfo from "@/hooks/useSubscriptionInfo";
+import { api } from "@/trpc/react";
+import { toast } from "sonner";
 
 export default function SettingsPage() {
   const router = useRouter();
+  const { subInfo, isLoading } = useSubscriptionInfo();
+  const { mutate, isPending } =
+    api.subscription.getCustomerPortalInfo.useMutation({
+      onSuccess: (data) => {
+        if (data?.portalUrl?.general?.overview) {
+          window.location.href = data.portalUrl.general.overview;
+        }
+      },
+      onError: (error) => {
+        toast.error("Failed to open customer portal");
+      },
+    });
   // TODO: Fetch user subscription status and details
+
+  const openCustomerPortal = async () => {
+    if (!subInfo) return;
+    try {
+      await mutate();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  if (isLoading) return <div>Loading...</div>;
 
   return (
     <div className="min-h-screen space-y-6 p-4 pb-16 md:p-10 dark:bg-[hsl(20_14.3%_4.1%)]">
@@ -51,12 +77,28 @@ export default function SettingsPage() {
           <div>
             <h3 className="mb-2 text-lg font-medium">Manage Billing</h3>
             <p className="text-muted-foreground mb-3 text-sm">
-              View your payment history, update payment methods, or cancel your
-              subscription through our secure customer portal.
+              Download your invoices, view your payment history, update payment
+              methods, or cancel your subscription through our secure customer
+              portal.
             </p>
             {/* TODO: Replace "#" with the actual customer portal link */}
-            <Button asChild variant="outline">
-              <Link href="#">Go to Customer Portal</Link>
+            <Button
+              asChild
+              variant="outline"
+              disabled={!subInfo || isPending}
+              onClick={openCustomerPortal}
+              className="flex w-fit items-center justify-center"
+            >
+              {isPending ? (
+                <div>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Loading ...
+                </div>
+              ) : (
+                <div className="flex items-center justify-center">
+                  <Link href="#">Go to Customer Portal</Link>
+                </div>
+              )}
             </Button>
           </div>
           <Separator />
