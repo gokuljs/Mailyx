@@ -53,7 +53,7 @@ function Mail({
         if (window.innerWidth <= 1200) {
           setMinSizes([25, 40, 40]);
         } else {
-          setMinSizes([20, 30, 40]);
+          setMinSizes([20, 40, 40]);
         }
       }
     };

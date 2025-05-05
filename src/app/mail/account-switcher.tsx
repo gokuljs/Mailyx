@@ -11,6 +11,9 @@ import { api } from "@/trpc/react";
 import React, { useState } from "react";
 import { useLocalStorage } from "usehooks-ts";
 import { useUser } from "@clerk/clerk-react";
+import { Plus } from "lucide-react";
+import { toast } from "sonner";
+import { getAurinkoAuthUrl } from "@/lib/aruinko";
 
 type Props = {
   isCollapsed: boolean;
@@ -57,6 +60,20 @@ export default function AccountSwitcher({ isCollapsed }: Props) {
               </div>
             </SelectItem>
           ))}
+          <div
+            onClick={async () => {
+              try {
+                const url = await getAurinkoAuthUrl("Google");
+                if (url) window.location.href = url;
+              } catch (error) {
+                toast.error((error as Error).message);
+              }
+            }}
+            className="flex cursor-pointer items-center gap-3 px-2 py-1"
+          >
+            <Plus className="mr-1 h-4 w-4" />
+            Add account
+          </div>
         </SelectContent>
       </Select>
     </div>
