@@ -45,7 +45,7 @@ export default function SettingsPage() {
     }
   };
 
-  if (isLoading) return <div>Loading...</div>;
+  console.log(subInfo);
 
   return (
     <div className="min-h-screen space-y-6 p-4 pb-16 md:p-10 dark:bg-[hsl(20_14.3%_4.1%)]">
@@ -53,7 +53,7 @@ export default function SettingsPage() {
       <Button
         variant="ghost"
         onClick={() => router.back()}
-        className="mb-4 px-2 text-sm"
+        className="mb-4 cursor-pointer px-2 text-sm"
       >
         <ArrowLeft className="mr-2 h-4 w-4" />
         Back
@@ -86,14 +86,13 @@ export default function SettingsPage() {
             </p>
             {/* TODO: Replace "#" with the actual customer portal link */}
             <Button
-              asChild
               variant="outline"
-              disabled={!subInfo || isPending}
+              disabled={!subInfo || isPending || isLoading}
               onClick={openCustomerPortal}
               className="flex w-fit items-center justify-center"
             >
               {isPending ? (
-                <div>
+                <div className="flex items-center justify-center gap-2">
                   <Loader2 className="h-4 w-4 animate-spin" />
                   Loading ...
                 </div>
