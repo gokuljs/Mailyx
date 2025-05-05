@@ -101,4 +101,46 @@ export const subscriptionRouter = createTRPCRouter({
       console.log(JSON.stringify(e, null, 2));
     }
   }),
+  changePlan: privateProcedure
+    .input(z.object({ newPriceId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      try {
+        const { newPriceId } = input;
+        const userId = ctx.auth.userId;
+        if (!userId) {
+          throw new Error("User not found");
+        }
+        if (!newPriceId) {
+          throw new Error("New price ID not found");
+        }
+        const subscription = await ctx.db.subscription.findFirst({
+          where: { userId },
+          select: {
+            paddleSubscriptionId: true,
+          },
+        });
+        if (!subscription?.paddleSubscriptionId) {
+          throw new Error("Subscription not found");
+        }
+        const response = await axios.patch(
+          `${process.env.PADDLE_API_BASE_URL}/subscriptions/${subscription.paddleSubscriptionId}`,
+          {
+            proration_billing_mode: "prorated_next_billing_period",
+            items: [
+              {
+                price_id: newPriceId,
+                quantity: 1,
+              },
+            ],
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${process.env.PADDLE_API_KEY}`,
+            },
+          },
+        );
+      } catch (e) {
+        console.log(JSON.stringify(e, null, 2));
+      }
+    }),
 });

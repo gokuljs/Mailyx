@@ -35,9 +35,10 @@ export default function ChangePlanModal({
   const { data: currentPlanId, isLoading: isLoadingPlans } =
     api.subscription.getSubscriptionPlans.useQuery(); // Fetch plans
   const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null);
-  const isChangingPlan = false;
+  const { mutate: changePlan, isPending: isChangingPlan } =
+    api.subscription.changePlan.useMutation();
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     if (!selectedPlanId) {
       toast.warning("Please select a plan to switch to.");
       return;
@@ -46,6 +47,11 @@ export default function ChangePlanModal({
     if (selectedPlanId === currentPlanId) {
       toast.info("You are already on this plan.");
       return;
+    }
+    try {
+      await changePlan({ newPriceId: selectedPlanId });
+    } catch (error) {
+      console.error(error);
     }
   };
 
