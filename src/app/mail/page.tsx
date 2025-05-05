@@ -6,6 +6,7 @@ import ComposeButton from "./ComposeButton";
 import { Button } from "@/components/ui/button";
 import { Settings } from "lucide-react";
 import { useRouter } from "next/navigation";
+import NavBar from "../_components/navbar";
 const Mail = dynamic(() => import("./Mail"), {
   ssr: false,
   loading: () => <p>Loading...</p>,

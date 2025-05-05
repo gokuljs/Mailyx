@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import ParticlesBackground from "../_components/Particles";
 import { GlowingEffect } from "../_components/glowing-effect";
 import { api } from "@/trpc/react";
+import NavBar from "../_components/navbar";
 
 interface FormData {
   email: string;
@@ -73,6 +74,7 @@ export default function ContactUs() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center">
+      <NavBar />
       <ParticlesBackground />
       <h2 className="mt-14 mb-12 bg-gradient-to-b from-white to-gray-500 bg-clip-text text-6xl font-bold text-transparent">
         Contact Us

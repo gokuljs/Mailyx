@@ -1,5 +1,6 @@
 import { BackgroundBeams } from "./_components/background-beams";
 import { GlowingEffect } from "./_components/glowing-effect";
+import NavBar from "./_components/navbar";
 import ParticlesBackground from "./_components/Particles";
 import StartMailyxButton from "./_components/StartMailyxButton";
 
@@ -10,6 +11,7 @@ export default async function Home() {
     <>
       <>
         <div className="relative z-10 flex min-h-screen flex-col items-center bg-black pt-60">
+          <NavBar />
           <ParticlesBackground />
           <BackgroundBeams />
           <h1 className="inline-block bg-linear-to-b from-white to-orange-300 bg-clip-text text-center text-6xl font-bold text-transparent">

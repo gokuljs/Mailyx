@@ -9,6 +9,7 @@ import usePaddleOverlayCheck from "@/hooks/usePaddleOverlayCheck";
 import { useRouter } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 import useSubscriptionInfo from "@/hooks/useSubscriptionInfo";
+import NavBar from "../_components/navbar";
 
 const Pricing = () => {
   const { isLoaded, isSignedIn, user } = useUser();
@@ -18,6 +19,7 @@ const Pricing = () => {
 
   return (
     <div className="flex min-h-screen flex-col items-center bg-black py-20 pt-40 text-white">
+      <NavBar />
       <ParticlesBackground />
       <h2 className="mb-4 flex justify-center bg-gradient-to-b from-white to-gray-400 bg-clip-text text-center text-6xl font-bold text-transparent">
         Simple and Affordable <br /> Pricing Plans
