@@ -8,10 +8,12 @@ import { plans } from "@/lib/Constants";
 import usePaddleOverlayCheck from "@/hooks/usePaddleOverlayCheck";
 import { useRouter } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
+import useSubscriptionInfo from "@/hooks/useSubscriptionInfo";
 
 const Pricing = () => {
   const { isLoaded, isSignedIn, user } = useUser();
   const { handleCheckout } = usePaddleOverlayCheck();
+  const { isSubscribed } = useSubscriptionInfo();
   const router = useRouter();
 
   return (
@@ -76,22 +78,38 @@ const Pricing = () => {
                 </ul>
               </div>
               {/* Button pushed to bottom using mt-auto inside flex */}
-              <button
-                onClick={() => {
-                  if (plan.id === "free") {
-                    router.push("/mail");
-                  } else {
+              {!isSubscribed && (
+                <button
+                  onClick={() => {
+                    if (plan.id === "free") {
+                      router.push("/mail");
+                      return;
+                    }
                     if (isSignedIn && plan.priceId) {
                       handleCheckout(plan.priceId, plan.id);
                     } else {
                       router.push("/sign-in");
                     }
-                  }
-                }}
-                className={`w-full ${plan.buttonColor} mt-auto cursor-pointer rounded-xl border border-transparent px-6 py-2 text-white transition-all duration-150 hover:border hover:${plan?.borderColor ?? "border-gray-100"} hover:opacity-70`}
-              >
-                {plan.buttonText}
-              </button>
+                  }}
+                  className={`w-full ${plan.buttonColor} mt-auto cursor-pointer rounded-xl border border-transparent px-6 py-2 text-white transition-all duration-150 hover:border hover:${plan?.borderColor ?? "border-gray-100"} hover:opacity-70`}
+                >
+                  {plan.buttonText}
+                </button>
+              )}
+              {plan.id !== "free" && isSubscribed && (
+                <button
+                  onClick={() => {
+                    if (isSignedIn && plan.priceId) {
+                      handleCheckout(plan.priceId, plan.id);
+                    } else {
+                      router.push("/sign-in");
+                    }
+                  }}
+                  className={`w-full ${plan.buttonColor} mt-auto cursor-pointer rounded-xl border border-transparent px-6 py-2 text-white transition-all duration-150 hover:border hover:${plan?.borderColor ?? "border-gray-100"} hover:opacity-70`}
+                >
+                  {isSubscribed ? "Manage Subscription" : plan.buttonText}
+                </button>
+              )}
             </div>
           </div>
         ))}
