@@ -17,7 +17,7 @@ const Pricing = () => {
   const router = useRouter();
 
   return (
-    <div className="flex min-h-screen flex-col items-center bg-[size:20px_20px] py-20 pt-40 text-white">
+    <div className="flex min-h-screen flex-col items-center bg-black py-20 pt-40 text-white">
       <ParticlesBackground />
       <h2 className="mb-4 flex justify-center bg-gradient-to-b from-white to-gray-400 bg-clip-text text-center text-6xl font-bold text-transparent">
         Simple and Affordable <br /> Pricing Plans
