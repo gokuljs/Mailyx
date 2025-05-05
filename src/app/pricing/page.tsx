@@ -100,7 +100,7 @@ const Pricing = () => {
                 <button
                   onClick={() => {
                     if (isSignedIn && plan.priceId) {
-                      handleCheckout(plan.priceId, plan.id);
+                      router.push("/settings");
                     } else {
                       router.push("/sign-in");
                     }
