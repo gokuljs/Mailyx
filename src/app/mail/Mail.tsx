@@ -57,7 +57,7 @@ function Mail({
         <ResizablePanel
           defaultSize={defaultLayout[0]}
           collapsedSize={navCollapsedSize}
-          minSize={15}
+          minSize={20}
           maxSize={40}
           onCollapse={() => {
             setIsCollapsed(true);

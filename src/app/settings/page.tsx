@@ -19,7 +19,7 @@ export default function SettingsPage() {
   // TODO: Fetch user subscription status and details
 
   return (
-    <div className="space-y-6 p-4 pb-16 md:p-10 dark:bg-[hsl(20_14.3%_4.1%)]">
+    <div className="min-h-screen space-y-6 p-4 pb-16 md:p-10 dark:bg-[hsl(20_14.3%_4.1%)]">
       {/* Back Button */}
       <Button
         variant="ghost"
