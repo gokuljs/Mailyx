@@ -13,6 +13,7 @@ import remarkGfm from "remark-gfm";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import PremiumBanner from "./PremiumBanner";
+import { api } from "@/trpc/react";
 
 const transitionDebug = {
   type: "easeOut",
@@ -21,7 +22,7 @@ const transitionDebug = {
 const AskAI = ({ isCollapsed }: { isCollapsed: boolean }) => {
   const [accountId] = useLocalStorage("accountId", "");
   const containerRef = useRef<HTMLDivElement>(null);
-
+  const utils = api.useUtils();
   const { input, handleInputChange, handleSubmit, messages, isLoading } =
     useChat({
       api: "/api/chat",
@@ -35,7 +36,9 @@ const AskAI = ({ isCollapsed }: { isCollapsed: boolean }) => {
           );
         }
       },
-
+      onFinish: () => {
+        utils.account.chatBotInteraction.invalidate();
+      },
       initialMessages: [],
     });
 

@@ -9,13 +9,14 @@ datasource db {
 }
 
 model User {
-    id           String        @id @default(cuid())
-    emailAddress String        @unique
-    firstName    String?
-    lastName     String?
-    imageUrl     String?
-    Account      Account[]
-    Subscription Subscription?
+    id                 String              @id @default(cuid())
+    emailAddress       String              @unique
+    firstName          String?
+    lastName           String?
+    imageUrl           String?
+    Account            Account[]
+    Subscription       Subscription?
+    chatBotInteraction chatBotInteraction?
 }
 
 model Account {
@@ -171,6 +172,17 @@ model Subscription {
     billingInterval      String
     billingFrequency     Int
     planId               String
+}
+
+model chatBotInteraction {
+    id     String @id @default(cuid())
+    day    String
+    count  Int    @default(1)
+    userId String @unique
+    user   User   @relation(fields: [userId], references: [id])
+
+    @@unique([day, userId])
+    @@index([day, userId])
 }
 
 enum SubscriptionStatus {

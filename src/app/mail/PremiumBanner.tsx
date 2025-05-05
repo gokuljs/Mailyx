@@ -7,10 +7,14 @@ import BannerContent from "./BannerContent";
 import { FREE_CREDITS_PER_DAY } from "@/lib/Constants";
 import useSubscriptionInfo from "@/hooks/useSubscriptionInfo";
 import { api } from "@/trpc/react";
+import useThreads from "@/hooks/useThreads";
 
 const PremiumBanner = () => {
   const { subInfo, isLoading, isSubscribed } = useSubscriptionInfo();
-  const remainIngCredits = 5;
+  const { accountId } = useThreads();
+  const { data: remainingCredits } = api.account.chatBotInteraction.useQuery({
+    accountId,
+  });
   const test = api.useUtils();
   React.useEffect(() => {
     setTimeout(() => {
@@ -28,7 +32,7 @@ const PremiumBanner = () => {
       ) : (
         <BannerContent
           heading="Basic Plan"
-          credits={remainIngCredits}
+          credits={remainingCredits}
           total={FREE_CREDITS_PER_DAY}
           subtext="Upgrade to Pro to ask as many questions..."
         />

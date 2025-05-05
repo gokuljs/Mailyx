@@ -1,8 +1,10 @@
+import { FREE_CREDITS_PER_DAY } from "./../../../lib/Constants";
 import { Configuration, OpenAIApi } from "openai-edge";
 import { Message, streamText } from "ai";
 import { auth } from "@clerk/nextjs/server";
 import { OramaClient } from "@/lib/orama";
 import { openai as aiProvider } from "@ai-sdk/openai";
+import { db } from "@/server/db";
 
 const config = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
@@ -10,6 +12,7 @@ const config = new Configuration({
 const openai = new OpenAIApi(config);
 
 export async function POST(req: Request) {
+  const today = new Date().toDateString();
   try {
     const { userId } = await auth();
     if (!userId) {
@@ -18,6 +21,43 @@ export async function POST(req: Request) {
     const { accountId, messages } = await req.json();
     if (!accountId) {
       throw new Error("Account Id not found");
+    }
+    const subInfo = await db.subscription.findFirst({
+      where: {
+        userId,
+      },
+      select: {
+        status: true,
+        endedAt: true,
+      },
+    });
+    const currentDate = new Date();
+    const endDate = subInfo?.endedAt ? new Date(subInfo.endedAt) : null;
+    const isSubscribed =
+      subInfo?.status === "ACTIVE" && (!endDate || currentDate < endDate);
+    if (!isSubscribed) {
+      const chatBotInteraction = await db.chatBotInteraction.findUnique({
+        where: {
+          userId,
+          day: today,
+        },
+      });
+      if (!chatBotInteraction) {
+        await db.chatBotInteraction.create({
+          data: {
+            userId,
+            day: today,
+            count: 1,
+          },
+        });
+      } else if (chatBotInteraction.count >= FREE_CREDITS_PER_DAY) {
+        return new Response(
+          "You have reached the daily limit of free credits",
+          {
+            status: 429,
+          },
+        );
+      }
     }
     const orama = new OramaClient(accountId);
     await orama.init();
@@ -49,6 +89,16 @@ export async function POST(req: Request) {
     const result = streamText({
       model: aiProvider("gpt-4.1-mini"),
       messages: allMessages,
+      onFinish: async (response) => {
+        await db.chatBotInteraction.update({
+          where: { userId, day: today },
+          data: {
+            count: {
+              increment: 1,
+            },
+          },
+        });
+      },
     });
 
     // 2) return a pre‑built StreamingTextResponse
