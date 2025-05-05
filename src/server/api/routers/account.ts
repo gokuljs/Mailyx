@@ -1,12 +1,11 @@
-import { EmailAddress, emailAddressSchema } from "./../../../lib/types";
-import { Select } from "@/components/ui/select";
+import { emailAddressSchema } from "./../../../lib/types";
 import { z } from "zod";
 import { createTRPCRouter, privateProcedure, publicProcedure } from "../trpc";
 import { db } from "@/server/db";
-import { threadId } from "worker_threads";
 import { Account } from "@/lib/accounts";
 import { OramaClient } from "@/lib/orama";
 import { catchFirst } from "@/lib/redisCatchFetch";
+import { FREE_CREDITS_PER_DAY } from "@/lib/Constants";
 
 export const authorizeAccountAccess = async (
   accountId: string,
@@ -197,7 +196,7 @@ export const accountRouter = createTRPCRouter({
           },
         },
       });
-      console.log(JSON.stringify(thread, null, 2), account.emailAddress);
+
       if (!thread || thread.email.length === 0)
         throw new Error("Email not found");
       const messages = thread.email;
@@ -304,5 +303,29 @@ export const accountRouter = createTRPCRouter({
         term: input.query,
       });
       return result;
+    }),
+  chatBotInteraction: privateProcedure
+    .input(
+      z.object({
+        accountId: z.string(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const account = await authorizeAccountAccess(
+        input?.accountId,
+        ctx?.auth?.userId,
+      );
+      const userId = ctx?.auth?.userId;
+      if (!userId) throw new Error("Unauthorized");
+      const today = new Date().toDateString();
+      const chatBotInteraction = await db.chatBotInteraction.findUnique({
+        where: { userId, day: today },
+        select: {
+          count: true,
+        },
+      });
+      const remainingCredits =
+        FREE_CREDITS_PER_DAY - (chatBotInteraction?.count ?? 0);
+      return remainingCredits;
     }),
 });

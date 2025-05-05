@@ -12,28 +12,44 @@ export async function syncEmailsToDatabase(
   emails: EmailMessage[],
   accountId: string,
 ) {
-  console.log("Attempting to synch emails to database", emails.length);
-  const limit = pLimit(10);
+  console.log(`Syncing ${emails.length} emails to database`);
+  const limit = pLimit(5);
   const orama = new OramaClient(accountId);
   await orama.init();
   try {
-    for (const email of emails) {
-      const body = turndown.turndown(email?.body ?? email?.bodySnippet ?? "");
-      const embeddings = await getEmbeddings(body);
-      await orama.insert({
-        subject: email.subject,
-        body: body,
-        rawBody: email.bodySnippet ?? "",
-        from: email.from.address,
-        to: email?.to.map((to) => to.address),
-        sentAt: email.sentAt.toString(),
-        threadId: email.threadId,
-        embeddings,
-      });
-      await upsertEmail(email, accountId, 0);
-      await invalidatedUserThreadCache(accountId);
+    async function syncToOrama() {
+      await Promise.all(
+        emails.map((email) => {
+          return limit(async () => {
+            const body = turndown.turndown(
+              email.body ?? email.bodySnippet ?? "",
+            );
+            const payload = `From: ${email.from.name} <${email.from.address}>\nTo: ${email.to.map((t) => `${t.name} <${t.address}>`).join(", ")}\nSubject: ${email.subject}\nBody: ${body}\n SentAt: ${new Date(email.sentAt).toLocaleString()}`;
+            const bodyEmbedding = await getEmbeddings(payload);
+            await orama.insert({
+              title: email.subject,
+              body: body,
+              rawBody: email.bodySnippet ?? "",
+              from: `${email.from.name} <${email.from.address}>`,
+              to: email.to.map((t) => `${t.name} <${t.address}>`),
+              sentAt: new Date(email.sentAt).toLocaleString(),
+              embeddings: bodyEmbedding,
+              threadId: email.threadId,
+            });
+          });
+        }),
+      );
     }
 
+    async function syncToDB() {
+      for (const [index, email] of emails.entries()) {
+        await upsertEmail(email, accountId, index);
+        await invalidatedUserThreadCache(accountId);
+      }
+    }
+    await Promise.all([syncToOrama(), syncToDB()]);
+
+    await orama.saveIndex();
     // await Promise.all(
     //   emails?.map((email, index) => upsertEmail(email, accountId, index)),
     // );

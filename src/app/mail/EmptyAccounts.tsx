@@ -1,16 +1,20 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import useSubscriptionInfo from "@/hooks/useSubscriptionInfo";
 import { getAurinkoAuthUrl } from "@/lib/aruinko";
 import { api } from "@/trpc/react";
 import { useUser } from "@clerk/nextjs";
 import { Plus, Inbox } from "lucide-react";
+import { toast } from "sonner";
 
 export function EmptyAccounts() {
   const { isSignedIn } = useUser();
   const { data: accounts } = api.account.getAccounts.useQuery(undefined, {
     enabled: isSignedIn,
   });
+  const { isSubscribed, isLoading } = useSubscriptionInfo();
+  if (isLoading) return <></>;
   return (
     <div className="flex h-[calc(100vh-60px)] items-center justify-center bg-transparent">
       <Card className="max-w-sm text-center dark:bg-[hsl(20_14.3%_4.1%)]">
@@ -28,9 +32,14 @@ export function EmptyAccounts() {
 
           <Button
             onClick={async () => {
-              const url = await getAurinkoAuthUrl("Google");
-              console.log(url);
-              if (url) window.location.href = url;
+              try {
+                const url = await getAurinkoAuthUrl("Google", isSubscribed);
+                console.log(url);
+                if (url) window.location.href = url;
+              } catch (error) {
+                toast.error((error as Error).message);
+                console.error(error);
+              }
             }}
             className="cursor-pointer"
           >

@@ -82,3 +82,16 @@ export interface EmailHeader {
   name: string;
   value: string;
 }
+
+export interface Tier {
+  name: string;
+  id: "free" | "monthly" | "annual";
+  price: string;
+  description: string;
+  features: string[];
+  buttonText: string;
+  highlighted: boolean;
+  buttonColor: string;
+  priceId?: string;
+  borderColor?: string;
+}

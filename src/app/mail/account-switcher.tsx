@@ -11,6 +11,10 @@ import { api } from "@/trpc/react";
 import React, { useState } from "react";
 import { useLocalStorage } from "usehooks-ts";
 import { useUser } from "@clerk/clerk-react";
+import { Plus } from "lucide-react";
+import { toast } from "sonner";
+import { getAurinkoAuthUrl } from "@/lib/aruinko";
+import useSubscriptionInfo from "@/hooks/useSubscriptionInfo";
 
 type Props = {
   isCollapsed: boolean;
@@ -21,8 +25,9 @@ export default function AccountSwitcher({ isCollapsed }: Props) {
   const { data: accounts } = api.account.getAccounts.useQuery(undefined, {
     enabled: isSignedIn,
   });
+  const { isSubscribed, isLoading } = useSubscriptionInfo();
   const [accountId, setAccountId] = useLocalStorage("accountId", "");
-  if (!accounts) return null;
+  if (!accounts || isLoading) return null;
   return (
     <div className="flex w-full items-center gap-2">
       <Select defaultValue={accountId} onValueChange={setAccountId}>
@@ -57,6 +62,20 @@ export default function AccountSwitcher({ isCollapsed }: Props) {
               </div>
             </SelectItem>
           ))}
+          <div
+            onClick={async () => {
+              try {
+                const url = await getAurinkoAuthUrl("Google", isSubscribed);
+                if (url) window.location.href = url;
+              } catch (error) {
+                toast.error((error as Error).message);
+              }
+            }}
+            className="flex cursor-pointer items-center gap-3 px-2 py-1"
+          >
+            <Plus className="mr-1 h-4 w-4" />
+            Add account
+          </div>
         </SelectContent>
       </Select>
     </div>

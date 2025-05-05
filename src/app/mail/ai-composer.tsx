@@ -44,7 +44,6 @@ const AiComposer = (props: Props) => {
       `
       My name is ${account?.name} and my email is ${account?.emailAddress}
     `;
-    console.log(context, "ssss");
     const { output } = await generateEmail(context, prompt);
     for await (const token of readStreamableValue(output)) {
       if (token) {

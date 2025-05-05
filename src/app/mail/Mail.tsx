@@ -23,8 +23,7 @@ import { useLocalStorage } from "usehooks-ts";
 import SearchBar from "./SearchBar";
 import AskAi from "./AskAi";
 import { api } from "@/trpc/react";
-import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+
 import { EmptyAccounts } from "./EmptyAccounts";
 import { useUser } from "@clerk/nextjs";
 
@@ -35,7 +34,7 @@ type Props = {
 };
 
 function Mail({
-  defaultLayout = [20, 32, 48],
+  defaultLayout = [20, 32, 50],
   navCollapsedSize,
   defaultCollapsed,
 }: Props) {
@@ -45,7 +44,29 @@ function Mail({
   const { data: accounts } = api.account.getAccounts.useQuery(undefined, {
     enabled: isSignedIn,
   });
-  console.log({ accounts });
+  const [minSizes, setMinSizes] = useState([25, 30, 30]); // Default sizes
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (typeof window !== "undefined") {
+        // Ensure window is defined (for SSR)
+        if (window.innerWidth <= 1200) {
+          setMinSizes([25, 40, 40]);
+        } else {
+          setMinSizes([20, 40, 40]);
+        }
+      }
+    };
+
+    // Set initial sizes
+    handleResize();
+
+    // Add event listener
+    window.addEventListener("resize", handleResize);
+
+    // Clean up event listener on component unmount
+    return () => window.removeEventListener("resize", handleResize);
+  }, []); // Empty dependency array ensures this runs only on mount and unmount
 
   return (
     <TooltipProvider delayDuration={0}>
@@ -59,7 +80,7 @@ function Mail({
         <ResizablePanel
           defaultSize={defaultLayout[0]}
           collapsedSize={navCollapsedSize}
-          minSize={15}
+          minSize={minSizes[0]}
           maxSize={40}
           onCollapse={() => {
             setIsCollapsed(true);
@@ -90,7 +111,7 @@ function Mail({
           </div>
         </ResizablePanel>
         <ResizableHandle withHandle />
-        <ResizablePanel defaultSize={defaultLayout[1]} minSize={30}>
+        <ResizablePanel defaultSize={defaultLayout[1]} minSize={minSizes[1]}>
           <Tabs
             defaultValue="inbox"
             value={done ? "done" : "inbox"}
@@ -142,7 +163,7 @@ function Mail({
           </Tabs>
         </ResizablePanel>
         <ResizableHandle withHandle />
-        <ResizablePanel defaultSize={defaultLayout[2]} minSize={30}>
+        <ResizablePanel defaultSize={defaultLayout[2]} minSize={minSizes[2]}>
           <ThreadDisplay />
         </ResizablePanel>
       </ResizablePanelGroup>

@@ -1,8 +1,5 @@
-import Link from "next/link";
 import { BackgroundBeams } from "./_components/background-beams";
-import { HoverBorderGradient } from "./_components/hover-border-gradient";
 import { GlowingEffect } from "./_components/glowing-effect";
-import LinkAccountButton from "./_components/link-account-button";
 import ParticlesBackground from "./_components/Particles";
 import StartMailyxButton from "./_components/StartMailyxButton";
 

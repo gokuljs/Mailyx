@@ -84,7 +84,6 @@ const EmailEditor = ({
         outputTest += token;
       }
     }
-    console.log({ outputTest }, "ssss");
   };
 
   const onGenerate = (token: String) => {

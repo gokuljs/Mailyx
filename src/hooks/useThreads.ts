@@ -15,7 +15,7 @@ const useThreads = () => {
     enabled: isSignedIn,
   });
   const [threadId, setThreadId] = useAtom(threadIdAtom);
-  console.log({ accountId }, "ssss");
+
   const {
     data: threads,
     isFetching,

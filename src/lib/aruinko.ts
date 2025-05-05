@@ -1,14 +1,31 @@
 "use server";
+import { db } from "@/server/db";
 import { auth } from "@clerk/nextjs/server";
 import axios from "axios";
 import { access } from "fs";
+import { FREE_ACCOUNTS_PER_USER, PRO_ACCOUNTS_PER_USER } from "./Constants";
+import { toast } from "sonner";
 
 export const getAurinkoAuthUrl = async (
   serviceType: "Google" | "Office365",
+  isSubscribed: boolean,
 ) => {
   try {
     const { userId } = await auth();
     if (!userId) throw new Error("User not Authorized");
+    const accountCount = await db.account.count({
+      where: {
+        userId,
+      },
+    });
+
+    const maxAccounts = isSubscribed
+      ? PRO_ACCOUNTS_PER_USER
+      : FREE_ACCOUNTS_PER_USER;
+
+    if (accountCount >= maxAccounts) {
+      throw new Error("You have reached the maximum number of accounts");
+    }
     const params = new URLSearchParams({
       clientId: process.env.NEXT_AURINKO_CLIENT_ID as string,
       serviceType,
@@ -19,6 +36,7 @@ export const getAurinkoAuthUrl = async (
     return `https://api.aurinko.io/v1/auth/authorize?${params.toString()}`;
   } catch (error) {
     console.log(error);
+    throw error;
   }
 };
 
