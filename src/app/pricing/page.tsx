@@ -22,7 +22,7 @@ const Pricing = () => {
     <>
       <div className="flex min-h-screen flex-col items-center bg-black/10 pt-40 text-white">
         <NavBar />
-        <h2 className="mb-4 flex justify-center bg-gradient-to-b from-white to-gray-400 bg-clip-text text-center text-6xl font-bold text-transparent">
+        <h2 className="mb-4 flex justify-center bg-gradient-to-b from-white to-stone-400 bg-clip-text text-center text-6xl font-bold text-transparent">
           Simple and Affordable <br /> Pricing Plans
         </h2>
         <p className="text-muted-foreground mx-auto mb-10 max-w-xl text-center text-xl">
@@ -47,7 +47,7 @@ const Pricing = () => {
               {/* Notice: 'flex flex-col flex-1' to ensure stretch */}
               <div className="flex flex-1 flex-col justify-between bg-transparent">
                 <div>
-                  <h3 className="mb-4 flex items-center justify-between bg-gradient-to-b from-white to-gray-400 bg-clip-text text-2xl font-semibold text-transparent">
+                  <h3 className="mb-4 flex items-center justify-between bg-gradient-to-b from-white to-stone-400 bg-clip-text text-2xl font-semibold text-transparent">
                     {plan.name}
                     {plan.highlighted && (
                       <HoverBorderGradient

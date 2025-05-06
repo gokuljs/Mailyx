@@ -77,7 +77,7 @@ export default function ContactUs() {
     <div className="flex min-h-screen flex-col items-center justify-center pt-20">
       <NavBar />
       <ParticlesBackground />
-      <h2 className="mt-20 mb-12 bg-gradient-to-b from-white to-gray-500 bg-clip-text text-6xl font-bold text-transparent">
+      <h2 className="mt-20 mb-12 bg-gradient-to-b from-white to-stone-500 bg-clip-text text-6xl font-bold text-transparent">
         Contact Us
       </h2>
       <div className="flex w-full justify-center px-3.5">

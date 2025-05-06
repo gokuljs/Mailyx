@@ -14,21 +14,21 @@ export default async function Home() {
         <div className="relative z-10 flex min-h-screen flex-col items-center bg-black pt-60">
           <NavBar />
           <ParticlesBackground />
-          <BackgroundBeams />
-          <h1 className="inline-block bg-linear-to-b from-white to-orange-300 bg-clip-text text-center text-6xl font-bold text-transparent">
+          {/* <BackgroundBeams /> */}
+          <h1 className="inline-block bg-linear-to-br from-white to-stone-500 bg-clip-text text-center text-6xl font-bold text-transparent">
             Mailyx — A minimalist, <br />
             AI-powered email client
           </h1>
           <div className="h-4"></div>
-          <p className="mb-8 max-w-xl text-center text-xl text-orange-100">
+          <p className="mb-8 max-w-xl text-center text-xl text-stone-600">
             A calm, modern email client designed for clarity, not clutter.
           </p>
           <div className="h-8"></div>
           <div className="space-x-4">
-            <StartMailyxButton />
+            <StartMailyxButton text="Start Using Mailyx" />
           </div>
           <div className="mx-auto mt-12 max-w-5xl">
-            <h2 className="mb-8 bg-linear-to-b from-white to-gray-600 bg-clip-text text-center text-4xl font-semibold text-transparent">
+            <h2 className="mb-8 bg-linear-to-b from-white to-stone-600 bg-clip-text text-center text-4xl font-semibold text-transparent">
               Experience the power of:
             </h2>
 

@@ -17,7 +17,7 @@ const Footer = () => {
                 width={32} // Slightly larger logo
                 height={32}
               />
-              <span className="text-lg font-semibold text-neutral-100">
+              <span className="bg-gradient-to-br from-stone-700 to-stone-950 bg-clip-text text-lg font-semibold">
                 Mailyx
               </span>
             </Link>

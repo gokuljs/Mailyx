@@ -9,7 +9,7 @@ const TermsOfServicePage = () => {
       <NavBar />
       <ParticlesBackground />
       <div className="mx-auto max-w-3xl px-4">
-        <h1 className="mb-4 text-center text-4xl font-bold text-white sm:text-5xl">
+        <h1 className="mb-4 text-center text-4xl font-bold text-stone-200 sm:text-5xl">
           Terms and Conditions
         </h1>
         <p className="mb-12 text-center text-gray-400">
