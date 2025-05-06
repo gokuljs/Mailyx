@@ -1,4 +1,5 @@
 import { BackgroundBeams } from "./_components/background-beams";
+import Footer from "./_components/footer";
 import { GlowingEffect } from "./_components/glowing-effect";
 import NavBar from "./_components/navbar";
 import ParticlesBackground from "./_components/Particles";
@@ -106,6 +107,7 @@ export default async function Home() {
               </div>
             </div>
           </div>
+          <Footer />
         </div>
       </>
     </>
