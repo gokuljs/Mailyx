@@ -1,9 +1,8 @@
 "use client";
-
 import { useRouter } from "next/navigation";
 import { HoverBorderGradient } from "./hover-border-gradient";
 
-export default function StartMailyxButton() {
+export default function StartMailyxButton({ text }: { text: string }) {
   const router = useRouter();
 
   const handleClick = () => {
@@ -18,7 +17,7 @@ export default function StartMailyxButton() {
       onClick={handleClick}
       className="cursor-pointer"
     >
-      Start Using Mailyx
+      {text}
     </HoverBorderGradient>
   );
 }

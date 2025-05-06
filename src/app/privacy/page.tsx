@@ -1,10 +1,15 @@
 import React from "react";
+import Footer from "../_components/footer";
+import NavBar from "../_components/navbar";
+import ParticlesBackground from "../_components/Particles";
 
 const PrivacyPolicyPage = () => {
   return (
-    <main className="bg-grid min-h-screen bg-black px-6 py-60 text-gray-200">
-      <div className="mx-auto max-w-3xl">
-        <h1 className="mb-4 text-center text-4xl font-bold text-white sm:text-5xl">
+    <main className="min-h-screen pt-40 text-gray-200">
+      <NavBar />
+      <ParticlesBackground />
+      <div className="mx-auto max-w-3xl px-4">
+        <h1 className="mb-4 text-center text-4xl font-bold text-stone-200 sm:text-5xl">
           Privacy Policy
         </h1>
         <p className="mb-12 text-center text-gray-400">
@@ -170,6 +175,9 @@ const PrivacyPolicyPage = () => {
             </p>
           </div>
         </section>
+      </div>
+      <div className="z-50 w-full bg-transparent">
+        <Footer />
       </div>
     </main>
   );

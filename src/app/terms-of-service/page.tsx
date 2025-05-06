@@ -1,10 +1,15 @@
 import React from "react";
+import Footer from "../_components/footer";
+import ParticlesBackground from "../_components/Particles";
+import NavBar from "../_components/navbar";
 
 const TermsOfServicePage = () => {
   return (
-    <main className="bg-grid min-h-screen bg-black px-6 py-60 text-gray-200">
-      <div className="mx-auto max-w-3xl">
-        <h1 className="mb-4 text-center text-4xl font-bold text-white sm:text-5xl">
+    <main className="min-h-screen pt-40 text-gray-200">
+      <NavBar />
+      <ParticlesBackground />
+      <div className="mx-auto max-w-3xl px-4">
+        <h1 className="mb-4 text-center text-4xl font-bold text-stone-200 sm:text-5xl">
           Terms and Conditions
         </h1>
         <p className="mb-12 text-center text-gray-400">
@@ -130,6 +135,9 @@ const TermsOfServicePage = () => {
             </p>
           </div>
         </section>
+      </div>
+      <div className="z-50 w-full">
+        <Footer />
       </div>
     </main>
   );

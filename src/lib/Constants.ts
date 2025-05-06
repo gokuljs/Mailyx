@@ -33,8 +33,8 @@ export const plans: Tier[] = [
     ],
     buttonText: "Subscribe to Pro",
     highlighted: true,
-    buttonColor: "bg-orange-600",
-    borderColor: "border-orange-300",
+    buttonColor: "bg-stone-600",
+    borderColor: "border-stone-300",
     priceId: process.env.NEXT_PUBLIC_PADDLE_MONTHLY_PRICE_ID,
   },
   {

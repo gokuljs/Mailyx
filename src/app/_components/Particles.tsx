@@ -34,7 +34,7 @@ const ParticlesBackground = () => {
       id="tsparticles"
       init={particlesInit}
       options={particlesOptions}
-      className="absolute inset-0 -z-10"
+      className="fixed inset-0 -z-10 bg-black"
     />
   );
 };

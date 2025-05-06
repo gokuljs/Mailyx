@@ -103,9 +103,9 @@
 }
 
 .dark {
-  --background: 20 14.3% 4.1%;
+  --background: oklch(0.141 0.005 285.823);
   --foreground: oklch(0.985 0 0);
-  --card: 20 14.3% 4.1%;
+  --card: oklch(0.21 0.006 285.885);
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.21 0.006 285.885);
   --popover-foreground: oklch(0.985 0 0);
@@ -250,6 +250,10 @@ body {
 }
 
 .premium-card {
-  background: HSL(20_14.3%_4.1%);
-  background: linear-gradient(153deg, rgba(0, 0, 0, 1) 50%, #fb923c 100%);
+  background: HSL(20_14.3%_4.1%) !important;
+  background: linear-gradient(
+    153deg,
+    rgba(0, 0, 0, 1) 50%,
+    #fb923c 100%
+  ) !important;
 }
