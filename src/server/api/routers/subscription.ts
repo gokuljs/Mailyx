@@ -22,7 +22,7 @@ export const subscriptionRouter = createTRPCRouter({
           userId: schema.subscription.userId,
           status: schema.subscription.status,
           paddleSubscriptionId: schema.subscription.paddleSubscriptionId,
-          customerId: schema.subscription.customerId,
+          customerID: schema.subscription.customerID,
           addressId: schema.subscription.addressId,
           businessId: schema.subscription.businessId,
           planId: schema.subscription.planId,
@@ -46,7 +46,7 @@ export const subscriptionRouter = createTRPCRouter({
       const subscriptions = await db
         .select({
           paddleSubscriptionId: schema.subscription.paddleSubscriptionId,
-          customerId: schema.subscription.customerId,
+          customerID: schema.subscription.customerID,
         })
         .from(schema.subscription)
         .where(eq(schema.subscription.userId, userId))
@@ -54,12 +54,12 @@ export const subscriptionRouter = createTRPCRouter({
 
       const subscription = subscriptions[0];
 
-      if (!subscription?.customerId) {
+      if (!subscription?.customerID) {
         throw new Error("Customer ID not found");
       }
 
       const response = await axios.post(
-        `${process.env.PADDLE_API_BASE_URL}/customers/${subscription.customerId}/portal-sessions`,
+        `${process.env.PADDLE_API_BASE_URL}/customers/${subscription.customerID}/portal-sessions`,
         {
           subscription_ids: [subscription.paddleSubscriptionId],
         },
