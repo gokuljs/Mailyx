@@ -10,7 +10,7 @@ type Props = {
 const BannerContent = ({ heading, credits, total, subtext }: Props) => {
   return (
     <div className="z-40">
-      <div className="flex items-center gap-2 bg-gradient-to-r from-white to-zinc-950 bg-clip-text text-xl font-semibold text-transparent">
+      <div className="flex items-center gap-2 bg-gradient-to-r from-white to-stone-950 bg-clip-text text-xl font-semibold text-transparent">
         {heading}
       </div>
       {total && credits && total >= 0 && credits >= 0 && (
