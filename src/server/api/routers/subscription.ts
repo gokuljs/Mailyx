@@ -4,6 +4,9 @@ import { createTRPCRouter, privateProcedure } from "../trpc";
 import { error } from "console";
 import axios from "axios";
 import { plans } from "@/lib/Constants";
+import * as schema from "@/drizzle/schema";
+import { db } from "@/drizzle/db";
+import { eq } from "drizzle-orm";
 
 export const subscriptionRouter = createTRPCRouter({
   getSubscriptionInfo: privateProcedure.query(async ({ ctx, input }) => {
@@ -12,20 +15,23 @@ export const subscriptionRouter = createTRPCRouter({
       if (!userId) {
         throw new Error("User not found");
       }
-      const subscription = await ctx.db.subscription.findUnique({
-        where: { userId },
-        select: {
-          endedAt: true,
-          userId: true,
-          status: true,
-          paddleSubscriptionId: true,
-          customerID: true,
-          addressId: true,
-          businessId: true,
-          planId: true,
-        },
-      });
-      return subscription;
+
+      const subscriptions = await db
+        .select({
+          endedAt: schema.subscription.endedAt,
+          userId: schema.subscription.userId,
+          status: schema.subscription.status,
+          paddleSubscriptionId: schema.subscription.paddleSubscriptionId,
+          customerId: schema.subscription.customerId,
+          addressId: schema.subscription.addressId,
+          businessId: schema.subscription.businessId,
+          planId: schema.subscription.planId,
+        })
+        .from(schema.subscription)
+        .where(eq(schema.subscription.userId, userId))
+        .limit(1);
+
+      return subscriptions[0] || null;
     } catch (e) {
       console.log(e);
     }
@@ -36,19 +42,24 @@ export const subscriptionRouter = createTRPCRouter({
       if (!userId) {
         throw new Error("User not found");
       }
-      const subscription = await ctx.db.subscription.findUnique({
-        where: { userId },
-        select: {
-          paddleSubscriptionId: true,
-          customerID: true,
-        },
-      });
-      if (!subscription?.customerID) {
+
+      const subscriptions = await db
+        .select({
+          paddleSubscriptionId: schema.subscription.paddleSubscriptionId,
+          customerId: schema.subscription.customerId,
+        })
+        .from(schema.subscription)
+        .where(eq(schema.subscription.userId, userId))
+        .limit(1);
+
+      const subscription = subscriptions[0];
+
+      if (!subscription?.customerId) {
         throw new Error("Customer ID not found");
       }
 
       const response = await axios.post(
-        `${process.env.PADDLE_API_BASE_URL}/customers/${subscription.customerID}/portal-sessions`,
+        `${process.env.PADDLE_API_BASE_URL}/customers/${subscription.customerId}/portal-sessions`,
         {
           subscription_ids: [subscription.paddleSubscriptionId],
         },
@@ -72,21 +83,22 @@ export const subscriptionRouter = createTRPCRouter({
   }),
   getSubscriptionPlans: privateProcedure.query(async ({ ctx }) => {
     try {
-      const subscription = await ctx.db.subscription.findFirst({
-        where: {
-          userId: ctx.auth.userId,
-        },
-        select: {
-          paddleSubscriptionId: true,
-        },
-      });
+      const subscriptions = await db
+        .select({
+          paddleSubscriptionId: schema.subscription.paddleSubscriptionId,
+        })
+        .from(schema.subscription)
+        .where(eq(schema.subscription.userId, ctx.auth.userId))
+        .limit(1);
+
+      const subscription = subscriptions[0];
+
       if (!subscription?.paddleSubscriptionId) {
         throw new Error("Subscription not found");
       }
 
       const response = await axios.get(
         `${process.env.PADDLE_API_BASE_URL}/subscriptions/${subscription.paddleSubscriptionId}`,
-
         {
           headers: {
             Authorization: `Bearer ${process.env.PADDLE_API_KEY}`,
@@ -113,12 +125,17 @@ export const subscriptionRouter = createTRPCRouter({
         if (!newPriceId) {
           throw new Error("New price ID not found");
         }
-        const subscription = await ctx.db.subscription.findFirst({
-          where: { userId },
-          select: {
-            paddleSubscriptionId: true,
-          },
-        });
+
+        const subscriptions = await db
+          .select({
+            paddleSubscriptionId: schema.subscription.paddleSubscriptionId,
+          })
+          .from(schema.subscription)
+          .where(eq(schema.subscription.userId, userId))
+          .limit(1);
+
+        const subscription = subscriptions[0];
+
         if (!subscription?.paddleSubscriptionId) {
           throw new Error("Subscription not found");
         }

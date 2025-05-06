@@ -1,22 +1,23 @@
 import { emailAddressSchema } from "./../../../lib/types";
 import { z } from "zod";
 import { createTRPCRouter, privateProcedure, publicProcedure } from "../trpc";
-import { db } from "@/server/db";
+import * as schema from "@/drizzle/schema";
+import { eq, and, count, type SQL, desc, asc } from "drizzle-orm";
+
 import { Account } from "@/lib/accounts";
 import { OramaClient } from "@/lib/orama";
 import { catchFirst } from "@/lib/redisCatchFetch";
 import { FREE_CREDITS_PER_DAY } from "@/lib/Constants";
+import { db } from "@/drizzle/db";
 
 export const authorizeAccountAccess = async (
   accountId: string,
   userId: string,
 ) => {
-  const account = await db.account.findFirst({
-    where: {
-      id: accountId,
-      userId,
-    },
-    select: {
+  const account = await db.query.account.findFirst({
+    where: (fields, { eq, and }) =>
+      and(eq(fields.id, accountId), eq(fields.userId, userId)),
+    columns: {
       id: true,
       emailAddress: true,
       accessToken: true,
@@ -34,11 +35,9 @@ export const accountRouter = createTRPCRouter({
     const accounts = await catchFirst(
       key,
       async () => {
-        return ctx.db.account.findMany({
-          where: {
-            userId,
-          },
-          select: {
+        return ctx.db.query.account.findMany({
+          where: (fields, { eq }) => eq(fields.userId, userId),
+          columns: {
             id: true,
             emailAddress: true,
             name: true,
@@ -58,24 +57,26 @@ export const accountRouter = createTRPCRouter({
     )
     .query(async ({ ctx, input }) => {
       const account = await authorizeAccountAccess(
-        input?.accountId,
-        ctx?.auth?.userId,
+        input.accountId,
+        ctx.auth.userId,
       );
 
-      let filter: any = {};
-      if (input?.tab === "inbox") {
-        filter.inboxStatus = true;
-      } else if (input?.tab === "draft") {
-        filter.draftStatus = true;
+      const conditions: SQL[] = [eq(schema.thread.accountId, account.id)];
+
+      if (input.tab === "inbox") {
+        conditions.push(eq(schema.thread.inboxStatus, true));
+      } else if (input.tab === "draft") {
+        conditions.push(eq(schema.thread.draftStatus, true));
       } else {
-        filter.sentStatus = true;
+        conditions.push(eq(schema.thread.sentStatus, true));
       }
-      return ctx.db.thread?.count({
-        where: {
-          accountId: account.id,
-          ...filter,
-        },
-      });
+
+      const result = await ctx.db
+        .select({ value: count() })
+        .from(schema.thread)
+        .where(and(...conditions));
+
+      return result[0]?.value ?? 0;
     }),
   getThreads: privateProcedure
     .input(
@@ -98,45 +99,60 @@ export const accountRouter = createTRPCRouter({
         key,
         async () => {
           const account = await authorizeAccountAccess(input.accountId, userId);
-          let filter: any = {};
-          if (input.tab === "inbox") {
-            filter.inboxStatus = true;
-          } else if (input.tab === "draft") {
-            filter.draftStatus = true;
-          } else {
-            filter.sentStatus = true;
-          }
-          filter.done = {
-            equals: input.done,
-          };
 
-          return ctx.db.thread.findMany({
-            where: {
-              accountId: account.id,
-              ...filter,
-            },
-            include: {
-              email: {
-                orderBy: {
-                  sentAt: "asc",
-                },
-                select: {
-                  from: true,
-                  body: true,
-                  bodySnippet: true,
-                  emailLabel: true,
-                  subject: true,
-                  sysLabels: true,
-                  id: true,
-                  sentAt: true,
-                },
-              },
-            },
-            take: 50,
-            orderBy: {
-              lastMessageDate: "desc",
-            },
-          });
+          // Build the conditions for thread filtering
+          const conditions: SQL[] = [eq(schema.thread.accountId, account.id)];
+
+          if (input.tab === "inbox") {
+            conditions.push(eq(schema.thread.inboxStatus, true));
+          } else if (input.tab === "draft") {
+            conditions.push(eq(schema.thread.draftStatus, true));
+          } else {
+            conditions.push(eq(schema.thread.sentStatus, true));
+          }
+
+          if (input.done !== undefined) {
+            conditions.push(eq(schema.thread.done, input.done));
+          }
+
+          // First, fetch threads
+          const threads = await db
+            .select()
+            .from(schema.thread)
+            .where(and(...conditions))
+            .orderBy(desc(schema.thread.lastMessageDate))
+            .limit(50);
+
+          // For each thread, get its emails
+          const threadResults = [];
+
+          for (const thread of threads) {
+            const emails = await db
+              .select()
+              .from(schema.email)
+              .where(eq(schema.email.threadId, thread.id))
+              .orderBy(asc(schema.email.sentAt))
+              .leftJoin(
+                schema.emailAddress,
+                eq(schema.email.fromId, schema.emailAddress.id),
+              );
+
+            threadResults.push({
+              ...thread,
+              email: emails.map((row) => ({
+                from: row.EmailAddress,
+                body: row.Email.body,
+                bodySnippet: row.Email.bodySnippet,
+                emailLabel: row.Email.emailLabel,
+                subject: row.Email.subject,
+                sysLabels: row.Email.sysLabels,
+                id: row.Email.id,
+                sentAt: row.Email.sentAt,
+              })),
+            });
+          }
+
+          return threadResults;
         },
         5000,
       );
@@ -153,11 +169,9 @@ export const accountRouter = createTRPCRouter({
         input?.accountId,
         ctx?.auth?.userId,
       );
-      return await ctx.db.emailAddress.findMany({
-        where: {
-          accountId: input?.accountId,
-        },
-        select: {
+      return await ctx.db.query.emailAddress.findMany({
+        where: (fields, { eq }) => eq(fields.accountId, input?.accountId),
+        columns: {
           address: true,
           name: true,
         },
@@ -175,63 +189,122 @@ export const accountRouter = createTRPCRouter({
         input?.accountId,
         ctx?.auth?.userId,
       );
-      const thread = await ctx.db.thread.findFirst({
-        where: {
-          id: input?.threadId,
-        },
-        include: {
-          email: {
-            orderBy: {
-              sentAt: "asc",
-            },
-            select: {
-              from: true,
-              to: true,
-              cc: true,
-              bcc: true,
-              sentAt: true,
-              subject: true,
-              internetMessageId: true,
-            },
-          },
-        },
-      });
 
-      if (!thread || thread.email.length === 0)
+      // Fetch the thread and emails separately as a workaround
+      const thread = await db
+        .select()
+        .from(schema.thread)
+        .where(eq(schema.thread.id, input?.threadId))
+        .limit(1);
+
+      if (!thread || thread.length === 0) {
+        throw new Error("Thread not found");
+      }
+
+      // Fetch emails for this thread
+      const emailsData = await db
+        .select({
+          email: schema.email,
+          from: schema.emailAddress,
+        })
+        .from(schema.email)
+        .where(eq(schema.email.threadId, input?.threadId))
+        .orderBy(asc(schema.email.sentAt))
+        .leftJoin(
+          schema.emailAddress,
+          eq(schema.email.fromId, schema.emailAddress.id),
+        );
+
+      if (!emailsData || emailsData.length === 0) {
         throw new Error("Email not found");
-      const messages = thread.email;
+      }
+
+      // Get to/cc/bcc recipients for each email
+      const messages = [];
+
+      for (const emailData of emailsData) {
+        // Get 'to' recipients
+        const toRecipients = await db
+          .select({
+            emailAddress: schema.emailAddress,
+          })
+          .from(schema.toEmails)
+          .where(eq(schema.toEmails.a, emailData.email.id))
+          .leftJoin(
+            schema.emailAddress,
+            eq(schema.toEmails.b, schema.emailAddress.id),
+          );
+
+        // Get 'cc' recipients
+        const ccRecipients = await db
+          .select({
+            emailAddress: schema.emailAddress,
+          })
+          .from(schema.ccEmails)
+          .where(eq(schema.ccEmails.a, emailData.email.id))
+          .leftJoin(
+            schema.emailAddress,
+            eq(schema.ccEmails.b, schema.emailAddress.id),
+          );
+
+        // Get 'bcc' recipients
+        const bccRecipients = await db
+          .select({
+            emailAddress: schema.emailAddress,
+          })
+          .from(schema.bccEmails)
+          .where(eq(schema.bccEmails.a, emailData.email.id))
+          .leftJoin(
+            schema.emailAddress,
+            eq(schema.bccEmails.b, schema.emailAddress.id),
+          );
+
+        messages.push({
+          from: emailData.from,
+          to: toRecipients.map((r) => r.emailAddress),
+          cc: ccRecipients.map((r) => r.emailAddress),
+          bcc: bccRecipients.map((r) => r.emailAddress),
+          sentAt: emailData.email.sentAt,
+          subject: emailData.email.subject,
+          internetMessageId: emailData.email.internetMessageId,
+        });
+      }
+
+      // Handle potential null references by adding null checks
       const lastExternal = messages
         .slice()
         .reverse()
-        .find((e) => e.from.address.trim() !== account.emailAddress.trim());
+        .find((e) => e.from?.address?.trim() !== account.emailAddress.trim());
       const lastSent = messages
         .slice()
         .reverse()
-        .find((e) => e.from.address.trim() === account.emailAddress.trim());
+        .find((e) => e.from?.address?.trim() === account.emailAddress.trim());
       const email = lastExternal ?? lastSent;
+
       if (!email) {
         throw new Error("No emails in this thread to reply to");
       }
-      let toRecipients: typeof email.to = [];
-      let ccRecipients: typeof email.cc = [];
+
+      let toRecipients = [];
+      let ccRecipients = [];
       if (lastExternal) {
         // incoming: reply TO the sender, and CC anyone else you already had in the thread
         toRecipients = [
           lastExternal.from,
           ...lastExternal.to.filter(
-            (r) => r.address !== account.emailAddress.trim(),
+            (r) => r?.address !== account.emailAddress.trim(),
           ),
         ];
         ccRecipients = lastExternal.cc.filter(
-          (r) => r.address !== account.emailAddress.trim(),
+          (r) => r?.address !== account.emailAddress.trim(),
         );
       } else {
-        // no incoming: “reply” to your own last sent → just re‑use its recipients
+        // no incoming: "reply" to your own last sent → just re‑use its recipients
         toRecipients = lastSent!.to.filter(
-          (r) => r.address !== account.emailAddress.trim(),
+          (r) => r?.address !== account.emailAddress.trim(),
         );
         ccRecipients = lastSent!.cc.filter(
-          (r) => r.address !== account.emailAddress.trim(),
+          (r) => r?.address !== account.emailAddress.trim(),
         );
       }
 
@@ -318,14 +391,18 @@ export const accountRouter = createTRPCRouter({
       const userId = ctx?.auth?.userId;
       if (!userId) throw new Error("Unauthorized");
       const today = new Date().toDateString();
-      const chatBotInteraction = await db.chatBotInteraction.findUnique({
-        where: { userId, day: today },
-        select: {
-          count: true,
-        },
-      });
-      const remainingCredits =
-        FREE_CREDITS_PER_DAY - (chatBotInteraction?.count ?? 0);
+
+      const result = await db
+        .select({ count: schema.chatBotInteraction.count })
+        .from(schema.chatBotInteraction)
+        .where(
+          and(
+            eq(schema.chatBotInteraction.userId, userId),
+            eq(schema.chatBotInteraction.day, today),
+          ),
+        );
+
+      const remainingCredits = FREE_CREDITS_PER_DAY - (result[0]?.count ?? 0);
       return remainingCredits;
     }),
 });

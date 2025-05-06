@@ -2,6 +2,9 @@ import { z } from "zod";
 import nodemailer from "nodemailer";
 import { createTRPCRouter, publicProcedure } from "../trpc";
 import { error } from "console";
+import * as schema from "@/drizzle/schema";
+import { db } from "@/drizzle/db";
+import cuid from "cuid";
 
 export const contactRouter = createTRPCRouter({
   sendMessage: publicProcedure
@@ -15,12 +18,17 @@ export const contactRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const { email, message, subject } = input;
       try {
-        await ctx.db.contactMessage.create({
-          data: {
-            fromEmail: email,
-            subject,
-            message,
-          },
+        // Generate a unique ID for the message
+        const messageId = cuid();
+        const now = new Date().toISOString();
+
+        // Insert using Drizzle
+        await db.insert(schema.contactMessage).values({
+          id: messageId,
+          fromEmail: email,
+          subject,
+          message,
+          updatedAt: now,
         });
 
         const transporter = nodemailer.createTransport({
