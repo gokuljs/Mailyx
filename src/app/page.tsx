@@ -107,7 +107,9 @@ export default async function Home() {
               </div>
             </div>
           </div>
-          <Footer />
+          <div className="z-50 w-full bg-transparent">
+            <Footer />
+          </div>
         </div>
       </>
     </>

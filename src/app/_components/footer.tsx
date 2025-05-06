@@ -4,12 +4,12 @@ import Image from "next/image";
 
 const Footer = () => {
   return (
-    <footer className="mt-20 w-full bg-black bg-gradient-to-b from-black to-neutral-800 text-neutral-400">
+    <footer className="-z-40 mt-20 w-full bg-gradient-to-b from-black/20 to-neutral-700/50 text-neutral-400/50">
       <div className="container mx-auto px-4 py-12">
-        {/* Top Section: Logo + Link Columns - Use grid-cols-4 and col-start to create middle space */}
-        <div className="mb-8 grid grid-cols-1 gap-8 md:grid-cols-4">
+        {/* Top Section: Logo + Link Columns - Adjust grid for mobile */}
+        <div className="mb-8 grid grid-cols-2 gap-8 md:grid-cols-4">
           {/* Logo */}
-          <div className="col-span-1 flex items-start">
+          <div className="col-span-2 flex items-start md:col-span-1">
             <Link href="/" className="flex items-center space-x-2">
               <Image
                 src="/brand-logo.svg"
@@ -23,7 +23,7 @@ const Footer = () => {
             </Link>
           </div>
 
-          {/* Company - Starts in the 3rd column on md screens */}
+          {/* Company - Starts in the 1st column on mobile, 3rd on md */}
           <div className="col-span-1 md:col-start-3">
             <h3 className="mb-3 font-semibold text-neutral-100">Company</h3>
             <ul className="space-y-2 text-sm">
@@ -40,7 +40,7 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Legal - Starts in the 4th column on md screens */}
+          {/* Legal - Starts in the 2nd column on mobile, 4th on md */}
           <div className="col-span-1 md:col-start-4">
             <h3 className="mb-3 font-semibold text-neutral-100">Legal</h3>
             <ul className="space-y-2 text-sm">

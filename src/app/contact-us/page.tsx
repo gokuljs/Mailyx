@@ -8,6 +8,7 @@ import ParticlesBackground from "../_components/Particles";
 import { GlowingEffect } from "../_components/glowing-effect";
 import { api } from "@/trpc/react";
 import NavBar from "../_components/navbar";
+import Footer from "../_components/footer";
 
 interface FormData {
   email: string;
@@ -73,10 +74,10 @@ export default function ContactUs() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-black">
       <NavBar />
       <ParticlesBackground />
-      <h2 className="mt-14 mb-12 bg-gradient-to-b from-white to-gray-500 bg-clip-text text-6xl font-bold text-transparent">
+      <h2 className="mt-20 mb-12 bg-gradient-to-b from-white to-gray-500 bg-clip-text text-6xl font-bold text-transparent">
         Contact Us
       </h2>
       <div className="w-full max-w-3xl rounded-2xl border border-white/9 bg-gradient-to-b from-white/5 to-transparent px-6 py-8 text-white backdrop-blur-sm">
@@ -158,6 +159,9 @@ export default function ContactUs() {
             {loading ? "Sending..." : "Send Message"}
           </button>
         </form>
+      </div>
+      <div className="z-50 w-full bg-transparent">
+        <Footer />
       </div>
     </div>
   );

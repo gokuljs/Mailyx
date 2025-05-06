@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 import useSubscriptionInfo from "@/hooks/useSubscriptionInfo";
 import NavBar from "../_components/navbar";
+import Footer from "../_components/footer";
 
 const Pricing = () => {
   const { isLoaded, isSignedIn, user } = useUser();
@@ -18,7 +19,7 @@ const Pricing = () => {
   const router = useRouter();
 
   return (
-    <div className="flex min-h-screen flex-col items-center bg-black py-20 pt-40 text-white">
+    <div className="flex min-h-screen flex-col items-center bg-black pt-40 text-white">
       <NavBar />
       <ParticlesBackground />
       <h2 className="mb-4 flex justify-center bg-gradient-to-b from-white to-gray-400 bg-clip-text text-center text-6xl font-bold text-transparent">
@@ -115,6 +116,9 @@ const Pricing = () => {
             </div>
           </div>
         ))}
+      </div>
+      <div className="z-50 w-full bg-transparent">
+        <Footer />
       </div>
     </div>
   );
