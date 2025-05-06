@@ -6,21 +6,18 @@ import ParticlesBackground from "./_components/Particles";
 import StartMailyxButton from "./_components/StartMailyxButton";
 
 export default async function Home() {
-  // const { signOut } = useClerk();
-
   return (
     <>
       <>
-        <div className="relative z-10 flex min-h-screen flex-col items-center bg-black pt-60">
+        <div className="relative z-10 flex min-h-screen flex-col items-center bg-black pt-60 md:px-0">
           <NavBar />
           <ParticlesBackground />
-          {/* <BackgroundBeams /> */}
-          <h1 className="inline-block bg-linear-to-br from-white to-stone-500 bg-clip-text text-center text-6xl font-bold text-transparent">
-            Mailyx — A minimalist, <br />
+          <h1 className="inline-block bg-linear-to-br from-white to-stone-500 bg-clip-text px-2 text-center text-4xl font-bold text-transparent md:px-0 md:text-6xl">
+            Mailyx — A minimalist <br />
             AI-powered email client
           </h1>
           <div className="h-4"></div>
-          <p className="mb-8 max-w-xl text-center text-xl text-stone-600">
+          <p className="mb-8 max-w-xl px-3 text-center text-lg text-stone-600 md:px-0 md:text-xl">
             A calm, modern email client designed for clarity, not clutter.
           </p>
           <div className="h-8"></div>
@@ -28,8 +25,8 @@ export default async function Home() {
             <StartMailyxButton text="Start Using Mailyx" />
           </div>
           <div className="mx-auto mt-12 max-w-5xl">
-            <h2 className="mb-8 bg-linear-to-b from-white to-stone-600 bg-clip-text text-center text-4xl font-semibold text-transparent">
-              Experience the power of:
+            <h2 className="mb-8 bg-linear-to-b from-white to-stone-600 bg-clip-text text-center text-3xl font-semibold text-transparent md:text-4xl">
+              Experience the power of
             </h2>
 
             <div className="grid grid-cols-1 gap-4 px-5 md:grid-cols-3">
