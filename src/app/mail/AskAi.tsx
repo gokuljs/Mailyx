@@ -58,7 +58,7 @@ const AskAI = ({ isCollapsed }: { isCollapsed: boolean }) => {
     <div className="mb-14 p-1">
       <PremiumBanner />
       <div className="h-4"></div>
-      <motion.div className="flex max-h-[420px] flex-1 flex-col items-end justify-end rounded-lg border bg-white p-2 pb-4 shadow-zinc-950 dark:bg-zinc-950">
+      <motion.div className="flex max-h-[420px] flex-1 flex-col items-end justify-end rounded-lg border bg-white p-2 pb-4 shadow-zinc-950 dark:bg-stone-950">
         <div
           ref={containerRef}
           className="flex max-h-[50vh] w-full flex-col gap-2 overflow-y-scroll"
@@ -113,7 +113,7 @@ const AskAI = ({ isCollapsed }: { isCollapsed: boolean }) => {
                       target: { value: "What can I ask?" } as HTMLInputElement,
                     } as React.ChangeEvent<HTMLInputElement>)
                   }
-                  className="rounded-md bg-zinc-900 px-2 py-1 text-xs text-gray-200 dark:bg-amber-600 dark:text-zinc-950"
+                  className="rounded-md bg-zinc-900 px-2 py-1 text-xs text-gray-200 dark:bg-stone-600 dark:text-white/80"
                 >
                   What can I ask?
                 </span>
@@ -125,7 +125,7 @@ const AskAI = ({ isCollapsed }: { isCollapsed: boolean }) => {
                       } as HTMLInputElement,
                     } as React.ChangeEvent<HTMLInputElement>)
                   }
-                  className="rounded-md bg-zinc-900 px-2 py-1 text-xs text-gray-200 dark:bg-amber-600 dark:text-zinc-950"
+                  className="rounded-md bg-zinc-900 px-2 py-1 text-xs text-gray-200 dark:bg-stone-600 dark:text-white/80"
                 >
                   When is my next flight?
                 </span>
@@ -137,7 +137,7 @@ const AskAI = ({ isCollapsed }: { isCollapsed: boolean }) => {
                       } as HTMLInputElement,
                     } as React.ChangeEvent<HTMLInputElement>)
                   }
-                  className="rounded-md bg-zinc-900 px-2 py-1 text-xs text-gray-200 dark:bg-amber-600 dark:text-zinc-950"
+                  className="rounded-md bg-zinc-900 px-2 py-1 text-xs text-gray-200 dark:bg-stone-600 dark:text-white/80"
                 >
                   When is my next meeting?
                 </span>
