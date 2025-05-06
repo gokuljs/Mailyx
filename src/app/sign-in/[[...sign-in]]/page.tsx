@@ -16,7 +16,7 @@ export default function Page() {
             disabled={false}
             proximity={80} // Responsive to mouse proximity
             inactiveZone={0.1}
-            variant="orange"
+            variant="stone"
           />
         </div>
 
@@ -26,7 +26,7 @@ export default function Page() {
               baseTheme: [dark],
               variables: {
                 colorBackground: "#000000",
-                colorPrimary: "#f97316",
+                colorPrimary: "#57534e",
                 colorText: "#ffff",
               },
             }}

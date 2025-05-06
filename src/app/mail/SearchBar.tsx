@@ -18,7 +18,7 @@ const SearchBar = () => {
   };
   return (
     <div className="relative flex items-center p-4">
-      <Search className="absolute top-6.5 left-6 size-4 text-orange-400" />
+      <Search className="absolute top-6.5 left-6 size-4 text-stone-400" />
       <Input
         placeholder="Search..."
         className="pl-8"
@@ -32,7 +32,7 @@ const SearchBar = () => {
 
       <div className="absolute top-5.5 right-6 flex items-center gap-2">
         {isFetching && (
-          <Loader2 className="size-4 animate-spin text-orange-400" />
+          <Loader2 className="size-4 animate-spin text-stone-400" />
         )}
         <button className="rounded-sm p-1 hover:bg-gray-400/20">
           <X

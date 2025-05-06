@@ -21,7 +21,7 @@ const PaddleButton = ({ isSubscribed }: Props) => {
   return (
     <Button
       onClick={handleClick}
-      className="z-50 w-fit cursor-pointer bg-gradient-to-br from-stone-100 to-stone-400/50 transition-all duration-150 outline-none"
+      className="z-50 w-fit cursor-pointer bg-gradient-to-br from-stone-500 to-stone-700/90 text-neutral-300 transition-all duration-150 outline-none"
     >
       {isSubscribed ? "Manage Subscription" : "Subscribe"}
     </Button>
