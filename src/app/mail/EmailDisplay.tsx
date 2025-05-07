@@ -24,15 +24,15 @@ const EmailDisplay = ({ email }: Props) => {
         <div className="flex items-center justify-between gap-2">
           {!isMe && (
             <Avatar
-              name={email.from.name ?? email.from.address}
-              email={email.from.address}
+              name={email?.from?.name ?? email?.from?.address}
+              email={email?.from?.address}
               size="35"
               textSizeRatio={2}
               round={true}
             />
           )}
           <span className="font-medium">
-            {isMe ? "Me" : email.from.address}
+            {isMe ? "Me" : email?.from?.address}
           </span>
         </div>
         <p className="text-muted-foreground text-xs">
