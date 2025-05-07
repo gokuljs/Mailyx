@@ -1,10 +1,12 @@
 import { exchangeCodeForAccessToken, getAccountDetails } from "@/lib/aruinko";
 import redisHandler from "@/lib/redis";
-import { db } from "@/server/db";
+import { db } from "@/drizzle/db";
+import { account } from "@/drizzle/schema";
 import { auth } from "@clerk/nextjs/server";
 import axios from "axios";
 import { NextRequest, NextResponse } from "next/server";
 import { after } from "next/server";
+import { eq } from "drizzle-orm";
 
 export const GET = async (req: NextRequest) => {
   const { userId } = await auth();
@@ -41,21 +43,31 @@ export const GET = async (req: NextRequest) => {
     });
   }
   const accountDetails = await getAccountDetails(token.accessToken);
-  await db.account.upsert({
-    where: {
-      id: token.accountId.toString(),
-    },
-    update: {
-      accessToken: token.accessToken,
-    },
-    create: {
+
+  // Check if account exists
+  const existingAccount = await db
+    .select()
+    .from(account)
+    .where(eq(account.id, token.accountId.toString()))
+    .limit(1);
+
+  if (existingAccount.length > 0) {
+    // Update existing account
+    await db
+      .update(account)
+      .set({ accessToken: token.accessToken })
+      .where(eq(account.id, token.accountId.toString()));
+  } else {
+    // Create new account
+    await db.insert(account).values({
       id: token.accountId.toString(),
       userId,
       accessToken: token.accessToken,
       emailAddress: accountDetails?.email || "",
       name: accountDetails?.name || "",
-    },
-  });
+    });
+  }
+
   const key = `accounts:user:${userId}`;
   await redisHandler.del(key);
 

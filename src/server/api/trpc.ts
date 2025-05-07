@@ -1,3 +1,4 @@
+import { db } from "@/drizzle/db";
 import { auth } from "@clerk/nextjs/server";
 /**
  * YOU PROBABLY DON'T NEED TO EDIT THIS FILE, UNLESS:
@@ -10,8 +11,6 @@ import { auth } from "@clerk/nextjs/server";
 import { initTRPC } from "@trpc/server";
 import superjson from "superjson";
 import { ZodError } from "zod";
-
-import { db } from "@/server/db";
 
 /**
  * 1. CONTEXT

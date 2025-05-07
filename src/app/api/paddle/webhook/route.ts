@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Environment, EventName, Paddle } from "@paddle/paddle-node-sdk";
-import { db } from "@/server/db";
-import { SubscriptionStatus } from "@prisma/client";
+import { db } from "@/drizzle/db";
+import * as schema from "@/drizzle/schema";
+import { eq } from "drizzle-orm";
+import cuid from "cuid";
 
 const paddle = new Paddle(process.env.PADDLE_API_KEY as string, {
   environment: process.env.PADDLE_ENV as Environment,
@@ -56,43 +58,50 @@ const handleSubscriptionCreated = async (data: any) => {
       return;
     }
 
-    await db.subscription.upsert({
-      where: {
-        userId: userId,
-      },
-      update: {
-        paddleSubscriptionId: data.id,
-        customerID: data.customerId,
-        addressId: data.addressId,
-        businessId: data.businessId,
-        startedAt: new Date(data.currentBillingPeriod.startsAt),
-        endedAt: new Date(data.currentBillingPeriod.endsAt),
-        nextBilledAt: data.nextBilledAt ? new Date(data.nextBilledAt) : null,
-        pausedAt: data.pausedAt ? new Date(data.pausedAt) : null,
-        canceledAt: data.canceledAt ? new Date(data.canceledAt) : null,
-        status: data.status.toUpperCase() as SubscriptionStatus,
-        billingInterval: data.billingCycle.interval,
-        billingFrequency: data.billingCycle.frequency,
-        updatedAt: new Date(),
-        planId: data.customData?.planType || "",
-      },
-      create: {
+    // First check if subscription exists
+    const existingSubscription = await db
+      .select()
+      .from(schema.subscription)
+      .where(eq(schema.subscription.userId, userId))
+      .limit(1);
+
+    const now = new Date().toISOString();
+    const subscriptionData = {
+      paddleSubscriptionId: data.id,
+      customerID: data.customerId,
+      addressId: data.addressId,
+      businessId: data.businessId,
+      startedAt: new Date(data.currentBillingPeriod.startsAt).toISOString(),
+      endedAt: new Date(data.currentBillingPeriod.endsAt).toISOString(),
+      nextBilledAt: data.nextBilledAt
+        ? new Date(data.nextBilledAt).toISOString()
+        : null,
+      pausedAt: data.pausedAt ? new Date(data.pausedAt).toISOString() : null,
+      canceledAt: data.canceledAt
+        ? new Date(data.canceledAt).toISOString()
+        : null,
+      status: data.status.toUpperCase(),
+      billingInterval: data.billingCycle.interval,
+      billingFrequency: data.billingCycle.frequency,
+      updatedAt: now,
+      planId: data.customData?.planType || "",
+    };
+
+    if (existingSubscription.length > 0) {
+      // Update existing subscription
+      await db
+        .update(schema.subscription)
+        .set(subscriptionData)
+        .where(eq(schema.subscription.userId, userId));
+    } else {
+      // Create new subscription
+      await db.insert(schema.subscription).values({
+        id: cuid(),
         userId,
-        paddleSubscriptionId: data.id,
-        customerID: data.customerId,
-        addressId: data.addressId,
-        businessId: data.businessId,
-        startedAt: new Date(data.currentBillingPeriod.startsAt),
-        endedAt: new Date(data.currentBillingPeriod.endsAt),
-        nextBilledAt: data.nextBilledAt ? new Date(data.nextBilledAt) : null,
-        pausedAt: data.pausedAt ? new Date(data.pausedAt) : null,
-        canceledAt: data.canceledAt ? new Date(data.canceledAt) : null,
-        status: data.status.toUpperCase() as SubscriptionStatus,
-        billingInterval: data.billingCycle.interval,
-        billingFrequency: data.billingCycle.frequency,
-        planId: data.customData?.planType || "",
-      },
-    });
+        createdAt: now,
+        ...subscriptionData,
+      });
+    }
 
     console.log(`Subscription created for user ${userId}`);
   } catch (error) {
@@ -111,26 +120,30 @@ const handleSubscriptionUpdated = async (data: any) => {
       return;
     }
 
-    await db.subscription.update({
-      where: {
-        paddleSubscriptionId: paddleSubscriptionId,
-      },
-      data: {
+    await db
+      .update(schema.subscription)
+      .set({
         customerID: data.customerId,
         addressId: data.addressId,
         businessId: data.businessId,
-        startedAt: new Date(data.currentBillingPeriod.startsAt),
-        endedAt: new Date(data.currentBillingPeriod.endsAt),
-        nextBilledAt: data.nextBilledAt ? new Date(data.nextBilledAt) : null,
-        pausedAt: data.pausedAt ? new Date(data.pausedAt) : null,
-        canceledAt: data.canceledAt ? new Date(data.canceledAt) : null,
-        status: data.status.toUpperCase() as SubscriptionStatus,
+        startedAt: new Date(data.currentBillingPeriod.startsAt).toISOString(),
+        endedAt: new Date(data.currentBillingPeriod.endsAt).toISOString(),
+        nextBilledAt: data.nextBilledAt
+          ? new Date(data.nextBilledAt).toISOString()
+          : null,
+        pausedAt: data.pausedAt ? new Date(data.pausedAt).toISOString() : null,
+        canceledAt: data.canceledAt
+          ? new Date(data.canceledAt).toISOString()
+          : null,
+        status: data.status.toUpperCase(),
         billingInterval: data.billingCycle.interval,
         billingFrequency: data.billingCycle.frequency,
-        updatedAt: new Date(),
+        updatedAt: new Date().toISOString(),
         planId: data.customData?.planType || "",
-      },
-    });
+      })
+      .where(
+        eq(schema.subscription.paddleSubscriptionId, paddleSubscriptionId),
+      );
 
     console.log(`Subscription updated for ${paddleSubscriptionId}`);
   } catch (error) {
