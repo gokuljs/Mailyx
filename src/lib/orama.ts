@@ -91,7 +91,13 @@ export class OramaClient {
   }
 
   async search({ term }: { term: string }) {
-    return await search(this.orama, { term });
+    return await search(this.orama, {
+      term,
+      properties: ["subject", "from", "to", "body", "sentAt", "threadId"],
+      limit: 50,
+      tolerance: 1, // Allow 1 typo
+      mode: "fulltext", // Use full text search mode
+    });
   }
 
   async insert(document: any) {

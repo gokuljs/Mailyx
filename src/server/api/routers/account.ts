@@ -400,6 +400,7 @@ export const accountRouter = createTRPCRouter({
         input?.accountId,
         ctx?.auth?.userId,
       );
+      console.log("Searching Db orama");
       const orama = new OramaClient(account?.id);
       await orama.init();
       const result = await orama.search({
