@@ -58,7 +58,6 @@ const ComposeButton = (props: Props) => {
       {
         onSuccess: () => {
           toast.success("Email sent");
-          setOpen(false);
         },
         onError: (error) => {
           console.log(error);
