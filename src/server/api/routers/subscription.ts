@@ -1,9 +1,6 @@
 import { z } from "zod";
-import nodemailer from "nodemailer";
 import { createTRPCRouter, privateProcedure } from "../trpc";
-import { error } from "console";
 import axios from "axios";
-import { plans } from "@/lib/Constants";
 import * as schema from "@/drizzle/schema";
 import { db } from "@/drizzle/db";
 import { eq } from "drizzle-orm";

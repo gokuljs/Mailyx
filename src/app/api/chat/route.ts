@@ -4,7 +4,9 @@ import { Message, streamText } from "ai";
 import { auth } from "@clerk/nextjs/server";
 import { OramaClient } from "@/lib/orama";
 import { openai as aiProvider } from "@ai-sdk/openai";
-import { db } from "@/server/db";
+import { db } from "@/drizzle/db";
+import { subscription, chatBotInteraction } from "@/drizzle/schema";
+import { eq, and } from "drizzle-orm";
 
 const config = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
@@ -22,43 +24,75 @@ export async function POST(req: Request) {
     if (!accountId) {
       throw new Error("Account Id not found");
     }
-    const subInfo = await db.subscription.findFirst({
-      where: {
-        userId,
-      },
-      select: {
-        status: true,
-        endedAt: true,
-      },
-    });
+
+    // Check subscription status
+    const subInfo = await db
+      .select({
+        status: subscription.status,
+        endedAt: subscription.endedAt,
+      })
+      .from(subscription)
+      .where(eq(subscription.userId, userId))
+      .limit(1);
+
     const currentDate = new Date();
-    const endDate = subInfo?.endedAt ? new Date(subInfo.endedAt) : null;
+    const endDate = subInfo[0]?.endedAt ? new Date(subInfo[0].endedAt) : null;
     const isSubscribed =
-      subInfo?.status === "ACTIVE" && (!endDate || currentDate < endDate);
+      subInfo[0]?.status === "ACTIVE" && (!endDate || currentDate < endDate);
+
     if (!isSubscribed) {
-      const chatBotInteraction = await db.chatBotInteraction.findUnique({
-        where: {
+      // First check if the user has ANY interactions (to avoid unique constraint)
+      const anyUserInteraction = await db
+        .select()
+        .from(chatBotInteraction)
+        .where(eq(chatBotInteraction.userId, userId))
+        .limit(1);
+
+      if (anyUserInteraction.length === 0) {
+        // User has no interactions yet, create a new record
+        await db.insert(chatBotInteraction).values({
+          id: crypto.randomUUID(),
           userId,
           day: today,
-        },
-      });
-      if (!chatBotInteraction) {
-        await db.chatBotInteraction.create({
-          data: {
-            userId,
-            day: today,
-            count: 1,
-          },
+          count: 1,
         });
-      } else if (chatBotInteraction.count >= FREE_CREDITS_PER_DAY) {
-        return new Response(
-          "You have reached the daily limit of free credits",
-          {
-            status: 429,
-          },
-        );
+      } else {
+        // User already has interactions, check for today
+        const todayInteraction = await db
+          .select()
+          .from(chatBotInteraction)
+          .where(
+            and(
+              eq(chatBotInteraction.userId, userId),
+              eq(chatBotInteraction.day, today),
+            ),
+          )
+          .limit(1);
+
+        if (todayInteraction.length === 0) {
+          // User has interactions but not for today
+          await db
+            .update(chatBotInteraction)
+            .set({
+              day: today,
+              count: 1,
+            })
+            .where(eq(chatBotInteraction.userId, userId));
+        } else if (
+          todayInteraction.length > 0 &&
+          todayInteraction[0] &&
+          todayInteraction[0].count >= FREE_CREDITS_PER_DAY
+        ) {
+          return new Response(
+            "You have reached the daily limit of free credits",
+            {
+              status: 429,
+            },
+          );
+        }
       }
     }
+
     const orama = new OramaClient(accountId);
     await orama.init();
     const lastMessage = messages.at(-1);
@@ -90,14 +124,22 @@ export async function POST(req: Request) {
       model: aiProvider("gpt-4.1-mini"),
       messages: allMessages,
       onFinish: async (response) => {
-        await db.chatBotInteraction.update({
-          where: { userId, day: today },
-          data: {
-            count: {
-              increment: 1,
-            },
-          },
-        });
+        // Update interaction count - get the latest to avoid race conditions
+        const existingInteraction = await db
+          .select()
+          .from(chatBotInteraction)
+          .where(eq(chatBotInteraction.userId, userId))
+          .limit(1);
+
+        if (existingInteraction.length > 0 && existingInteraction[0]) {
+          await db
+            .update(chatBotInteraction)
+            .set({
+              day: today,
+              count: existingInteraction[0].count + 1,
+            })
+            .where(eq(chatBotInteraction.userId, userId));
+        }
       },
     });
 

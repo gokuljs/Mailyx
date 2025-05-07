@@ -1,4 +1,5 @@
-import { db } from "@/server/db";
+import { db } from "@/drizzle/db";
+import { user } from "@/drizzle/schema";
 
 export const POST = async (req: Request) => {
   try {
@@ -15,14 +16,13 @@ export const POST = async (req: Request) => {
       return new Response("Missing required user fields", { status: 400 });
     }
     console.log("Creating a new User", emailAddress, "-", firstName);
-    await db.user.create({
-      data: {
-        id,
-        emailAddress,
-        firstName,
-        lastName,
-        imageUrl,
-      },
+
+    await db.insert(user).values({
+      id,
+      emailAddress,
+      firstName,
+      lastName,
+      imageUrl,
     });
 
     return new Response("Webhook received", { status: 200 });

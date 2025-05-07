@@ -7,7 +7,9 @@ import {
   SyncResponse,
   SyncUpdatedResponse,
 } from "./types";
-import { db } from "@/server/db";
+import { db } from "@/drizzle/db";
+import { account } from "@/drizzle/schema";
+import { eq } from "drizzle-orm";
 import { syncEmailsToDatabase } from "./sync-to-db";
 
 export class Account {
@@ -148,22 +150,30 @@ export class Account {
       console.log(error);
     }
   }
+
   async syncEmails() {
-    const account = await db.account.findUnique({
-      where: {
-        accessToken: this.token,
-      },
-    });
-    if (!account) throw new Error("Account not found");
-    if (!account.nextDeltaToken) throw new Error("Account not ready for sync");
+    const accounts = await db
+      .select()
+      .from(account)
+      .where(eq(account.accessToken, this.token))
+      .limit(1);
+
+    const accountData = accounts[0];
+    if (!accountData) throw new Error("Account not found");
+    if (!accountData.nextDeltaToken)
+      throw new Error("Account not ready for sync");
+
     let response = await this.getUpdateEmails({
-      deltaToken: account?.nextDeltaToken,
+      deltaToken: accountData.nextDeltaToken,
     });
-    let storedDeltaToken = account.nextDeltaToken;
+
+    let storedDeltaToken = accountData.nextDeltaToken;
     let allEmails: EmailMessage[] = response?.records;
+
     if (response?.nextDeltaToken) {
       storedDeltaToken = response?.nextDeltaToken;
     }
+
     while (response.nextPageToken) {
       response = await this.getUpdateEmails({
         pageToken: response.nextPageToken,
@@ -173,20 +183,18 @@ export class Account {
         storedDeltaToken = response?.nextDeltaToken;
       }
     }
+
     try {
-      syncEmailsToDatabase(allEmails, account.id);
+      syncEmailsToDatabase(allEmails, accountData.id);
     } catch (e) {
-      console.error("Error during sync:", error);
+      console.error("Error during sync:", e);
     }
 
-    await db.account.update({
-      where: {
-        id: account.id,
-      },
-      data: {
-        nextDeltaToken: storedDeltaToken,
-      },
-    });
+    await db
+      .update(account)
+      .set({ nextDeltaToken: storedDeltaToken })
+      .where(eq(account.id, accountData.id));
+
     return {
       allEmails: allEmails,
       deltaToken: storedDeltaToken,

@@ -1,11 +1,11 @@
-import { db } from "@/server/db";
+import { db } from "@/drizzle/db";
+import { user } from "@/drizzle/schema";
 
-await db.user.create({
-  data: {
-    emailAddress: "jsgokul123@gmail.com",
-    firstName: "gokul",
-    lastName: "js",
-  },
+await db.insert(user).values({
+  id: crypto.randomUUID(),
+  emailAddress: "jsgokul123@gmail.com",
+  firstName: "gokul",
+  lastName: "js",
 });
 
 console.log("done");

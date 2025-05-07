@@ -1,6 +1,8 @@
 import { Account } from "@/lib/accounts";
 import { syncEmailsToDatabase } from "@/lib/sync-to-db";
-import { db } from "@/server/db";
+import { db } from "@/drizzle/db";
+import { account } from "@/drizzle/schema";
+import { eq, and } from "drizzle-orm";
 import { error } from "console";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -22,12 +24,15 @@ export const POST = async (req: NextRequest) => {
       { status: 400 },
     );
   }
-  const dbAccount = await db.account.findUnique({
-    where: {
-      id: accountId,
-      userId,
-    },
-  });
+
+  const accounts = await db
+    .select()
+    .from(account)
+    .where(and(eq(account.id, accountId), eq(account.userId, userId)))
+    .limit(1);
+
+  const dbAccount = accounts[0];
+
   if (!dbAccount)
     return NextResponse.json(
       {
@@ -35,9 +40,10 @@ export const POST = async (req: NextRequest) => {
       },
       { status: 404 },
     );
+
   // performInitialSync
-  const account = new Account(dbAccount.accessToken);
-  const response = await account.performInitialSync();
+  const accountClient = new Account(dbAccount.accessToken);
+  const response = await accountClient.performInitialSync();
   if (!response) {
     return NextResponse.json(
       {
@@ -49,14 +55,14 @@ export const POST = async (req: NextRequest) => {
     );
   }
   const { emails, deltaToken } = response;
-  await db.account.update({
-    where: {
-      id: accountId,
-    },
-    data: {
+
+  await db
+    .update(account)
+    .set({
       nextDeltaToken: deltaToken,
-    },
-  });
+    })
+    .where(eq(account.id, accountId));
+
   // console.log("%%%%%%%%%%%%%%%");
   // console.log(JSON.stringify(emails.slice(0, 1), null, 2));
   await syncEmailsToDatabase(emails, accountId);
