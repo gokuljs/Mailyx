@@ -2,7 +2,7 @@ import { emailAddressSchema } from "./../../../lib/types";
 import { z } from "zod";
 import { createTRPCRouter, privateProcedure, publicProcedure } from "../trpc";
 import * as schema from "@/drizzle/schema";
-import { eq, and, count, type SQL, desc, asc } from "drizzle-orm";
+import { eq, and, count, type SQL, desc, asc, inArray } from "drizzle-orm";
 
 import { Account } from "@/lib/accounts";
 import { OramaClient } from "@/lib/orama";
@@ -94,13 +94,14 @@ export const accountRouter = createTRPCRouter({
       const userId = ctx?.auth?.userId;
       const key = `threads:user:${userId}:account:${input.accountId}:tab:${input.tab}:done:${input.done ?? "all"}`;
       const acc = new Account(account?.accessToken);
-      acc.syncEmails().catch(console.error);
+      // acc.syncEmails().catch(console.error);
+
       const threads = await catchFirst(
         key,
         async () => {
           const account = await authorizeAccountAccess(input.accountId, userId);
 
-          // Build the conditions for thread filtering
+          // Build conditions for filtering
           const conditions: SQL[] = [eq(schema.thread.accountId, account.id)];
 
           if (input.tab === "inbox") {
@@ -115,7 +116,8 @@ export const accountRouter = createTRPCRouter({
             conditions.push(eq(schema.thread.done, input.done));
           }
 
-          // First, fetch threads
+          // Fetch threads
+          console.time("DB:getThreads");
           const threads = await db
             .select()
             .from(schema.thread)
@@ -123,41 +125,69 @@ export const accountRouter = createTRPCRouter({
             .orderBy(desc(schema.thread.lastMessageDate))
             .limit(50);
 
-          // For each thread, get its emails
-          const threadResults = [];
+          const threadIds = threads.map((t) => t.id);
+          if (threadIds.length === 0) return [];
 
-          for (const thread of threads) {
-            const emails = await db
-              .select()
-              .from(schema.email)
-              .where(eq(schema.email.threadId, thread.id))
-              .orderBy(asc(schema.email.sentAt))
-              .leftJoin(
-                schema.emailAddress,
-                eq(schema.email.fromId, schema.emailAddress.id),
-              );
+          // Fetch all emails for those threads in one query
+          const emails = await db
+            .select({
+              threadId: schema.email.threadId,
+              Email: {
+                id: schema.email.id,
+                subject: schema.email.subject,
+                sentAt: schema.email.sentAt,
+                emailLabel: schema.email.emailLabel,
+                sysLabels: schema.email.sysLabels,
+                body: schema.email.body,
+                bodySnippet: schema.email.bodySnippet,
+              },
+              EmailAddress: {
+                name: schema.emailAddress.name,
+                address: schema.emailAddress.address,
+              },
+            })
+            .from(schema.email)
+            .where(inArray(schema.email.threadId, threadIds))
+            .orderBy(asc(schema.email.sentAt))
+            .leftJoin(
+              schema.emailAddress,
+              eq(schema.email.fromId, schema.emailAddress.id),
+            );
 
-            threadResults.push({
-              ...thread,
-              email: emails.map((row) => ({
-                from: row.EmailAddress,
-                body: row.Email.body,
-                bodySnippet: row.Email.bodySnippet,
-                emailLabel: row.Email.emailLabel,
-                subject: row.Email.subject,
-                sysLabels: row.Email.sysLabels,
-                id: row.Email.id,
-                sentAt: row.Email.sentAt,
-              })),
-            });
+          // Group emails by threadId
+          const groupedEmails = new Map<string, any[]>();
+          for (const row of emails) {
+            const formatted = {
+              from: row.EmailAddress,
+              body: row.Email.body ?? "",
+              bodySnippet: row.Email.bodySnippet ?? "",
+              emailLabel: row.Email.emailLabel,
+              subject: row.Email.subject,
+              sysLabels: row.Email.sysLabels,
+              id: row.Email.id,
+              sentAt: row.Email.sentAt,
+            };
+            if (!groupedEmails.has(row.threadId)) {
+              groupedEmails.set(row.threadId, []);
+            }
+            groupedEmails.get(row.threadId)!.push(formatted);
           }
 
+          // Map threads to include grouped emails
+          const threadResults = threads.map((thread) => ({
+            ...thread,
+            email: groupedEmails.get(thread.id) ?? [],
+          }));
+
+          console.timeEnd("DB:getThreads");
           return threadResults;
         },
         5000,
       );
+
       return threads;
     }),
+
   getSuggestions: privateProcedure
     .input(
       z.object({
