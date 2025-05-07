@@ -1,9 +1,385 @@
 {
-  "id": "00000000-0000-0000-0000-000000000000",
-  "prevId": "",
+  "id": "afa346d2-3908-45d5-a223-874efe3b07f2",
+  "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
+    "public.Account": {
+      "name": "Account",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "userId": {
+          "name": "userId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "emailAddress": {
+          "name": "emailAddress",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "accessToken": {
+          "name": "accessToken",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "oramaIndex": {
+          "name": "oramaIndex",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "nextDeltaToken": {
+          "name": "nextDeltaToken",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "Account_userId_fkey": {
+          "name": "Account_userId_fkey",
+          "tableFrom": "Account",
+          "tableTo": "User",
+          "columnsFrom": [
+            "userId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "Account_accessToken_key": {
+          "name": "Account_accessToken_key",
+          "nullsNotDistinct": false,
+          "columns": [
+            "accessToken"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public._BccEmails": {
+      "name": "_BccEmails",
+      "schema": "",
+      "columns": {
+        "A": {
+          "name": "A",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "B": {
+          "name": "B",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "_BccEmails_AB_unique": {
+          "name": "_BccEmails_AB_unique",
+          "columns": [
+            {
+              "expression": "A",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last",
+              "opclass": "text_ops"
+            },
+            {
+              "expression": "B",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last",
+              "opclass": "text_ops"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_BccEmails_B_index": {
+          "name": "_BccEmails_B_index",
+          "columns": [
+            {
+              "expression": "B",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last",
+              "opclass": "text_ops"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "_BccEmails_A_fkey": {
+          "name": "_BccEmails_A_fkey",
+          "tableFrom": "_BccEmails",
+          "tableTo": "Email",
+          "columnsFrom": [
+            "A"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        },
+        "_BccEmails_B_fkey": {
+          "name": "_BccEmails_B_fkey",
+          "tableFrom": "_BccEmails",
+          "tableTo": "EmailAddress",
+          "columnsFrom": [
+            "B"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public._CcEmails": {
+      "name": "_CcEmails",
+      "schema": "",
+      "columns": {
+        "A": {
+          "name": "A",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "B": {
+          "name": "B",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "_CcEmails_AB_unique": {
+          "name": "_CcEmails_AB_unique",
+          "columns": [
+            {
+              "expression": "A",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last",
+              "opclass": "text_ops"
+            },
+            {
+              "expression": "B",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last",
+              "opclass": "text_ops"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_CcEmails_B_index": {
+          "name": "_CcEmails_B_index",
+          "columns": [
+            {
+              "expression": "B",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last",
+              "opclass": "text_ops"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "_CcEmails_A_fkey": {
+          "name": "_CcEmails_A_fkey",
+          "tableFrom": "_CcEmails",
+          "tableTo": "Email",
+          "columnsFrom": [
+            "A"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        },
+        "_CcEmails_B_fkey": {
+          "name": "_CcEmails_B_fkey",
+          "tableFrom": "_CcEmails",
+          "tableTo": "EmailAddress",
+          "columnsFrom": [
+            "B"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.chatBotInteraction": {
+      "name": "chatBotInteraction",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "day": {
+          "name": "day",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "count": {
+          "name": "count",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "userId": {
+          "name": "userId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "chatBotInteraction_day_userId_idx": {
+          "name": "chatBotInteraction_day_userId_idx",
+          "columns": [
+            {
+              "expression": "day",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last",
+              "opclass": "text_ops"
+            },
+            {
+              "expression": "userId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last",
+              "opclass": "text_ops"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "chatBotInteraction_day_userId_key": {
+          "name": "chatBotInteraction_day_userId_key",
+          "columns": [
+            {
+              "expression": "day",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last",
+              "opclass": "text_ops"
+            },
+            {
+              "expression": "userId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last",
+              "opclass": "text_ops"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "chatBotInteraction_userId_key": {
+          "name": "chatBotInteraction_userId_key",
+          "columns": [
+            {
+              "expression": "userId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last",
+              "opclass": "text_ops"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "chatBotInteraction_userId_fkey": {
+          "name": "chatBotInteraction_userId_fkey",
+          "tableFrom": "chatBotInteraction",
+          "tableTo": "User",
+          "columnsFrom": [
+            "userId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
     "public.ContactMessage": {
       "name": "ContactMessage",
       "schema": "",
@@ -51,912 +427,8 @@
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
-      "checkConstraints": {},
       "policies": {},
-      "isRLSEnabled": false
-    },
-    "public.chatBotInteraction": {
-      "name": "chatBotInteraction",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "text",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "day": {
-          "name": "day",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "count": {
-          "name": "count",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "default": 1
-        },
-        "userId": {
-          "name": "userId",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        }
-      },
-      "indexes": {
-        "chatBotInteraction_day_userId_idx": {
-          "name": "chatBotInteraction_day_userId_idx",
-          "columns": [
-            {
-              "expression": "day",
-              "asc": true,
-              "nulls": "last",
-              "opclass": "text_ops",
-              "isExpression": false
-            },
-            {
-              "expression": "userId",
-              "asc": true,
-              "nulls": "last",
-              "opclass": "text_ops",
-              "isExpression": false
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "chatBotInteraction_day_userId_key": {
-          "name": "chatBotInteraction_day_userId_key",
-          "columns": [
-            {
-              "expression": "day",
-              "asc": true,
-              "nulls": "last",
-              "opclass": "text_ops",
-              "isExpression": false
-            },
-            {
-              "expression": "userId",
-              "asc": true,
-              "nulls": "last",
-              "opclass": "text_ops",
-              "isExpression": false
-            }
-          ],
-          "isUnique": true,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "chatBotInteraction_userId_key": {
-          "name": "chatBotInteraction_userId_key",
-          "columns": [
-            {
-              "expression": "userId",
-              "asc": true,
-              "nulls": "last",
-              "opclass": "text_ops",
-              "isExpression": false
-            }
-          ],
-          "isUnique": true,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        }
-      },
-      "foreignKeys": {
-        "chatBotInteraction_userId_fkey": {
-          "name": "chatBotInteraction_userId_fkey",
-          "tableFrom": "chatBotInteraction",
-          "tableTo": "User",
-          "schemaTo": "public",
-          "columnsFrom": [
-            "userId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "restrict",
-          "onUpdate": "cascade"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
       "checkConstraints": {},
-      "policies": {},
-      "isRLSEnabled": false
-    },
-    "public.Subscription": {
-      "name": "Subscription",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "text",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "userId": {
-          "name": "userId",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "paddleSubscriptionId": {
-          "name": "paddleSubscriptionId",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "customerID": {
-          "name": "customerID",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "addressId": {
-          "name": "addressId",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "businessId": {
-          "name": "businessId",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "createdAt": {
-          "name": "createdAt",
-          "type": "timestamp(3)",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "updatedAt": {
-          "name": "updatedAt",
-          "type": "timestamp(3)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "startedAt": {
-          "name": "startedAt",
-          "type": "timestamp(3)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "endedAt": {
-          "name": "endedAt",
-          "type": "timestamp(3)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "nextBilledAt": {
-          "name": "nextBilledAt",
-          "type": "timestamp(3)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "pausedAt": {
-          "name": "pausedAt",
-          "type": "timestamp(3)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "canceledAt": {
-          "name": "canceledAt",
-          "type": "timestamp(3)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "status": {
-          "name": "status",
-          "type": "SubscriptionStatus",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "billingInterval": {
-          "name": "billingInterval",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "billingFrequency": {
-          "name": "billingFrequency",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "planId": {
-          "name": "planId",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "Subscription_userId_fkey": {
-          "name": "Subscription_userId_fkey",
-          "tableFrom": "Subscription",
-          "tableTo": "User",
-          "schemaTo": "public",
-          "columnsFrom": [
-            "userId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "restrict",
-          "onUpdate": "cascade"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "Subscription_userId_key": {
-          "columns": [
-            "userId"
-          ],
-          "nullsNotDistinct": false,
-          "name": "Subscription_userId_key"
-        },
-        "Subscription_paddleSubscriptionId_key": {
-          "columns": [
-            "paddleSubscriptionId"
-          ],
-          "nullsNotDistinct": false,
-          "name": "Subscription_paddleSubscriptionId_key"
-        }
-      },
-      "checkConstraints": {},
-      "policies": {},
-      "isRLSEnabled": false
-    },
-    "public._ToEmails": {
-      "name": "_ToEmails",
-      "schema": "",
-      "columns": {
-        "A": {
-          "name": "A",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "B": {
-          "name": "B",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        }
-      },
-      "indexes": {
-        "_ToEmails_AB_unique": {
-          "name": "_ToEmails_AB_unique",
-          "columns": [
-            {
-              "expression": "A",
-              "asc": true,
-              "nulls": "last",
-              "opclass": "text_ops",
-              "isExpression": false
-            },
-            {
-              "expression": "B",
-              "asc": true,
-              "nulls": "last",
-              "opclass": "text_ops",
-              "isExpression": false
-            }
-          ],
-          "isUnique": true,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "_ToEmails_B_index": {
-          "name": "_ToEmails_B_index",
-          "columns": [
-            {
-              "expression": "B",
-              "asc": true,
-              "nulls": "last",
-              "opclass": "text_ops",
-              "isExpression": false
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        }
-      },
-      "foreignKeys": {
-        "_ToEmails_A_fkey": {
-          "name": "_ToEmails_A_fkey",
-          "tableFrom": "_ToEmails",
-          "tableTo": "Email",
-          "schemaTo": "public",
-          "columnsFrom": [
-            "A"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "cascade"
-        },
-        "_ToEmails_B_fkey": {
-          "name": "_ToEmails_B_fkey",
-          "tableFrom": "_ToEmails",
-          "tableTo": "EmailAddress",
-          "schemaTo": "public",
-          "columnsFrom": [
-            "B"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "cascade"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "checkConstraints": {},
-      "policies": {},
-      "isRLSEnabled": false
-    },
-    "public._ReplyToEmails": {
-      "name": "_ReplyToEmails",
-      "schema": "",
-      "columns": {
-        "A": {
-          "name": "A",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "B": {
-          "name": "B",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        }
-      },
-      "indexes": {
-        "_ReplyToEmails_AB_unique": {
-          "name": "_ReplyToEmails_AB_unique",
-          "columns": [
-            {
-              "expression": "A",
-              "asc": true,
-              "nulls": "last",
-              "opclass": "text_ops",
-              "isExpression": false
-            },
-            {
-              "expression": "B",
-              "asc": true,
-              "nulls": "last",
-              "opclass": "text_ops",
-              "isExpression": false
-            }
-          ],
-          "isUnique": true,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "_ReplyToEmails_B_index": {
-          "name": "_ReplyToEmails_B_index",
-          "columns": [
-            {
-              "expression": "B",
-              "asc": true,
-              "nulls": "last",
-              "opclass": "text_ops",
-              "isExpression": false
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        }
-      },
-      "foreignKeys": {
-        "_ReplyToEmails_A_fkey": {
-          "name": "_ReplyToEmails_A_fkey",
-          "tableFrom": "_ReplyToEmails",
-          "tableTo": "Email",
-          "schemaTo": "public",
-          "columnsFrom": [
-            "A"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "cascade"
-        },
-        "_ReplyToEmails_B_fkey": {
-          "name": "_ReplyToEmails_B_fkey",
-          "tableFrom": "_ReplyToEmails",
-          "tableTo": "EmailAddress",
-          "schemaTo": "public",
-          "columnsFrom": [
-            "B"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "cascade"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "checkConstraints": {},
-      "policies": {},
-      "isRLSEnabled": false
-    },
-    "public._CcEmails": {
-      "name": "_CcEmails",
-      "schema": "",
-      "columns": {
-        "A": {
-          "name": "A",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "B": {
-          "name": "B",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        }
-      },
-      "indexes": {
-        "_CcEmails_AB_unique": {
-          "name": "_CcEmails_AB_unique",
-          "columns": [
-            {
-              "expression": "A",
-              "asc": true,
-              "nulls": "last",
-              "opclass": "text_ops",
-              "isExpression": false
-            },
-            {
-              "expression": "B",
-              "asc": true,
-              "nulls": "last",
-              "opclass": "text_ops",
-              "isExpression": false
-            }
-          ],
-          "isUnique": true,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "_CcEmails_B_index": {
-          "name": "_CcEmails_B_index",
-          "columns": [
-            {
-              "expression": "B",
-              "asc": true,
-              "nulls": "last",
-              "opclass": "text_ops",
-              "isExpression": false
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        }
-      },
-      "foreignKeys": {
-        "_CcEmails_A_fkey": {
-          "name": "_CcEmails_A_fkey",
-          "tableFrom": "_CcEmails",
-          "tableTo": "Email",
-          "schemaTo": "public",
-          "columnsFrom": [
-            "A"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "cascade"
-        },
-        "_CcEmails_B_fkey": {
-          "name": "_CcEmails_B_fkey",
-          "tableFrom": "_CcEmails",
-          "tableTo": "EmailAddress",
-          "schemaTo": "public",
-          "columnsFrom": [
-            "B"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "cascade"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "checkConstraints": {},
-      "policies": {},
-      "isRLSEnabled": false
-    },
-    "public._BccEmails": {
-      "name": "_BccEmails",
-      "schema": "",
-      "columns": {
-        "A": {
-          "name": "A",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "B": {
-          "name": "B",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        }
-      },
-      "indexes": {
-        "_BccEmails_AB_unique": {
-          "name": "_BccEmails_AB_unique",
-          "columns": [
-            {
-              "expression": "A",
-              "asc": true,
-              "nulls": "last",
-              "opclass": "text_ops",
-              "isExpression": false
-            },
-            {
-              "expression": "B",
-              "asc": true,
-              "nulls": "last",
-              "opclass": "text_ops",
-              "isExpression": false
-            }
-          ],
-          "isUnique": true,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "_BccEmails_B_index": {
-          "name": "_BccEmails_B_index",
-          "columns": [
-            {
-              "expression": "B",
-              "asc": true,
-              "nulls": "last",
-              "opclass": "text_ops",
-              "isExpression": false
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        }
-      },
-      "foreignKeys": {
-        "_BccEmails_A_fkey": {
-          "name": "_BccEmails_A_fkey",
-          "tableFrom": "_BccEmails",
-          "tableTo": "Email",
-          "schemaTo": "public",
-          "columnsFrom": [
-            "A"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "cascade"
-        },
-        "_BccEmails_B_fkey": {
-          "name": "_BccEmails_B_fkey",
-          "tableFrom": "_BccEmails",
-          "tableTo": "EmailAddress",
-          "schemaTo": "public",
-          "columnsFrom": [
-            "B"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "cascade"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "checkConstraints": {},
-      "policies": {},
-      "isRLSEnabled": false
-    },
-    "public.Thread": {
-      "name": "Thread",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "text",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "subject": {
-          "name": "subject",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "lastMessageDate": {
-          "name": "lastMessageDate",
-          "type": "timestamp(3)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "participantsIds": {
-          "name": "participantsIds",
-          "type": "text[]",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "accountId": {
-          "name": "accountId",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "done": {
-          "name": "done",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": true,
-          "default": false
-        },
-        "inboxStatus": {
-          "name": "inboxStatus",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": true,
-          "default": true
-        },
-        "draftStatus": {
-          "name": "draftStatus",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": true,
-          "default": false
-        },
-        "sentStatus": {
-          "name": "sentStatus",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": true,
-          "default": false
-        }
-      },
-      "indexes": {
-        "Thread_accountId_idx": {
-          "name": "Thread_accountId_idx",
-          "columns": [
-            {
-              "expression": "accountId",
-              "asc": true,
-              "nulls": "last",
-              "opclass": "text_ops",
-              "isExpression": false
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "Thread_done_idx": {
-          "name": "Thread_done_idx",
-          "columns": [
-            {
-              "expression": "done",
-              "asc": true,
-              "nulls": "last",
-              "opclass": "bool_ops",
-              "isExpression": false
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "Thread_draftStatus_idx": {
-          "name": "Thread_draftStatus_idx",
-          "columns": [
-            {
-              "expression": "draftStatus",
-              "asc": true,
-              "nulls": "last",
-              "opclass": "bool_ops",
-              "isExpression": false
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "Thread_inboxStatus_idx": {
-          "name": "Thread_inboxStatus_idx",
-          "columns": [
-            {
-              "expression": "inboxStatus",
-              "asc": true,
-              "nulls": "last",
-              "opclass": "bool_ops",
-              "isExpression": false
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "Thread_lastMessageDate_idx": {
-          "name": "Thread_lastMessageDate_idx",
-          "columns": [
-            {
-              "expression": "lastMessageDate",
-              "asc": true,
-              "nulls": "last",
-              "opclass": "timestamp_ops",
-              "isExpression": false
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "Thread_sentStatus_idx": {
-          "name": "Thread_sentStatus_idx",
-          "columns": [
-            {
-              "expression": "sentStatus",
-              "asc": true,
-              "nulls": "last",
-              "opclass": "bool_ops",
-              "isExpression": false
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        }
-      },
-      "foreignKeys": {
-        "Thread_accountId_fkey": {
-          "name": "Thread_accountId_fkey",
-          "tableFrom": "Thread",
-          "tableTo": "Account",
-          "schemaTo": "public",
-          "columnsFrom": [
-            "accountId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "set null",
-          "onUpdate": "cascade"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "checkConstraints": {},
-      "policies": {},
-      "isRLSEnabled": false
-    },
-    "public.EmailAttachment": {
-      "name": "EmailAttachment",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "text",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "name": {
-          "name": "name",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "mimeType": {
-          "name": "mimeType",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "size": {
-          "name": "size",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "inline": {
-          "name": "inline",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "contentId": {
-          "name": "contentId",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "content": {
-          "name": "content",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "contentLocation": {
-          "name": "contentLocation",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "emailId": {
-          "name": "emailId",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "EmailAttachment_emailId_fkey": {
-          "name": "EmailAttachment_emailId_fkey",
-          "tableFrom": "EmailAttachment",
-          "tableTo": "Email",
-          "schemaTo": "public",
-          "columnsFrom": [
-            "emailId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "restrict",
-          "onUpdate": "cascade"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "checkConstraints": {},
-      "policies": {},
       "isRLSEnabled": false
     },
     "public.Email": {
@@ -1125,10 +597,10 @@
           "columns": [
             {
               "expression": "emailLabel",
+              "isExpression": false,
               "asc": true,
               "nulls": "last",
-              "opclass": "enum_ops",
-              "isExpression": false
+              "opclass": "enum_ops"
             }
           ],
           "isUnique": false,
@@ -1141,10 +613,10 @@
           "columns": [
             {
               "expression": "sentAt",
+              "isExpression": false,
               "asc": true,
               "nulls": "last",
-              "opclass": "timestamp_ops",
-              "isExpression": false
+              "opclass": "timestamp_ops"
             }
           ],
           "isUnique": false,
@@ -1157,10 +629,10 @@
           "columns": [
             {
               "expression": "threadId",
+              "isExpression": false,
               "asc": true,
               "nulls": "last",
-              "opclass": "text_ops",
-              "isExpression": false
+              "opclass": "text_ops"
             }
           ],
           "isUnique": false,
@@ -1174,7 +646,6 @@
           "name": "Email_fromId_fkey",
           "tableFrom": "Email",
           "tableTo": "EmailAddress",
-          "schemaTo": "public",
           "columnsFrom": [
             "fromId"
           ],
@@ -1188,7 +659,6 @@
           "name": "Email_threadId_fkey",
           "tableFrom": "Email",
           "tableTo": "Thread",
-          "schemaTo": "public",
           "columnsFrom": [
             "threadId"
           ],
@@ -1201,8 +671,8 @@
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
-      "checkConstraints": {},
       "policies": {},
+      "checkConstraints": {},
       "isRLSEnabled": false
     },
     "public.EmailAddress": {
@@ -1246,17 +716,17 @@
           "columns": [
             {
               "expression": "accountId",
+              "isExpression": false,
               "asc": true,
               "nulls": "last",
-              "opclass": "text_ops",
-              "isExpression": false
+              "opclass": "text_ops"
             },
             {
               "expression": "address",
+              "isExpression": false,
               "asc": true,
               "nulls": "last",
-              "opclass": "text_ops",
-              "isExpression": false
+              "opclass": "text_ops"
             }
           ],
           "isUnique": true,
@@ -1270,7 +740,6 @@
           "name": "EmailAddress_accountId_fkey",
           "tableFrom": "EmailAddress",
           "tableTo": "Account",
-          "schemaTo": "public",
           "columnsFrom": [
             "accountId"
           ],
@@ -1283,12 +752,185 @@
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
-      "checkConstraints": {},
       "policies": {},
+      "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.Account": {
-      "name": "Account",
+    "public.EmailAttachment": {
+      "name": "EmailAttachment",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "mimeType": {
+          "name": "mimeType",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "size": {
+          "name": "size",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "inline": {
+          "name": "inline",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "contentId": {
+          "name": "contentId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "content": {
+          "name": "content",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "contentLocation": {
+          "name": "contentLocation",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "emailId": {
+          "name": "emailId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "EmailAttachment_emailId_fkey": {
+          "name": "EmailAttachment_emailId_fkey",
+          "tableFrom": "EmailAttachment",
+          "tableTo": "Email",
+          "columnsFrom": [
+            "emailId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public._ReplyToEmails": {
+      "name": "_ReplyToEmails",
+      "schema": "",
+      "columns": {
+        "A": {
+          "name": "A",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "B": {
+          "name": "B",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "_ReplyToEmails_AB_unique": {
+          "name": "_ReplyToEmails_AB_unique",
+          "columns": [
+            {
+              "expression": "A",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last",
+              "opclass": "text_ops"
+            },
+            {
+              "expression": "B",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last",
+              "opclass": "text_ops"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_ReplyToEmails_B_index": {
+          "name": "_ReplyToEmails_B_index",
+          "columns": [
+            {
+              "expression": "B",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last",
+              "opclass": "text_ops"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "_ReplyToEmails_A_fkey": {
+          "name": "_ReplyToEmails_A_fkey",
+          "tableFrom": "_ReplyToEmails",
+          "tableTo": "Email",
+          "columnsFrom": [
+            "A"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        },
+        "_ReplyToEmails_B_fkey": {
+          "name": "_ReplyToEmails_B_fkey",
+          "tableFrom": "_ReplyToEmails",
+          "tableTo": "EmailAddress",
+          "columnsFrom": [
+            "B"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.Subscription": {
+      "name": "Subscription",
       "schema": "",
       "columns": {
         "id": {
@@ -1303,44 +945,105 @@
           "primaryKey": false,
           "notNull": true
         },
-        "emailAddress": {
-          "name": "emailAddress",
+        "paddleSubscriptionId": {
+          "name": "paddleSubscriptionId",
           "type": "text",
           "primaryKey": false,
           "notNull": true
         },
-        "accessToken": {
-          "name": "accessToken",
+        "customerID": {
+          "name": "customerID",
           "type": "text",
           "primaryKey": false,
           "notNull": true
         },
-        "name": {
-          "name": "name",
+        "addressId": {
+          "name": "addressId",
           "type": "text",
           "primaryKey": false,
           "notNull": true
         },
-        "oramaIndex": {
-          "name": "oramaIndex",
-          "type": "jsonb",
+        "businessId": {
+          "name": "businessId",
+          "type": "text",
           "primaryKey": false,
           "notNull": false
         },
-        "nextDeltaToken": {
-          "name": "nextDeltaToken",
-          "type": "text",
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp(3)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamp(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "startedAt": {
+          "name": "startedAt",
+          "type": "timestamp(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "endedAt": {
+          "name": "endedAt",
+          "type": "timestamp(3)",
           "primaryKey": false,
           "notNull": false
+        },
+        "nextBilledAt": {
+          "name": "nextBilledAt",
+          "type": "timestamp(3)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "pausedAt": {
+          "name": "pausedAt",
+          "type": "timestamp(3)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "canceledAt": {
+          "name": "canceledAt",
+          "type": "timestamp(3)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "status": {
+          "name": "status",
+          "type": "SubscriptionStatus",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "billingInterval": {
+          "name": "billingInterval",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "billingFrequency": {
+          "name": "billingFrequency",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "planId": {
+          "name": "planId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
         }
       },
       "indexes": {},
       "foreignKeys": {
-        "Account_userId_fkey": {
-          "name": "Account_userId_fkey",
-          "tableFrom": "Account",
+        "Subscription_userId_fkey": {
+          "name": "Subscription_userId_fkey",
+          "tableFrom": "Subscription",
           "tableTo": "User",
-          "schemaTo": "public",
           "columnsFrom": [
             "userId"
           ],
@@ -1353,16 +1056,297 @@
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
-        "Account_accessToken_key": {
-          "columns": [
-            "accessToken"
-          ],
+        "Subscription_userId_key": {
+          "name": "Subscription_userId_key",
           "nullsNotDistinct": false,
-          "name": "Account_accessToken_key"
+          "columns": [
+            "userId"
+          ]
+        },
+        "Subscription_paddleSubscriptionId_key": {
+          "name": "Subscription_paddleSubscriptionId_key",
+          "nullsNotDistinct": false,
+          "columns": [
+            "paddleSubscriptionId"
+          ]
         }
       },
-      "checkConstraints": {},
       "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.Thread": {
+      "name": "Thread",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "subject": {
+          "name": "subject",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "lastMessageDate": {
+          "name": "lastMessageDate",
+          "type": "timestamp(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "participantsIds": {
+          "name": "participantsIds",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "accountId": {
+          "name": "accountId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "done": {
+          "name": "done",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "inboxStatus": {
+          "name": "inboxStatus",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        },
+        "draftStatus": {
+          "name": "draftStatus",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "sentStatus": {
+          "name": "sentStatus",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        }
+      },
+      "indexes": {
+        "Thread_accountId_idx": {
+          "name": "Thread_accountId_idx",
+          "columns": [
+            {
+              "expression": "accountId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last",
+              "opclass": "text_ops"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "Thread_done_idx": {
+          "name": "Thread_done_idx",
+          "columns": [
+            {
+              "expression": "done",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last",
+              "opclass": "bool_ops"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "Thread_draftStatus_idx": {
+          "name": "Thread_draftStatus_idx",
+          "columns": [
+            {
+              "expression": "draftStatus",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last",
+              "opclass": "bool_ops"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "Thread_inboxStatus_idx": {
+          "name": "Thread_inboxStatus_idx",
+          "columns": [
+            {
+              "expression": "inboxStatus",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last",
+              "opclass": "bool_ops"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "Thread_lastMessageDate_idx": {
+          "name": "Thread_lastMessageDate_idx",
+          "columns": [
+            {
+              "expression": "lastMessageDate",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last",
+              "opclass": "timestamp_ops"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "Thread_sentStatus_idx": {
+          "name": "Thread_sentStatus_idx",
+          "columns": [
+            {
+              "expression": "sentStatus",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last",
+              "opclass": "bool_ops"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "Thread_accountId_fkey": {
+          "name": "Thread_accountId_fkey",
+          "tableFrom": "Thread",
+          "tableTo": "Account",
+          "columnsFrom": [
+            "accountId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public._ToEmails": {
+      "name": "_ToEmails",
+      "schema": "",
+      "columns": {
+        "A": {
+          "name": "A",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "B": {
+          "name": "B",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "_ToEmails_AB_unique": {
+          "name": "_ToEmails_AB_unique",
+          "columns": [
+            {
+              "expression": "A",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last",
+              "opclass": "text_ops"
+            },
+            {
+              "expression": "B",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last",
+              "opclass": "text_ops"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_ToEmails_B_index": {
+          "name": "_ToEmails_B_index",
+          "columns": [
+            {
+              "expression": "B",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last",
+              "opclass": "text_ops"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "_ToEmails_A_fkey": {
+          "name": "_ToEmails_A_fkey",
+          "tableFrom": "_ToEmails",
+          "tableTo": "Email",
+          "columnsFrom": [
+            "A"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        },
+        "_ToEmails_B_fkey": {
+          "name": "_ToEmails_B_fkey",
+          "tableFrom": "_ToEmails",
+          "tableTo": "EmailAddress",
+          "columnsFrom": [
+            "B"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
       "isRLSEnabled": false
     },
     "public.User": {
@@ -1405,59 +1389,59 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
         "User_emailAddress_key": {
+          "name": "User_emailAddress_key",
+          "nullsNotDistinct": false,
           "columns": [
             "emailAddress"
-          ],
-          "nullsNotDistinct": false,
-          "name": "User_emailAddress_key"
+          ]
         }
       },
-      "checkConstraints": {},
       "policies": {},
+      "checkConstraints": {},
       "isRLSEnabled": false
     }
   },
   "enums": {
     "public.EmailLabel": {
       "name": "EmailLabel",
+      "schema": "public",
       "values": [
         "inbox",
         "sent",
         "draft"
-      ],
-      "schema": "public"
+      ]
     },
     "public.MeetingMessageMethod": {
       "name": "MeetingMessageMethod",
+      "schema": "public",
       "values": [
         "request",
         "reply",
         "cancel",
         "counter",
         "other"
-      ],
-      "schema": "public"
+      ]
     },
     "public.Sensitivity": {
       "name": "Sensitivity",
+      "schema": "public",
       "values": [
         "normal",
         "private",
         "personal",
         "confidential"
-      ],
-      "schema": "public"
+      ]
     },
     "public.SubscriptionStatus": {
       "name": "SubscriptionStatus",
+      "schema": "public",
       "values": [
         "ACTIVE",
         "PAUSED",
         "CANCELLED",
         "EXPIRED",
         "PAST_DUE"
-      ],
-      "schema": "public"
+      ]
     }
   },
   "schemas": {},
@@ -1466,50 +1450,8 @@
   "policies": {},
   "views": {},
   "_meta": {
+    "columns": {},
     "schemas": {},
-    "tables": {},
-    "columns": {}
-  },
-  "internal": {
-    "tables": {
-      "Thread": {
-        "columns": {
-          "participantsIds": {
-            "isArray": true,
-            "dimensions": 1,
-            "rawType": "text"
-          }
-        }
-      },
-      "Email": {
-        "columns": {
-          "sysLabels": {
-            "isArray": true,
-            "dimensions": 1,
-            "rawType": "text"
-          },
-          "keywords": {
-            "isArray": true,
-            "dimensions": 1,
-            "rawType": "text"
-          },
-          "sysClassifications": {
-            "isArray": true,
-            "dimensions": 1,
-            "rawType": "text"
-          },
-          "internetHeaders": {
-            "isArray": true,
-            "dimensions": 1,
-            "rawType": "jsonb"
-          },
-          "omitted": {
-            "isArray": true,
-            "dimensions": 1,
-            "rawType": "text"
-          }
-        }
-      }
-    }
+    "tables": {}
   }
 }
