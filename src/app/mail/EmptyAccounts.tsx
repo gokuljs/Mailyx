@@ -5,8 +5,9 @@ import useSubscriptionInfo from "@/hooks/useSubscriptionInfo";
 import { getAurinkoAuthUrl } from "@/lib/aruinko";
 import { api } from "@/trpc/react";
 import { useUser } from "@clerk/nextjs";
-import { Plus, Inbox } from "lucide-react";
+import { Plus, Inbox, Loader } from "lucide-react";
 import { toast } from "sonner";
+import { useState } from "react";
 
 export function EmptyAccounts() {
   const { isSignedIn } = useUser();
@@ -14,6 +15,8 @@ export function EmptyAccounts() {
     enabled: isSignedIn,
   });
   const { isSubscribed, isLoading } = useSubscriptionInfo();
+  const [isLoadingButton, setIsLoadingButton] = useState(false);
+
   if (isLoading) return <></>;
   return (
     <div className="flex h-[calc(100vh-60px)] items-center justify-center bg-transparent">
@@ -33,18 +36,31 @@ export function EmptyAccounts() {
           <Button
             onClick={async () => {
               try {
+                setIsLoadingButton(true);
                 const url = await getAurinkoAuthUrl("Google", isSubscribed);
                 console.log(url);
                 if (url) window.location.href = url;
               } catch (error) {
                 toast.error((error as Error).message);
                 console.error(error);
+              } finally {
+                setIsLoadingButton(false);
               }
             }}
             className="cursor-pointer"
+            disabled={isLoadingButton}
           >
-            Connect account
-            <Plus />
+            {isLoadingButton ? (
+              <>
+                <span className="mr-2">Connecting</span>
+                <Loader className="h-4 w-4 animate-spin" />
+              </>
+            ) : (
+              <>
+                Connect account
+                <Plus />
+              </>
+            )}
           </Button>
         </CardContent>
       </Card>

@@ -70,11 +70,11 @@ const AskAI = ({ isCollapsed }: { isCollapsed: boolean }) => {
                 key={message.id}
                 layout="position"
                 className={cn(
-                  "z-10 mt-2 max-w-[250px] rounded-lg break-words",
+                  "z-10 mt-2 max-w-[350px] rounded-lg p-1 break-words shadow-sm transition-all",
                   {
-                    "self-end bg-zinc-900 text-white dark:bg-zinc-600":
+                    "self-end rounded-br-none bg-zinc-900 text-gray-100 dark:bg-zinc-800":
                       message.role === "user",
-                    "self-start bg-amber-400 text-zinc-900":
+                    "self-start rounded-bl-none bg-zinc-700 text-gray-200 dark:bg-zinc-700":
                       message.role === "assistant",
                   },
                 )}
@@ -172,7 +172,7 @@ const AskAI = ({ isCollapsed }: { isCollapsed: boolean }) => {
               type="submit"
               className="flex h-[35px] w-[35px] cursor-pointer items-center justify-center rounded-full bg-zinc-950 hover:!bg-zinc-700"
             >
-              <Send className="size-4 text-amber-500 dark:text-gray-300" />
+              <Send className="size-4 text-stone-400 dark:text-gray-300" />
             </Button>
           </form>
         </div>

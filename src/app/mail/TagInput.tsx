@@ -28,7 +28,7 @@ const TagInput = ({ label, placeholder, onChange, value }: Props) => {
   }));
   return (
     <div className="items flex items-center gap-2 rounded-md border">
-      <span className="ml-3 text-sm text-orange-500">{label}</span>
+      <span className="ml-3 text-sm text-stone-300">{label}</span>
       <Select
         onInputChange={setInputValue}
         value={value}
@@ -49,19 +49,19 @@ const TagInput = ({ label, placeholder, onChange, value }: Props) => {
         isMulti
         classNames={{
           menu: () => {
-            return "dark:!bg-[hsl(20_14.3%_4.1%)] !border !border-muted ";
+            return "dark:!bg-[hsl(20_14.3%_4.1%)] !text-white !border !border-muted ";
           },
           option: ({ isFocused }) => {
-            return `${isFocused ? "!bg-muted text-white" : ""} hover:!bg-muted text-white !cursor-pointer`;
+            return `${isFocused ? "!bg-muted !text-white" : ""} hover:!bg-muted !text-white !cursor-pointer`;
           },
           control: () => {
             return "!border-none !outline-none !ring-0 !shadow-none focus:border-none focus:outline-none focus:ring-0 focus:shadow-none !bg-transparent !dark:bg-transparent";
           },
-          input: () => "!text-muted-foreground",
-          multiValue: () => "!bg-orange-400 !rounded-md flex items-center",
-          multiValueLabel: () => "text-white px-2", // no bg here
+          input: () => "!text-white",
+          multiValue: () => "!bg-stone-600 !rounded-md flex items-center",
+          multiValueLabel: () => "!text-white px-2", // no bg here
           multiValueRemove: () =>
-            "text-muted px-2 hover:!bg-orange-400 hover:!text-white !rounded-r-lg",
+            "!text-white px-2 hover:!bg-stone-400 hover:!text-white !rounded-r-lg",
         }}
       />
     </div>

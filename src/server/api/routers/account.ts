@@ -22,6 +22,7 @@ export const authorizeAccountAccess = async (
       emailAddress: true,
       accessToken: true,
       name: true,
+      nextDeltaToken: true,
     },
   });
   if (!account) throw new Error("unAuthorized Access ");
@@ -93,8 +94,10 @@ export const accountRouter = createTRPCRouter({
       );
       const userId = ctx?.auth?.userId;
       const key = `threads:user:${userId}:account:${input.accountId}:tab:${input.tab}:done:${input.done ?? "all"}`;
-      const acc = new Account(account?.accessToken);
-      acc.syncEmails().catch(console.error);
+      if (account?.nextDeltaToken) {
+        const acc = new Account(account?.accessToken);
+        acc.syncEmails().catch(console.error);
+      }
 
       const threads = await catchFirst(
         key,
@@ -184,7 +187,7 @@ export const accountRouter = createTRPCRouter({
         },
         5000,
       );
-
+      console.log("threads", threads);
       return threads;
     }),
 
@@ -400,6 +403,7 @@ export const accountRouter = createTRPCRouter({
         input?.accountId,
         ctx?.auth?.userId,
       );
+      console.log("Searching Db orama");
       const orama = new OramaClient(account?.id);
       await orama.init();
       const result = await orama.search({

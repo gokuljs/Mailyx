@@ -76,22 +76,58 @@ export class OramaClient {
   }
 
   async vectorSearch({ term }: { term: string }) {
-    const embedding = await getEmbeddings(term);
+    console.log(`Performing vector search for: "${term}"`);
+    const cleanTerm = term.trim();
+
+    if (!cleanTerm) {
+      return { hits: [] };
+    }
+
+    const embedding = await getEmbeddings(cleanTerm);
     const result = await search(this.orama, {
       mode: "hybrid",
-      term: term,
+      term: cleanTerm,
+      properties: ["subject", "from", "to", "body"],
+      boost: {
+        subject: 2, // Boost matches in subject
+        body: 1, // Normal priority for body
+      },
       vector: {
         value: embedding,
         property: "embeddings",
       },
-      similarity: 0.8,
+      similarity: 0.7, // Slightly lower similarity threshold for more results
       limit: 50,
     });
+
+    console.log(`Vector search found ${result.hits.length} results`);
     return result;
   }
 
   async search({ term }: { term: string }) {
-    return await search(this.orama, { term });
+    console.log(`Performing search for: "${term}"`);
+    const cleanTerm = term.trim();
+
+    if (!cleanTerm) {
+      return { hits: [] };
+    }
+
+    // Perform search with improved configuration
+    const result = await search(this.orama, {
+      term: cleanTerm,
+      properties: ["subject", "from", "to", "body", "sentAt", "threadId"],
+      limit: 50,
+      tolerance: 1, // Allow 1 typo
+      mode: "fulltext", // Use full text search mode
+      boost: {
+        subject: 2, // Boost matches in subject
+        body: 1, // Normal priority for body
+      },
+      threshold: 0.3, // Lower threshold to catch more potential matches
+    });
+
+    console.log(`Search found ${result.hits.length} results`);
+    return result;
   }
 
   async insert(document: any) {

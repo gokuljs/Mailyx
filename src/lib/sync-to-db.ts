@@ -2,7 +2,7 @@ import { EmailAttachment, EmailMessage } from "./types";
 import pLimit from "p-limit";
 import { db } from "@/drizzle/db";
 import { OramaClient } from "./orama";
-import { turndown } from "./turndown";
+import { turndown, processEmailText, normalizeText } from "./turndown";
 import { getEmbeddings } from "./embedding";
 import { auth } from "@clerk/nextjs/server";
 import redisHandler from "./redis";
@@ -28,20 +28,25 @@ export async function syncEmailsToDatabase(
       await Promise.all(
         emails.map((email) => {
           return limit(async () => {
-            const body = turndown.turndown(
+            // Process email text with better cleanup
+            const cleanBody = processEmailText(
               email.body ?? email.bodySnippet ?? "",
             );
-            const payload = `From: ${email.from.name} <${email.from.address}>\nTo: ${email.to.map((t) => `${t.name} <${t.address}>`).join(", ")}\nSubject: ${email.subject}\nBody: ${body}\n SentAt: ${new Date(email.sentAt).toLocaleString()}`;
+            const cleanSubject = normalizeText(email.subject);
+
+            // Create a structured text representation for embedding
+            const payload = `From: ${email.from.name} <${email.from.address}>\nTo: ${email.to.map((t) => `${t.name} <${t.address}>`).join(", ")}\nSubject: ${cleanSubject}\nBody: ${cleanBody}\nSentAt: ${new Date(email.sentAt).toLocaleString()}`;
             const bodyEmbedding = await getEmbeddings(payload);
+
+            console.log("Indexing email:", email.id);
             await orama.insert({
-              title: email.subject,
-              body: body,
-              rawBody: email.bodySnippet ?? "",
+              subject: cleanSubject,
+              body: cleanBody,
               from: `${email.from.name} <${email.from.address}>`,
               to: email.to.map((t) => `${t.name} <${t.address}>`),
               sentAt: new Date(email.sentAt).toLocaleString(),
-              embeddings: bodyEmbedding,
               threadId: email.threadId,
+              embeddings: bodyEmbedding,
             });
           });
         }),
