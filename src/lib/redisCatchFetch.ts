@@ -12,6 +12,18 @@ export async function catchFirst<T>(
   }
   console.log(`[Cache MISS] ${key}`);
   const data = await fetcher();
-  await redisHandler.set(key, data, ttl);
+
+  // Only cache if data is not empty
+  if (
+    data &&
+    (typeof data !== "object" ||
+      Object.keys(data).length > 0 ||
+      (Array.isArray(data) && data.length > 0))
+  ) {
+    await redisHandler.set(key, data, ttl);
+  } else {
+    console.log(`[Cache SKIP] Empty data for ${key}`);
+  }
+
   return data;
 }
