@@ -99,6 +99,7 @@ const Component = ({
   };
   return (
     <EmailEditor
+      key={data?.id}
       subject={subject}
       toValues={toValues}
       setToValues={setToValues}
