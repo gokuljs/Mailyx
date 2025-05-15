@@ -1,10 +1,12 @@
 "use server";
-import { db } from "@/server/db";
+import { db } from "@/drizzle/db";
+import { account } from "@/drizzle/schema";
 import { auth } from "@clerk/nextjs/server";
 import axios from "axios";
 import { access } from "fs";
 import { FREE_ACCOUNTS_PER_USER, PRO_ACCOUNTS_PER_USER } from "./Constants";
 import { toast } from "sonner";
+import { count, eq } from "drizzle-orm";
 
 export const getAurinkoAuthUrl = async (
   serviceType: "Google" | "Office365",
@@ -13,11 +15,14 @@ export const getAurinkoAuthUrl = async (
   try {
     const { userId } = await auth();
     if (!userId) throw new Error("User not Authorized");
-    const accountCount = await db.account.count({
-      where: {
-        userId,
-      },
-    });
+
+    // Using Drizzle ORM to count accounts
+    const result = await db
+      .select({ value: count() })
+      .from(account)
+      .where(eq(account.userId, userId));
+
+    const accountCount = result[0]?.value || 0;
 
     const maxAccounts = isSubscribed
       ? PRO_ACCOUNTS_PER_USER

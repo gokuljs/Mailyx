@@ -257,3 +257,9 @@ body {
     #57534e 100%
   ) !important;
 }
+
+.tiptap .ProseMirror {
+  outline: none !important;
+  border: none !important;
+  outline: none !important;
+}

@@ -6,13 +6,21 @@ import React from "react";
 import Avatar from "react-avatar";
 import { Letter } from "react-letter";
 
+type EmailType =
+  | RouterOutputs["account"]["getThreads"][0]["email"][0]
+  | RouterOutputs["account"]["getThreadWithEmails"]["email"][0];
+
 type Props = {
-  email: RouterOutputs["account"]["getThreads"][0]["email"][0];
+  email: EmailType;
 };
 
 const EmailDisplay = ({ email }: Props) => {
   const { account } = useThreads();
   const isMe = account?.emailAddress === email?.from?.address;
+
+  // Check if we have full body content
+  const hasFullContent = "body" in email && !!email.body;
+
   return (
     <div
       className={cn(
@@ -41,11 +49,14 @@ const EmailDisplay = ({ email }: Props) => {
           })}
         </p>
       </div>
-      {/* <div className="h-4"></div> */}
-      <Letter
-        className="rounded-md bg-white text-black"
-        html={email?.body ?? ""}
-      />
+
+      {hasFullContent ? (
+        <Letter className="rounded-md bg-white text-black" html={email.body} />
+      ) : (
+        <div className="mt-2 text-sm text-gray-600">
+          {email.bodySnippet || "Loading content..."}
+        </div>
+      )}
     </div>
   );
 };

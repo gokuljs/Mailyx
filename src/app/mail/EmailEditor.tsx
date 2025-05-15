@@ -137,8 +137,12 @@ const EmailEditor = ({
             />
           </div>
         </div>
-        <div className="prose w-full flex-1">
-          <EditorContent editor={editor} value={value} />
+        <div className="prose w-full flex-1 border p-4">
+          <EditorContent
+            editor={editor}
+            value={value}
+            className="max-h-[150px] overflow-y-auto border p-2"
+          />
         </div>
         <Separator />
         <div className="mt-auto flex items-center justify-between px-4 py-4">
@@ -155,8 +159,9 @@ const EmailEditor = ({
               await handleSend(value);
             }}
             className="cursor-pointer"
+            disabled={isSending}
           >
-            Send
+            {isSending ? "Sending..." : "Send"}
           </Button>
         </div>
       </div>

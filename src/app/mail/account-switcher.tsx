@@ -27,7 +27,7 @@ export default function AccountSwitcher({ isCollapsed }: Props) {
   });
   const { isSubscribed, isLoading } = useSubscriptionInfo();
   const [accountId, setAccountId] = useLocalStorage("accountId", "");
-  if (!accounts || isLoading) return null;
+  if (!accounts) return null;
   return (
     <div className="flex w-full items-center gap-2">
       <Select defaultValue={accountId} onValueChange={setAccountId}>

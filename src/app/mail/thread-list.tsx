@@ -1,10 +1,14 @@
 import useThreads from "@/hooks/useThreads";
 import React, { ComponentProps } from "react";
 import { format, formatDistance, formatDistanceToNow } from "date-fns";
-import { Thread } from "@prisma/client";
 import { cn } from "@/lib/utils";
 import DOMPurify from "dompurify";
 import { Badge } from "@/components/ui/badge";
+import { thread } from "@/drizzle/schema";
+import { type InferSelectModel } from "drizzle-orm";
+
+// Define the Thread type using Drizzle schema
+type Thread = InferSelectModel<typeof thread>;
 
 type Props = {};
 
@@ -82,7 +86,7 @@ const ThreadList = (props: Props) => {
                   ></div>
                   {thread.email[0]?.sysLabels?.length && (
                     <div className="flex items-center gap-2">
-                      {thread.email[0]?.sysLabels.map((label) => (
+                      {thread.email[0]?.sysLabels.map((label: string) => (
                         <Badge
                           key={label}
                           variant={getBadgeVariantFromLabel(label)}

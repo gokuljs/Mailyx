@@ -3,11 +3,10 @@ import { useUser } from "@clerk/nextjs";
 import React from "react";
 
 function useSubscriptionInfo() {
-  const { isSignedIn } = useUser();
+  const { isSignedIn, isLoaded } = useUser();
+  console.log("isSignedIn", isSignedIn);
   const { data: subInfo, isLoading } =
-    api.subscription.getSubscriptionInfo.useQuery(undefined, {
-      enabled: isSignedIn,
-    });
+    api.subscription.getSubscriptionInfo.useQuery();
 
   const isSubscribed = React.useMemo(() => {
     if (!subInfo) return false;
