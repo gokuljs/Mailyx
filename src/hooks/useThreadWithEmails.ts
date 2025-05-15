@@ -17,8 +17,7 @@ const useThreadWithEmails = () => {
       threadId: threadId || "",
     },
     {
-      enabled: !!accountId && !!threadId,
-      refetchOnWindowFocus: false,
+      refetchOnWindowFocus: true,
     },
   );
 

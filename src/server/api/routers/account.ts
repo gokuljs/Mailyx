@@ -196,10 +196,18 @@ export const accountRouter = createTRPCRouter({
       }),
     )
     .query(async ({ ctx, input }) => {
+      console.log("getThreadWithEmails", input);
       const account = await authorizeAccountAccess(
         input.accountId,
         ctx.auth.userId,
       );
+
+      if (!input.threadId) {
+        throw new Error("Thread ID is required");
+      }
+      if (!input.accountId) {
+        throw new Error("Account ID is required");
+      }
 
       // Fetch thread
       const thread = await db
@@ -290,7 +298,7 @@ export const accountRouter = createTRPCRouter({
         input?.accountId,
         ctx?.auth?.userId,
       );
-
+      console.log("getReplyDetails", input);
       // Fetch the thread and emails separately as a workaround
       const thread = await db
         .select()
