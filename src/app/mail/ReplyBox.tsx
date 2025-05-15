@@ -22,20 +22,21 @@ const Component = ({
   data: RouterOutputs["account"]["getReplyDetails"];
 }) => {
   const { accountId, threadId } = useThreads();
+  const [isSending, setIsSending] = useState(false);
   const [subject, setSubject] = useState(
     data?.subject?.startsWith("Re:") ? data?.subject : `Re: ${data?.subject}`,
   );
   const [toValues, setToValues] = useState<{ label: string; value: string }[]>(
     data?.to?.map((item) => ({
-      label: item?.address,
-      value: item?.address,
-    })),
+      label: item?.address || "",
+      value: item?.address || "",
+    })) || [],
   );
   const [ccValue, setCCValues] = useState<{ label: string; value: string }[]>(
     data?.cc?.map((item) => ({
-      label: item?.address,
-      value: item?.address,
-    })),
+      label: item?.address || "",
+      value: item?.address || "",
+    })) || [],
   );
 
   useEffect(() => {
@@ -45,15 +46,15 @@ const Component = ({
     );
     setToValues(
       data?.to?.map((item) => ({
-        label: item?.address,
-        value: item?.address,
-      })),
+        label: item?.address || "",
+        value: item?.address || "",
+      })) || [],
     );
     setCCValues(
       data?.cc?.map((item) => ({
-        label: item?.address,
-        value: item?.address,
-      })),
+        label: item?.address || "",
+        value: item?.address || "",
+      })) || [],
     );
   }, [threadId, data]);
 
@@ -61,6 +62,7 @@ const Component = ({
 
   const handleSend = async (value: string) => {
     console.log("handle send");
+    setIsSending(true);
     if (!data) return;
     sendEmail.mutate(
       {
@@ -69,24 +71,28 @@ const Component = ({
         body: value,
         subject: subject,
         from: data?.from,
-        to: data?.to?.map((item) => ({
-          address: item.address,
-          name: item?.name || "",
-        })),
-        cc: data?.cc?.map((item) => ({
-          address: item.address,
-          name: item?.name || "",
-        })),
+        to:
+          data?.to?.map((item) => ({
+            address: item?.address || "",
+            name: item?.name || "",
+          })) || [],
+        cc:
+          data?.cc?.map((item) => ({
+            address: item?.address || "",
+            name: item?.name || "",
+          })) || [],
         replyTo: data?.from,
         inReplyTo: data?.id,
       },
       {
         onSuccess: () => {
           toast.success("Email sent SuccessFully");
+          setIsSending(false);
         },
         onError: (error) => {
           console.log(error);
           toast.error("Error Sending email ");
+          setIsSending(false);
         },
       },
     );
@@ -99,9 +105,12 @@ const Component = ({
       setSubject={setSubject}
       ccValues={ccValue}
       setCCValues={setCCValues}
-      to={data?.to?.map((item) => item?.address)}
+      to={
+        data?.to?.map((item) => item?.address || "").filter(Boolean) as string[]
+      }
       handleSend={handleSend}
-      isSending={false}
+      isSending={isSending}
+      defaultToolbarExpanded={true}
     />
   );
 };

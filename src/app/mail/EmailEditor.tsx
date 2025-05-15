@@ -155,8 +155,9 @@ const EmailEditor = ({
               await handleSend(value);
             }}
             className="cursor-pointer"
+            disabled={isSending}
           >
-            Send
+            {isSending ? "Sending..." : "Send"}
           </Button>
         </div>
       </div>
