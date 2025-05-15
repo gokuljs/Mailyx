@@ -98,7 +98,7 @@ const ThreadDisplay = (props: Props) => {
         </>
       )}
       {displayThread ? (
-        <div className="scrollbar-hide flex flex-1 flex-col overflow-scroll">
+        <div className="scrollbar-hide relative flex flex-1 flex-col overflow-scroll">
           <div className="flex items-center p-4">
             <div className="flex items-center gap-4 text-sm">
               <Avatar className="bg-muted text-muted-foreground flex items-center justify-center">
@@ -132,7 +132,7 @@ const ThreadDisplay = (props: Props) => {
             )}
           </div>
           <Separator />
-          <div className="scrollbar-hide flex max-h-[calc(100vh_-_500px)] flex-col overflow-y-auto">
+          <div className="scrollbar-hide flex max-h-[calc(100vh_-_500px)] flex-col overflow-y-auto pb-[200px]">
             {isLoading && !threadWithEmails ? (
               <div className="flex h-40 items-center justify-center">
                 <div className="text-muted-foreground text-sm">
@@ -150,7 +150,9 @@ const ThreadDisplay = (props: Props) => {
           <div className="flex-1"></div>
           <Separator />
 
-          <ReplyBox replyDetails={replyDetails} />
+          <div className="absolute bottom-0 left-0 z-20 w-full bg-black">
+            <ReplyBox replyDetails={replyDetails} />
+          </div>
         </div>
       ) : (
         <>
