@@ -4,16 +4,13 @@ import { api, RouterOutputs } from "@/trpc/react";
 import useThreads from "@/hooks/useThreads";
 import { toast } from "sonner";
 
-type Props = {};
+type Props = {
+  replyDetails?: RouterOutputs["account"]["getReplyDetails"];
+};
 
-const ReplyBox = (props: Props) => {
-  const { accountId, threadId } = useThreads();
-  const { data } = api.account.getReplyDetails.useQuery({
-    accountId,
-    threadId: threadId ?? "",
-  });
-  if (!data) return <></>;
-  return <Component data={data} />;
+const ReplyBox = ({ replyDetails }: Props) => {
+  if (!replyDetails) return <></>;
+  return <Component data={replyDetails} />;
 };
 
 const Component = ({

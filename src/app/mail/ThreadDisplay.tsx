@@ -9,8 +9,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
@@ -21,12 +19,23 @@ import ReplyBox from "./ReplyBox";
 import { useAtom } from "jotai";
 import { isSearchingAtom } from "./SearchBar";
 import SearchDisplay from "./SearchDisplay";
+import { api } from "@/trpc/react";
 
 type Props = {};
 
 const ThreadDisplay = (props: Props) => {
-  const { threadId, threads } = useThreads();
+  const { threadId, threads, accountId } = useThreads();
   const { threadWithEmails, isLoading } = useThreadWithEmails();
+  const { data: replyDetails } = api.account.getReplyDetails.useQuery(
+    {
+      accountId,
+      threadId: threadId ?? "",
+    },
+    {
+      enabled: !!accountId && !!threadId,
+    },
+  );
+
   const thread = threadId
     ? threadWithEmails || threads?.find((item) => item?.id === threadId)
     : null;
@@ -141,7 +150,7 @@ const ThreadDisplay = (props: Props) => {
           <div className="flex-1"></div>
           <Separator />
 
-          <ReplyBox />
+          <ReplyBox replyDetails={replyDetails} />
         </div>
       ) : (
         <>
