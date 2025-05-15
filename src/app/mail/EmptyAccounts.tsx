@@ -5,7 +5,7 @@ import useSubscriptionInfo from "@/hooks/useSubscriptionInfo";
 import { getAurinkoAuthUrl } from "@/lib/aruinko";
 import { api } from "@/trpc/react";
 import { useUser } from "@clerk/nextjs";
-import { Plus, Inbox, Loader } from "lucide-react";
+import { Plus, Mail } from "lucide-react";
 import { toast } from "sonner";
 import { useState } from "react";
 
@@ -20,50 +20,57 @@ export function EmptyAccounts() {
   if (isLoading) return <></>;
   return (
     <div className="flex h-[calc(100vh-60px)] items-center justify-center bg-transparent">
-      <Card className="max-w-sm text-center dark:bg-[hsl(20_14.3%_4.1%)]">
-        <CardContent className="flex flex-col items-center space-y-4 py-8">
-          {/* Replace with your favorite empty‑state SVG or illustration */}
-          <Inbox className="h-12 w-12 text-gray-400" />
+      <div className="relative max-w-md">
+        {/* Background glow effect */}
+        <div className="absolute -inset-6 rounded-3xl bg-zinc-700/20 opacity-50 blur-3xl"></div>
 
-          <h2 className="text-2xl font-semibold text-zinc-600">
-            No accounts connected
-          </h2>
+        <Card className="relative overflow-hidden rounded-xl border-none bg-zinc-900 text-white shadow-lg">
+          <CardContent className="relative flex flex-col items-center space-y-5 p-10">
+            {/* Icon */}
+            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-zinc-800 p-3">
+              <Mail className="h-8 w-8 text-white" />
+            </div>
 
-          <p className="text-muted-foreground">
-            Connect an account to start managing your Emails in one place.
-          </p>
+            <h2 className="text-xl font-semibold text-white">
+              No accounts connected
+            </h2>
 
-          <Button
-            onClick={async () => {
-              try {
-                setIsLoadingButton(true);
-                const url = await getAurinkoAuthUrl("Google", isSubscribed);
-                console.log(url);
-                if (url) window.location.href = url;
-              } catch (error) {
-                toast.error((error as Error).message);
-                console.error(error);
-              } finally {
-                setIsLoadingButton(false);
-              }
-            }}
-            className="cursor-pointer"
-            disabled={isLoadingButton}
-          >
-            {isLoadingButton ? (
-              <>
-                <span className="mr-2">Connecting</span>
-                <Loader className="h-4 w-4 animate-spin" />
-              </>
-            ) : (
-              <>
-                Connect account
-                <Plus />
-              </>
-            )}
-          </Button>
-        </CardContent>
-      </Card>
+            <p className="max-w-[280px] text-center text-sm text-zinc-400">
+              Connect an email account to start managing all your messages in
+              one beautiful place.
+            </p>
+
+            <Button
+              onClick={async () => {
+                try {
+                  setIsLoadingButton(true);
+                  const url = await getAurinkoAuthUrl("Google", isSubscribed);
+                  console.log(url);
+                  if (url) window.location.href = url;
+                } catch (error) {
+                  toast.error((error as Error).message);
+                  console.error(error);
+                } finally {
+                  setIsLoadingButton(false);
+                }
+              }}
+              className="mt-2 w-full bg-zinc-700 text-white hover:bg-zinc-600"
+              disabled={isLoadingButton}
+            >
+              {isLoadingButton ? (
+                <div className="flex items-center justify-center">
+                  <span>Connecting</span>
+                </div>
+              ) : (
+                <div className="flex items-center justify-center gap-2">
+                  Connect account
+                  <Plus className="h-4 w-4" />
+                </div>
+              )}
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }
