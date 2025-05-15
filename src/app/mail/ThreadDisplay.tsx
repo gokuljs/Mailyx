@@ -2,6 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import useThreads from "@/hooks/useThreads";
+import useThreadWithEmails from "@/hooks/useThreadWithEmails";
 import { Archive, ArchiveX, Clock, MoreVertical, Trash2 } from "lucide-react";
 import React from "react";
 import {
@@ -25,8 +26,15 @@ type Props = {};
 
 const ThreadDisplay = (props: Props) => {
   const { threadId, threads } = useThreads();
-  const thread = threads?.find((item) => item?.id === threadId);
+  const { threadWithEmails, isLoading } = useThreadWithEmails();
+  const thread = threadId
+    ? threadWithEmails || threads?.find((item) => item?.id === threadId)
+    : null;
   const [isSearching] = useAtom(isSearchingAtom);
+
+  // Use the full thread data when available, fallback to preview otherwise
+  const displayThread = threadWithEmails || thread;
+
   return (
     <div className="flex h-full flex-col">
       <div className="col-2 flex items-center p-2">
@@ -80,47 +88,55 @@ const ThreadDisplay = (props: Props) => {
           )}
         </>
       )}
-      {thread ? (
+      {displayThread ? (
         <div className="scrollbar-hide flex flex-1 flex-col overflow-scroll">
           <div className="flex items-center p-4">
             <div className="flex items-center gap-4 text-sm">
               <Avatar className="bg-muted text-muted-foreground flex items-center justify-center">
                 <AvatarImage />
                 <AvatarFallback>
-                  {thread.email[0]?.from?.name?.[0] ||
-                    thread.email[0]?.subject?.[0]}
+                  {displayThread.email[0]?.from?.name?.[0] ||
+                    displayThread.email[0]?.subject?.[0]}
                 </AvatarFallback>
               </Avatar>
               <div className="grid gap-1">
                 <div className="font-semibold text-gray-800 dark:text-gray-100">
-                  {thread?.email[0]?.from?.name}
+                  {displayThread?.email[0]?.from?.name}
                   <div className="line-clamp-1 text-xs text-gray-600 dark:text-gray-400">
-                    {thread?.email[0]?.subject}
+                    {displayThread?.email[0]?.subject}
                   </div>
                   <div className="line-clamp-1 flex gap-1 text-xs text-gray-500 dark:text-gray-400">
                     <span className="font-medium text-gray-600 dark:text-gray-300">
                       Reply-to:
                     </span>
                     <span className="dark:text-gray-200">
-                      {thread?.email[0]?.from?.address}
+                      {displayThread?.email[0]?.from?.address}
                     </span>
                   </div>
                 </div>
               </div>
             </div>
-            {thread?.email[0]?.sentAt && (
+            {displayThread?.email[0]?.sentAt && (
               <div className="text-muted-foreground ml-auto text-xs">
-                {format(new Date(thread?.email[0]?.sentAt), "PPpp")}
+                {format(new Date(displayThread?.email[0]?.sentAt), "PPpp")}
               </div>
             )}
           </div>
           <Separator />
           <div className="scrollbar-hide flex max-h-[calc(100vh_-_500px)] flex-col overflow-y-auto">
-            <div className="flex flex-col gap-4 p-6">
-              {thread?.email?.map((email) => {
-                return <EmailDisplay key={email?.id} email={email} />;
-              })}
-            </div>
+            {isLoading && !threadWithEmails ? (
+              <div className="flex h-40 items-center justify-center">
+                <div className="text-muted-foreground text-sm">
+                  Loading full message content...
+                </div>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-4 p-6">
+                {displayThread?.email?.map((email) => {
+                  return <EmailDisplay key={email?.id} email={email} />;
+                })}
+              </div>
+            )}
           </div>
           <div className="flex-1"></div>
           <Separator />
