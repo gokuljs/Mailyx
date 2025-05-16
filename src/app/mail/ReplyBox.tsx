@@ -109,6 +109,7 @@ const Component = ({
       handleSend={handleSend}
       isSending={isSending}
       defaultToolbarExpanded={true}
+      showExpandButton={true}
     />
   );
 };

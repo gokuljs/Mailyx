@@ -149,10 +149,10 @@ const ThreadDisplay = (props: Props) => {
           </div>
           <div className="flex-1"></div>
           <Separator />
-
-          <div className="absolute bottom-0 left-0 z-20 w-full bg-black">
+          <div className="absolute bottom-0 left-0 z-20 w-full bg-white dark:bg-[hsl(20_14.3%_4.1%)]">
             <ReplyBox replyDetails={replyDetails} />
           </div>
+          t
         </div>
       ) : (
         <>
