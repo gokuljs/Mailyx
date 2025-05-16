@@ -1,6 +1,7 @@
 import useThreads from "@/hooks/useThreads";
 import React, { ComponentProps } from "react";
-import { format, formatDistance, formatDistanceToNow } from "date-fns";
+import { formatDistance, formatDistanceToNow } from "date-fns";
+import { formatLocalDateTime } from "@/lib/timeAgointimeZone";
 import { cn } from "@/lib/utils";
 import DOMPurify from "dompurify";
 import { Badge } from "@/components/ui/badge";
@@ -26,7 +27,10 @@ const ThreadList = (props: Props) => {
   const { threads, threadId, setThreadId } = useThreads();
   const groupedThread = threads?.reduce(
     (acc, thread) => {
-      const date = format(thread.email[0]?.sentAt ?? new Date(), "yyyy-MM-dd");
+      const date = formatLocalDateTime(
+        thread.email[0]?.sentAt ?? new Date(),
+        "yyyy-MM-dd",
+      );
       if (!acc[date]) {
         acc[date] = [];
       }
@@ -66,7 +70,6 @@ const ThreadList = (props: Props) => {
                       <div className={cn("ml-auto text-xs")}>
                         {getTimeAgoInLocalTimezone(
                           thread.email.at(-1)?.sentAt ?? new Date(),
-                          thread.email.at(-1)?.from?.name ?? "",
                         )}
                       </div>
                     </div>

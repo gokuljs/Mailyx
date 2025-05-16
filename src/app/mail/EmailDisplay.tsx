@@ -1,4 +1,5 @@
 import useThreads from "@/hooks/useThreads";
+import { getTimeAgoInLocalTimezone } from "@/lib/timeAgointimeZone";
 import { cn } from "@/lib/utils";
 import { RouterOutputs } from "@/trpc/react";
 import { formatDistanceToNow } from "date-fns";
@@ -44,9 +45,7 @@ const EmailDisplay = ({ email }: Props) => {
           </span>
         </div>
         <p className="text-muted-foreground text-xs">
-          {formatDistanceToNow(email.sentAt ?? new Date(), {
-            addSuffix: true,
-          })}
+          {getTimeAgoInLocalTimezone(email.sentAt)}
         </p>
       </div>
 

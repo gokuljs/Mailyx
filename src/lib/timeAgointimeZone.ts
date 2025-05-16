@@ -1,7 +1,4 @@
-export function getTimeAgoInLocalTimezone(
-  utcTimeString: string | Date,
-  name: string,
-) {
+export function getTimeAgoInLocalTimezone(utcTimeString: string | Date) {
   const date =
     typeof utcTimeString === "string"
       ? new Date(utcTimeString.replace(" ", "T") + "Z")
@@ -24,4 +21,24 @@ export function getTimeAgoInLocalTimezone(
   if (diffDays < 30) return `${diffDays}d ago`;
   if (diffMonths < 12) return `${diffMonths}mo ago`;
   return `${diffYears}y ago`;
+}
+
+/**
+ * Formats a date in the local timezone with a standard format
+ * @param dateString UTC date string or Date object
+ * @param formatPattern Optional format pattern for date-fns (defaults to "PPpp")
+ * @returns Formatted date string in local timezone
+ */
+import { format } from "date-fns";
+
+export function formatLocalDateTime(
+  dateString: string | Date,
+  formatPattern: string = "PPpp",
+) {
+  const date =
+    typeof dateString === "string"
+      ? new Date(dateString.replace(" ", "T") + "Z")
+      : dateString;
+
+  return format(date, formatPattern);
 }

@@ -14,6 +14,7 @@ import {
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { AvatarFallback } from "@radix-ui/react-avatar";
 import { format } from "date-fns";
+import { formatLocalDateTime } from "@/lib/timeAgointimeZone";
 import EmailDisplay from "./EmailDisplay";
 import ReplyBox from "./ReplyBox";
 import { useAtom } from "jotai";
@@ -127,7 +128,7 @@ const ThreadDisplay = (props: Props) => {
             </div>
             {displayThread?.email[0]?.sentAt && (
               <div className="text-muted-foreground ml-auto text-xs">
-                {format(new Date(displayThread?.email[0]?.sentAt), "PPpp")}
+                {formatLocalDateTime(displayThread?.email[0]?.sentAt)}
               </div>
             )}
           </div>
