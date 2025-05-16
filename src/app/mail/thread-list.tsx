@@ -1,11 +1,13 @@
 import useThreads from "@/hooks/useThreads";
 import React, { ComponentProps } from "react";
-import { format, formatDistance, formatDistanceToNow } from "date-fns";
+import { formatDistance, formatDistanceToNow } from "date-fns";
+import { formatLocalDateTime } from "@/lib/timeAgointimeZone";
 import { cn } from "@/lib/utils";
 import DOMPurify from "dompurify";
 import { Badge } from "@/components/ui/badge";
 import { thread } from "@/drizzle/schema";
 import { type InferSelectModel } from "drizzle-orm";
+import { getTimeAgoInLocalTimezone } from "@/lib/timeAgointimeZone";
 
 // Define the Thread type using Drizzle schema
 type Thread = InferSelectModel<typeof thread>;
@@ -25,7 +27,10 @@ const ThreadList = (props: Props) => {
   const { threads, threadId, setThreadId } = useThreads();
   const groupedThread = threads?.reduce(
     (acc, thread) => {
-      const date = format(thread.email[0]?.sentAt ?? new Date(), "yyyy-MM-dd");
+      const date = formatLocalDateTime(
+        thread.email[0]?.sentAt ?? new Date(),
+        "yyyy-MM-dd",
+      );
       if (!acc[date]) {
         acc[date] = [];
       }
@@ -63,11 +68,8 @@ const ThreadList = (props: Props) => {
                         </div>
                       </div>
                       <div className={cn("ml-auto text-xs")}>
-                        {formatDistanceToNow(
+                        {getTimeAgoInLocalTimezone(
                           thread.email.at(-1)?.sentAt ?? new Date(),
-                          {
-                            addSuffix: true,
-                          },
                         )}
                       </div>
                     </div>

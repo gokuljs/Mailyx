@@ -6,7 +6,7 @@ import { auth } from "@clerk/nextjs/server";
 import axios from "axios";
 import { NextRequest, NextResponse } from "next/server";
 import { after } from "next/server";
-import { eq } from "drizzle-orm";
+import { eq, or } from "drizzle-orm";
 
 export const GET = async (req: NextRequest) => {
   const { userId } = await auth();
@@ -44,19 +44,26 @@ export const GET = async (req: NextRequest) => {
   }
   const accountDetails = await getAccountDetails(token.accessToken);
 
-  // Check if account exists
+  // Check if account exists by email first, then by ID
   const existingAccount = await db
     .select()
     .from(account)
-    .where(eq(account.id, token.accountId.toString()))
+    .where(
+      or(
+        eq(account.emailAddress, accountDetails?.email || ""),
+        eq(account.id, token.accountId.toString()),
+      ),
+    )
     .limit(1);
-
+  console.log({ existingAccount });
   if (existingAccount.length > 0) {
     // Update existing account
     await db
       .update(account)
       .set({ accessToken: token.accessToken })
-      .where(eq(account.id, token.accountId.toString()));
+      .where(
+        eq(account.id, existingAccount[0]?.id || token.accountId.toString()),
+      );
   } else {
     // Create new account
     await db.insert(account).values({

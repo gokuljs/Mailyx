@@ -45,16 +45,32 @@ export class Account {
     let params: Record<string, string> = {};
     if (deltaToken) params.deltaToken = deltaToken;
     if (pageToken) params.pageToken = pageToken;
-    const response = await axios.get<SyncUpdatedResponse>(
-      `https://api.aurinko.io/v1/email/sync/updated`,
-      {
-        headers: {
-          Authorization: `Bearer ${this.token}`,
+
+    // Validate token exists
+    if (!this.token || this.token.trim() === "") {
+      throw new Error("Authorization token is missing or empty");
+    }
+
+    try {
+      const response = await axios.get<SyncUpdatedResponse>(
+        `https://api.aurinko.io/v1/email/sync/updated`,
+        {
+          headers: {
+            Authorization: `Bearer ${this.token}`,
+          },
+          params,
         },
+      );
+      return response.data;
+    } catch (error: any) {
+      console.error("API error details:", {
+        status: error?.response?.status,
+        data: error?.response?.data,
         params,
-      },
-    );
-    return response.data;
+        tokenLength: this.token ? this.token.length : 0,
+      });
+      throw error;
+    }
   }
 
   async performInitialSync() {

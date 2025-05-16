@@ -13,6 +13,10 @@ import {
   emailAddress,
   emailAttachment,
   thread,
+  toEmails,
+  ccEmails,
+  bccEmails,
+  replyToEmails,
 } from "@/drizzle/schema";
 
 export async function syncEmailsToDatabase(
@@ -253,6 +257,65 @@ async function upsertEmail(
           emailLabel: emailLabelType,
         })
         .where(eq(emailTable.id, email.id));
+
+      // For existing emails, delete existing relationships first to avoid duplicates
+      await db.delete(toEmails).where(eq(toEmails.a, email.id));
+      await db.delete(ccEmails).where(eq(ccEmails.a, email.id));
+      await db.delete(bccEmails).where(eq(bccEmails.a, email.id));
+      await db.delete(replyToEmails).where(eq(replyToEmails.a, email.id));
+
+      // Re-add relationships
+      // 'to' email relationships
+      for (const toAddress of toAddresses) {
+        if (toAddress) {
+          await db
+            .insert(toEmails)
+            .values({
+              a: email.id,
+              b: toAddress.id,
+            })
+            .onConflictDoNothing();
+        }
+      }
+
+      // 'cc' email relationships
+      for (const ccAddress of ccAddresses) {
+        if (ccAddress) {
+          await db
+            .insert(ccEmails)
+            .values({
+              a: email.id,
+              b: ccAddress.id,
+            })
+            .onConflictDoNothing();
+        }
+      }
+
+      // 'bcc' email relationships
+      for (const bccAddress of bccAddresses) {
+        if (bccAddress) {
+          await db
+            .insert(bccEmails)
+            .values({
+              a: email.id,
+              b: bccAddress.id,
+            })
+            .onConflictDoNothing();
+        }
+      }
+
+      // 'replyTo' email relationships
+      for (const replyToAddress of replyToAddresses) {
+        if (replyToAddress) {
+          await db
+            .insert(replyToEmails)
+            .values({
+              a: email.id,
+              b: replyToAddress.id,
+            })
+            .onConflictDoNothing();
+        }
+      }
     } else {
       // Create email
       await db.insert(emailTable).values({
@@ -283,8 +346,58 @@ async function upsertEmail(
         omitted: email.omitted,
       });
 
-      // TODO: Handle the many-to-many relationships separately
-      // These would need additional code to properly handle the joins for to, cc, bcc, and replyTo
+      // Add initial relationships for new emails
+      // 'to' email relationships
+      for (const toAddress of toAddresses) {
+        if (toAddress) {
+          await db
+            .insert(toEmails)
+            .values({
+              a: email.id,
+              b: toAddress.id,
+            })
+            .onConflictDoNothing();
+        }
+      }
+
+      // 'cc' email relationships
+      for (const ccAddress of ccAddresses) {
+        if (ccAddress) {
+          await db
+            .insert(ccEmails)
+            .values({
+              a: email.id,
+              b: ccAddress.id,
+            })
+            .onConflictDoNothing();
+        }
+      }
+
+      // 'bcc' email relationships
+      for (const bccAddress of bccAddresses) {
+        if (bccAddress) {
+          await db
+            .insert(bccEmails)
+            .values({
+              a: email.id,
+              b: bccAddress.id,
+            })
+            .onConflictDoNothing();
+        }
+      }
+
+      // 'replyTo' email relationships
+      for (const replyToAddress of replyToAddresses) {
+        if (replyToAddress) {
+          await db
+            .insert(replyToEmails)
+            .values({
+              a: email.id,
+              b: replyToAddress.id,
+            })
+            .onConflictDoNothing();
+        }
+      }
     }
 
     // Update thread status based on emails
