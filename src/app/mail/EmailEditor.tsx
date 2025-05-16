@@ -577,10 +577,19 @@ const EmailEditor = ({
               <span className="font-medium text-green-600">Draft</span>
               <span className="font-medium"> to {to?.join(", ")}</span>
             </div>
-            <AiComposer
-              isComposing={defaultToolbarExpanded}
-              onGenerate={onGenerate}
-            />
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div>
+                    <AiComposer
+                      isComposing={defaultToolbarExpanded}
+                      onGenerate={onGenerate}
+                    />
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent>Use AI to compose your email</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
         </div>
         <div className="prose w-full flex-1 border p-4">
