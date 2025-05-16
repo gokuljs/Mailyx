@@ -154,8 +154,7 @@ export const accountRouter = createTRPCRouter({
             .leftJoin(
               schema.emailAddress,
               eq(schema.email.fromId, schema.emailAddress.id),
-            )
-            .limit(100);
+            );
 
           // Group emails by threadId
           const groupedEmails = new Map<string, any[]>();
