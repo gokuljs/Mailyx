@@ -6,6 +6,7 @@ import DOMPurify from "dompurify";
 import { Badge } from "@/components/ui/badge";
 import { thread } from "@/drizzle/schema";
 import { type InferSelectModel } from "drizzle-orm";
+import { getTimeAgoInLocalTimezone } from "@/lib/timeAgointimeZone";
 
 // Define the Thread type using Drizzle schema
 type Thread = InferSelectModel<typeof thread>;
@@ -63,11 +64,9 @@ const ThreadList = (props: Props) => {
                         </div>
                       </div>
                       <div className={cn("ml-auto text-xs")}>
-                        {formatDistanceToNow(
+                        {getTimeAgoInLocalTimezone(
                           thread.email.at(-1)?.sentAt ?? new Date(),
-                          {
-                            addSuffix: true,
-                          },
+                          thread.email.at(-1)?.from?.name ?? "",
                         )}
                       </div>
                     </div>
