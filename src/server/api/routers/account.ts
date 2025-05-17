@@ -79,7 +79,193 @@ export const accountRouter = createTRPCRouter({
 
       return result[0]?.value ?? 0;
     }),
+  getThreads: privateProcedure
+    .input(
+      z.object({
+        accountId: z.string(),
+        tab: z.string(),
+        done: z.boolean().optional(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const account = await authorizeAccountAccess(
+        input?.accountId,
+        ctx?.auth?.userId,
+      );
+      const userId = ctx?.auth?.userId;
+      const key = `threads:user:${userId}:account:${input.accountId}:tab:${input.tab}:done:${input.done ?? "all"}`;
+      if (account?.nextDeltaToken) {
+        const acc = new Account(account?.accessToken);
+        acc.syncEmails().catch(console.error);
+      }
 
+      const threads = await catchFirst(
+        key,
+        async () => {
+          const account = await authorizeAccountAccess(input.accountId, userId);
+
+          // Build conditions for filtering
+          const conditions: SQL[] = [eq(schema.thread.accountId, account.id)];
+
+          if (input.tab === "inbox") {
+            conditions.push(eq(schema.thread.inboxStatus, true));
+          } else if (input.tab === "draft") {
+            conditions.push(eq(schema.thread.draftStatus, true));
+          } else {
+            conditions.push(eq(schema.thread.sentStatus, true));
+          }
+
+          if (input.done !== undefined) {
+            conditions.push(eq(schema.thread.done, input.done));
+          }
+
+          // Fetch threads
+          console.time("DB:getThreads");
+          const threads = await db
+            .select()
+            .from(schema.thread)
+            .where(and(...conditions))
+            .orderBy(desc(schema.thread.lastMessageDate))
+            .limit(500);
+
+          const threadIds = threads.map((t) => t.id);
+          if (threadIds.length === 0) return [];
+
+          // Fetch email previews for those threads (excluding full body)
+          const emails = await db
+            .select({
+              threadId: schema.email.threadId,
+              Email: {
+                id: schema.email.id,
+                subject: schema.email.subject,
+                sentAt: schema.email.sentAt,
+                emailLabel: schema.email.emailLabel,
+                sysLabels: schema.email.sysLabels,
+                bodySnippet: schema.email.bodySnippet,
+              },
+              EmailAddress: {
+                name: schema.emailAddress.name,
+                address: schema.emailAddress.address,
+              },
+            })
+            .from(schema.email)
+            .where(inArray(schema.email.threadId, threadIds))
+            .orderBy(asc(schema.email.sentAt))
+            .leftJoin(
+              schema.emailAddress,
+              eq(schema.email.fromId, schema.emailAddress.id),
+            );
+
+          // Group emails by threadId
+          const groupedEmails = new Map<string, any[]>();
+          for (const row of emails) {
+            const formatted = {
+              from: row.EmailAddress,
+              bodySnippet: row.Email.bodySnippet ?? "",
+              emailLabel: row.Email.emailLabel,
+              subject: row.Email.subject,
+              sysLabels: row.Email.sysLabels,
+              id: row.Email.id,
+              sentAt: row.Email.sentAt,
+            };
+            if (!groupedEmails.has(row.threadId)) {
+              groupedEmails.set(row.threadId, []);
+            }
+            groupedEmails.get(row.threadId)!.push(formatted);
+          }
+
+          // Map threads to include grouped emails
+          const threadResults = threads.map((thread) => ({
+            ...thread,
+            email: groupedEmails.get(thread.id) ?? [],
+          }));
+
+          console.timeEnd("DB:getThreads");
+          return threadResults;
+        },
+        300,
+      );
+      return threads;
+    }),
+
+  getThreadWithEmails: privateProcedure
+    .input(
+      z.object({
+        accountId: z.string(),
+        threadId: z.string(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      console.log("getThreadWithEmails", input);
+      const account = await authorizeAccountAccess(
+        input.accountId,
+        ctx.auth.userId,
+      );
+
+      if (!input.threadId) {
+        throw new Error("Thread ID is required");
+      }
+      if (!input.accountId) {
+        throw new Error("Account ID is required");
+      }
+
+      // Fetch thread
+      const thread = await db
+        .select()
+        .from(schema.thread)
+        .where(
+          and(
+            eq(schema.thread.id, input.threadId),
+            eq(schema.thread.accountId, account.id),
+          ),
+        )
+        .limit(1);
+
+      if (thread.length === 0) {
+        throw new Error("Thread not found");
+      }
+
+      // Fetch emails with complete bodies
+      const emails = await db
+        .select({
+          Email: {
+            id: schema.email.id,
+            subject: schema.email.subject,
+            sentAt: schema.email.sentAt,
+            emailLabel: schema.email.emailLabel,
+            sysLabels: schema.email.sysLabels,
+            body: schema.email.body,
+            bodySnippet: schema.email.bodySnippet,
+          },
+          EmailAddress: {
+            name: schema.emailAddress.name,
+            address: schema.emailAddress.address,
+          },
+        })
+        .from(schema.email)
+        .where(eq(schema.email.threadId, input.threadId))
+        .orderBy(asc(schema.email.sentAt))
+        .leftJoin(
+          schema.emailAddress,
+          eq(schema.email.fromId, schema.emailAddress.id),
+        );
+
+      const formattedEmails = emails.map((row) => ({
+        from: row.EmailAddress,
+        body: row.Email.body ?? "",
+        bodySnippet: row.Email.bodySnippet ?? "",
+        emailLabel: row.Email.emailLabel,
+        subject: row.Email.subject,
+        sysLabels: row.Email.sysLabels,
+        id: row.Email.id,
+        sentAt: row.Email.sentAt,
+      }));
+
+      return {
+        ...thread[0],
+        email: formattedEmails,
+      };
+    }),
   getSuggestions: privateProcedure
     .input(
       z.object({
@@ -293,11 +479,15 @@ export const accountRouter = createTRPCRouter({
         ctx?.auth?.userId,
       );
       console.log("Searching Db orama");
+      console.time("init");
       const orama = new OramaClient(account?.id);
       await orama.init();
+      console.timeEnd("init");
+      console.time("search");
       const result = await orama.search({
         term: input.query,
       });
+      console.timeEnd("search");
       return result;
     }),
   chatBotInteraction: privateProcedure
