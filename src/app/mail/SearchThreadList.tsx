@@ -56,9 +56,23 @@ const SearchThreadList = (props: Props) => {
     );
   }, [search?.data]);
 
-  console.log(search.data, "ssss", "search");
-
-  console.log(search.data, "ssss");
+  if (search.isPending) {
+    return (
+      <div className="text-muted-foreground flex min-h-[calc(100vh-120px)] items-center justify-center border p-8 text-sm">
+        <div className="flex flex-col items-center gap-2">
+          <div className="h-5 w-5 animate-spin rounded-full border-2 border-current border-t-transparent"></div>
+          <p>Searching emails for &ldquo;{debounceSearchValue}&rdquo;...</p>
+        </div>
+      </div>
+    );
+  }
+  if (!search.data?.length) {
+    return (
+      <div className="text-muted-foreground flex min-h-[calc(100vh-120px)] items-center justify-center p-8 text-sm">
+        <div>No results found for &ldquo;{debounceSearchValue}&rdquo;</div>
+      </div>
+    );
+  }
   return (
     <div className="max-h-[calc(100vh-120px)] max-w-full overflow-y-auto">
       <div className="flex flex-col gap-2 p-4 pt-0">
