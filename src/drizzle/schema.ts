@@ -437,6 +437,13 @@ export const emailEmbedding = pgTable("EmailEmbedding", {
     .references(() => email.id, { onDelete: "cascade", onUpdate: "cascade" }),
   content: text("content").notNull(),
   embedding: vector("embedding", { dimensions: 1536 }).notNull(),
+  accountId: text("accountId")
+    .notNull()
+    .references(() => account.id, { onDelete: "cascade", onUpdate: "cascade" }),
+  userId: text("userId")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade", onUpdate: "cascade" }),
+  accountEmail: text("accountEmail").notNull(),
   createdAt: timestamp("createdAt", {
     precision: 3,
     mode: "string",

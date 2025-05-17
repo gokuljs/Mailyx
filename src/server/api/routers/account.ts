@@ -55,7 +55,7 @@ export const accountRouter = createTRPCRouter({
           },
         });
       },
-      5000,
+      300,
     );
     return accounts;
   }),

@@ -26,14 +26,14 @@ export async function syncEmailsToDatabase(
   console.log(`Syncing ${emails.length} emails to database`);
   const limit = pLimit(5);
   try {
-    const embeddingPromises = [];
+    // Process emails and generate embeddings together
 
     for (const [index, email] of emails.entries()) {
       // First store the email
       await upsertEmail(email, accountId, index);
 
       // Trigger embedding generation without awaiting
-      processEmailEmbedding(email, limit);
+      processEmailEmbedding(email, accountId, limit);
 
       await invalidatedUserThreadCache(accountId);
     }
@@ -485,8 +485,34 @@ async function storeEmailEmbedding(
   emailId: string,
   embedding: number[],
   payload: string,
+  accountId: string,
 ) {
   try {
+    // Get userId and emailAddress from the accountId
+    const accountInfo = await db
+      .select({
+        userId: account.userId,
+        emailAddress: account.emailAddress,
+      })
+      .from(account)
+      .where(eq(account.id, accountId))
+      .limit(1);
+
+    if (!accountInfo.length) {
+      console.log(`Cannot find account with ID ${accountId}`);
+      return;
+    }
+
+    const userId = accountInfo[0]?.userId;
+    const accountEmail = accountInfo[0]?.emailAddress;
+
+    if (!userId || !accountEmail) {
+      console.log(
+        `Cannot find userId or emailAddress for account ${accountId}`,
+      );
+      return;
+    }
+
     const existingEmbedding = await db
       .select()
       .from(emailEmbedding)
@@ -500,6 +526,9 @@ async function storeEmailEmbedding(
         .set({
           embedding: embedding,
           content: payload,
+          accountId: accountId,
+          userId: userId,
+          accountEmail: accountEmail,
         })
         .where(eq(emailEmbedding.emailId, emailId));
     } else {
@@ -509,6 +538,9 @@ async function storeEmailEmbedding(
         emailId: emailId,
         embedding: embedding,
         content: payload,
+        accountId: accountId,
+        userId: userId,
+        accountEmail: accountEmail,
       });
     }
   } catch (error) {
@@ -519,6 +551,7 @@ async function storeEmailEmbedding(
 // Separate function to process email embedding asynchronously
 function processEmailEmbedding(
   email: EmailMessage,
+  accountId: string,
   limit: ReturnType<typeof pLimit>,
 ) {
   // No await here - this runs completely independently
@@ -528,7 +561,7 @@ function processEmailEmbedding(
       const cleanSubject = normalizeText(email.subject);
       const payload = `From: ${email.from.name} <${email.from.address}>\nTo: ${email.to.map((t) => `${t.name} <${t.address}>`).join(", ")}\nSubject: ${cleanSubject}\nBody: ${cleanBody}\nSentAt: ${new Date(email.sentAt).toLocaleString()}`;
       const bodyEmbedding = await getEmbeddings(payload);
-      await storeEmailEmbedding(email.id, bodyEmbedding, payload);
+      await storeEmailEmbedding(email.id, bodyEmbedding, payload, accountId);
     } catch (error) {
       console.log(`Error processing embedding for email ${email.id}:`, error);
     }
