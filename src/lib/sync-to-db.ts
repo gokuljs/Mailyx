@@ -1,7 +1,6 @@
 import { EmailAttachment, EmailMessage } from "./types";
 import pLimit from "p-limit";
 import { db } from "@/drizzle/db";
-import { OramaClient } from "./orama";
 import { turndown, processEmailText, normalizeText } from "./turndown";
 import { getEmbeddings } from "./embedding";
 import { auth } from "@clerk/nextjs/server";
@@ -12,6 +11,7 @@ import {
   email as emailTable,
   emailAddress,
   emailAttachment,
+  emailEmbedding,
   thread,
   toEmails,
   ccEmails,
@@ -25,47 +25,18 @@ export async function syncEmailsToDatabase(
 ) {
   console.log(`Syncing ${emails.length} emails to database`);
   const limit = pLimit(5);
-  const orama = new OramaClient(accountId);
-  await orama.init();
   try {
-    // async function syncToOrama() {
-    //   await Promise.all(
-    //     emails.map((email) => {
-    //       return limit(async () => {
-    //         // Process email text with better cleanup
-    //         const cleanBody = processEmailText(
-    //           email.body ?? email.bodySnippet ?? "",
-    //         );
-    //         const cleanSubject = normalizeText(email.subject);
+    // Process emails and generate embeddings together
 
-    //         // Create a structured text representation for embedding
-    //         const payload = `From: ${email.from.name} <${email.from.address}>\nTo: ${email.to.map((t) => `${t.name} <${t.address}>`).join(", ")}\nSubject: ${cleanSubject}\nBody: ${cleanBody}\nSentAt: ${new Date(email.sentAt).toLocaleString()}`;
-    //         const bodyEmbedding = await getEmbeddings(payload);
+    for (const [index, email] of emails.entries()) {
+      // First store the email
+      await upsertEmail(email, accountId, index);
 
-    //         console.log("Indexing email:", email.id);
-    //         await orama.insert({
-    //           subject: cleanSubject,
-    //           body: cleanBody,
-    //           from: `${email.from.name} <${email.from.address}>`,
-    //           to: email.to.map((t) => `${t.name} <${t.address}>`),
-    //           sentAt: new Date(email.sentAt).toLocaleString(),
-    //           threadId: email.threadId,
-    //           embeddings: bodyEmbedding,
-    //         });
-    //       });
-    //     }),
-    //   );
-    // }
+      // Trigger embedding generation without awaiting
+      processEmailEmbedding(email, accountId, limit);
 
-    async function syncToDB() {
-      for (const [index, email] of emails.entries()) {
-        await upsertEmail(email, accountId, index);
-        await invalidatedUserThreadCache(accountId);
-      }
+      await invalidatedUserThreadCache(accountId);
     }
-    await Promise.all([syncToDB()]);
-
-    await orama.saveIndex();
   } catch (error) {
     console.log("Error");
   }
@@ -508,4 +479,91 @@ async function upsertAttachment(emailId: string, attachment: EmailAttachment) {
   } catch (error) {
     console.log(`Failed to upsert attachment for email ${emailId}: ${error}`);
   }
+}
+
+async function storeEmailEmbedding(
+  emailId: string,
+  embedding: number[],
+  payload: string,
+  accountId: string,
+) {
+  try {
+    // Get userId and emailAddress from the accountId
+    const accountInfo = await db
+      .select({
+        userId: account.userId,
+        emailAddress: account.emailAddress,
+      })
+      .from(account)
+      .where(eq(account.id, accountId))
+      .limit(1);
+
+    if (!accountInfo.length) {
+      console.log(`Cannot find account with ID ${accountId}`);
+      return;
+    }
+
+    const userId = accountInfo[0]?.userId;
+    const accountEmail = accountInfo[0]?.emailAddress;
+
+    if (!userId || !accountEmail) {
+      console.log(
+        `Cannot find userId or emailAddress for account ${accountId}`,
+      );
+      return;
+    }
+
+    const existingEmbedding = await db
+      .select()
+      .from(emailEmbedding)
+      .where(eq(emailEmbedding.emailId, emailId))
+      .execute();
+
+    if (existingEmbedding.length > 0) {
+      // Update existing embedding
+      await db
+        .update(emailEmbedding)
+        .set({
+          embedding: embedding,
+          content: payload,
+          accountId: accountId,
+          userId: userId,
+          accountEmail: accountEmail,
+        })
+        .where(eq(emailEmbedding.emailId, emailId));
+    } else {
+      // Insert new embedding
+      await db.insert(emailEmbedding).values({
+        id: crypto.randomUUID(),
+        emailId: emailId,
+        embedding: embedding,
+        content: payload,
+        accountId: accountId,
+        userId: userId,
+        accountEmail: accountEmail,
+      });
+    }
+  } catch (error) {
+    console.log(`Failed to store embedding for email ${emailId}: ${error}`);
+  }
+}
+
+// Separate function to process email embedding asynchronously
+function processEmailEmbedding(
+  email: EmailMessage,
+  accountId: string,
+  limit: ReturnType<typeof pLimit>,
+) {
+  // No await here - this runs completely independently
+  limit(async () => {
+    try {
+      const cleanBody = processEmailText(email.body ?? email.bodySnippet ?? "");
+      const cleanSubject = normalizeText(email.subject);
+      const payload = `From: ${email.from.name} <${email.from.address}>\nTo: ${email.to.map((t) => `${t.name} <${t.address}>`).join(", ")}\nSubject: ${cleanSubject}\nBody: ${cleanBody}\nSentAt: ${new Date(email.sentAt).toLocaleString()}`;
+      const bodyEmbedding = await getEmbeddings(payload);
+      await storeEmailEmbedding(email.id, bodyEmbedding, payload, accountId);
+    } catch (error) {
+      console.log(`Error processing embedding for email ${email.id}:`, error);
+    }
+  });
 }

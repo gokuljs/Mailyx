@@ -8,6 +8,27 @@
       "when": 1746595995526,
       "tag": "0000_striped_clint_barton",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1747511145319,
+      "tag": "0001_chief_young_avengers",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1747516446460,
+      "tag": "0002_eager_queen_noir",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1747516931229,
+      "tag": "0003_awesome_switch",
+      "breakpoints": true
     }
   ]
 }

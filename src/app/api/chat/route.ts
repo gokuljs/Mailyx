@@ -2,11 +2,17 @@ import { FREE_CREDITS_PER_DAY } from "./../../../lib/Constants";
 import { Configuration, OpenAIApi } from "openai-edge";
 import { Message, streamText } from "ai";
 import { auth } from "@clerk/nextjs/server";
-import { OramaClient } from "@/lib/orama";
+import { getEmbeddings } from "@/lib/embedding";
 import { openai as aiProvider } from "@ai-sdk/openai";
 import { db } from "@/drizzle/db";
-import { subscription, chatBotInteraction } from "@/drizzle/schema";
-import { eq, and } from "drizzle-orm";
+import {
+  subscription,
+  chatBotInteraction,
+  emailEmbedding,
+  email as emailTable,
+  emailAddress,
+} from "@/drizzle/schema";
+import { eq, and, sql } from "drizzle-orm";
 
 const config = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
@@ -93,13 +99,58 @@ export async function POST(req: Request) {
       }
     }
 
-    const orama = new OramaClient(accountId);
-    await orama.init();
+    // Get query embedding
     const lastMessage = messages.at(-1);
-    const context = await orama.vectorSearch({
-      term: lastMessage.content,
-    });
-    console.log(context.hits.length, "hits found");
+    const queryEmbedding = await getEmbeddings(lastMessage.content);
+
+    // Format embedding for PostgreSQL vector type
+    const embeddingString = `[${queryEmbedding.join(",")}]`;
+
+    // Use Supabase vector search through drizzle
+    const searchResults = await db.execute(sql`
+      SELECT 
+        e.id, 
+        e.subject, 
+        e.body, 
+        e."sentAt" as sentAt, 
+        ea.address as fromEmail, 
+        ea.name as fromName,
+        eb.content,
+        eb."accountEmail" as accountEmail,
+        eb.embedding <-> ${embeddingString}::vector as similarity
+      FROM "EmailEmbedding" eb
+      JOIN "Email" e ON eb."emailId" = e.id
+      JOIN "EmailAddress" ea ON e."fromId" = ea.id
+      WHERE eb."accountId" = ${accountId}
+        AND eb.embedding <-> ${embeddingString}::vector < 0.8
+      ORDER BY similarity ASC
+      LIMIT 5
+    `);
+
+    console.log(searchResults.length, "results found");
+    if (searchResults.length > 0) {
+      console.log(
+        "Similarity scores:",
+        searchResults.map((r) => r.similarity),
+      );
+    }
+
+    const context = {
+      hits: searchResults.map((result) => ({
+        document: {
+          subject: result.subject,
+          body: result.body,
+          from: {
+            name: result.fromname,
+            email: result.fromemail,
+          },
+          content: result.content,
+          accountEmail: result.accountemail,
+          similarity: result.similarity,
+        },
+      })),
+    };
+
     const systemPrompt = `
         You are an AI email assistant embedded in an email client app. Your purpose is to help the user compose emails by answering questions, providing suggestions, and offering relevant information based on the context of their previous emails.
         THE TIME NOW IS ${new Date().toLocaleString()}
