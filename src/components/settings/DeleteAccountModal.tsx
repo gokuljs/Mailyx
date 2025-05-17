@@ -13,6 +13,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { api } from "@/trpc/react";
 import { Loader2 } from "lucide-react";
+import { useLocalStorage } from "usehooks-ts";
 
 interface DeleteAccountModalProps {
   isOpen: boolean;
@@ -30,9 +31,17 @@ export default function DeleteAccountModal({
   onDeleteSuccess,
 }: DeleteAccountModalProps) {
   const [isConfirmed, setIsConfirmed] = useState(false);
+  const [currentAccountId, setCurrentAccountId] = useLocalStorage(
+    "accountId",
+    "",
+  );
 
   const { mutate, isPending } = api.account.deleteAccount.useMutation({
     onSuccess: () => {
+      // Clear localStorage accountId if it matches the deleted account
+      if (currentAccountId === accountId) {
+        setCurrentAccountId("");
+      }
       toast.success("Account deleted successfully");
       onDeleteSuccess();
       onClose();

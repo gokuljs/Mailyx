@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import { api } from "@/trpc/react";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useLocalStorage } from "usehooks-ts";
 import { useUser } from "@clerk/clerk-react";
 import { Plus } from "lucide-react";
@@ -27,6 +27,19 @@ export default function AccountSwitcher({ isCollapsed }: Props) {
   });
   const { isSubscribed, isLoading } = useSubscriptionInfo();
   const [accountId, setAccountId] = useLocalStorage("accountId", "");
+  console.log(accountId, "ssss");
+  // Set default account when accounts are loaded and accountId is empty or invalid
+  useEffect(() => {
+    if (accounts && accounts.length > 0) {
+      const accountExists = accounts.some(
+        (account) => account.id === accountId,
+      );
+      if (!accountExists && accounts[0]?.id) {
+        setAccountId(accounts[0].id);
+      }
+    }
+  }, [accounts, accountId, setAccountId]);
+
   if (!accounts) return null;
   return (
     <div className="flex w-full items-center gap-2">
