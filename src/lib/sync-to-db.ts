@@ -1,7 +1,6 @@
 import { EmailAttachment, EmailMessage } from "./types";
 import pLimit from "p-limit";
 import { db } from "@/drizzle/db";
-import { OramaClient } from "./orama";
 import { turndown, processEmailText, normalizeText } from "./turndown";
 import { getEmbeddings } from "./embedding";
 import { auth } from "@clerk/nextjs/server";
@@ -12,6 +11,7 @@ import {
   email as emailTable,
   emailAddress,
   emailAttachment,
+  emailEmbedding,
   thread,
   toEmails,
   ccEmails,
@@ -25,47 +25,25 @@ export async function syncEmailsToDatabase(
 ) {
   console.log(`Syncing ${emails.length} emails to database`);
   const limit = pLimit(5);
-  const orama = new OramaClient(accountId);
-  await orama.init();
   try {
-    // async function syncToOrama() {
-    //   await Promise.all(
-    //     emails.map((email) => {
-    //       return limit(async () => {
-    //         // Process email text with better cleanup
-    //         const cleanBody = processEmailText(
-    //           email.body ?? email.bodySnippet ?? "",
-    //         );
-    //         const cleanSubject = normalizeText(email.subject);
-
-    //         // Create a structured text representation for embedding
-    //         const payload = `From: ${email.from.name} <${email.from.address}>\nTo: ${email.to.map((t) => `${t.name} <${t.address}>`).join(", ")}\nSubject: ${cleanSubject}\nBody: ${cleanBody}\nSentAt: ${new Date(email.sentAt).toLocaleString()}`;
-    //         const bodyEmbedding = await getEmbeddings(payload);
-
-    //         console.log("Indexing email:", email.id);
-    //         await orama.insert({
-    //           subject: cleanSubject,
-    //           body: cleanBody,
-    //           from: `${email.from.name} <${email.from.address}>`,
-    //           to: email.to.map((t) => `${t.name} <${t.address}>`),
-    //           sentAt: new Date(email.sentAt).toLocaleString(),
-    //           threadId: email.threadId,
-    //           embeddings: bodyEmbedding,
-    //         });
-    //       });
-    //     }),
-    //   );
-    // }
-
     async function syncToDB() {
       for (const [index, email] of emails.entries()) {
         await upsertEmail(email, accountId, index);
+
+        // Process embedding after email is inserted
+        const cleanBody = processEmailText(
+          email.body ?? email.bodySnippet ?? "",
+        );
+        const cleanSubject = normalizeText(email.subject);
+        const payload = `From: ${email.from.name} <${email.from.address}>\nTo: ${email.to.map((t) => `${t.name} <${t.address}>`).join(", ")}\nSubject: ${cleanSubject}\nBody: ${cleanBody}\nSentAt: ${new Date(email.sentAt).toLocaleString()}`;
+        const bodyEmbedding = await getEmbeddings(payload);
+        await storeEmailEmbedding(email.id, bodyEmbedding, payload);
+
         await invalidatedUserThreadCache(accountId);
       }
     }
-    await Promise.all([syncToDB()]);
 
-    await orama.saveIndex();
+    await syncToDB();
   } catch (error) {
     console.log("Error");
   }
@@ -507,5 +485,40 @@ async function upsertAttachment(emailId: string, attachment: EmailAttachment) {
     }
   } catch (error) {
     console.log(`Failed to upsert attachment for email ${emailId}: ${error}`);
+  }
+}
+
+async function storeEmailEmbedding(
+  emailId: string,
+  embedding: number[],
+  payload: string,
+) {
+  try {
+    const existingEmbedding = await db
+      .select()
+      .from(emailEmbedding)
+      .where(eq(emailEmbedding.emailId, emailId))
+      .execute();
+
+    if (existingEmbedding.length > 0) {
+      // Update existing embedding
+      await db
+        .update(emailEmbedding)
+        .set({
+          embedding: embedding,
+          content: payload,
+        })
+        .where(eq(emailEmbedding.emailId, emailId));
+    } else {
+      // Insert new embedding
+      await db.insert(emailEmbedding).values({
+        id: crypto.randomUUID(),
+        emailId: emailId,
+        embedding: embedding,
+        content: payload,
+      });
+    }
+  } catch (error) {
+    console.log(`Failed to store embedding for email ${emailId}: ${error}`);
   }
 }
