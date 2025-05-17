@@ -428,24 +428,38 @@ export const user = pgTable(
   (table) => [unique("User_emailAddress_key").on(table.emailAddress)],
 );
 
-export const emailEmbedding = pgTable("EmailEmbedding", {
-  id: text("id")
-    .primaryKey()
-    .default(sql`gen_random_uuid()`),
-  emailId: text("emailId")
-    .notNull()
-    .references(() => email.id, { onDelete: "cascade", onUpdate: "cascade" }),
-  content: text("content").notNull(),
-  embedding: vector("embedding", { dimensions: 1536 }).notNull(),
-  accountId: text("accountId")
-    .notNull()
-    .references(() => account.id, { onDelete: "cascade", onUpdate: "cascade" }),
-  userId: text("userId")
-    .notNull()
-    .references(() => user.id, { onDelete: "cascade", onUpdate: "cascade" }),
-  accountEmail: text("accountEmail").notNull(),
-  createdAt: timestamp("createdAt", {
-    precision: 3,
-    mode: "string",
-  }).defaultNow(),
-});
+export const emailEmbedding = pgTable(
+  "EmailEmbedding",
+  {
+    id: text("id")
+      .primaryKey()
+      .default(sql`gen_random_uuid()`),
+    emailId: text("emailId")
+      .notNull()
+      .references(() => email.id, { onDelete: "cascade", onUpdate: "cascade" }),
+    content: text("content").notNull(),
+    embedding: vector("embedding", { dimensions: 1536 }).notNull(),
+    accountId: text("accountId")
+      .notNull()
+      .references(() => account.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    userId: text("userId")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade", onUpdate: "cascade" }),
+    accountEmail: text("accountEmail").notNull(),
+    createdAt: timestamp("createdAt", {
+      precision: 3,
+      mode: "string",
+    }).defaultNow(),
+  },
+  (table) => {
+    return {
+      embedIdx: sql`CREATE INDEX IF NOT EXISTS "emailEmbedding_embedding_idx" ON "EmailEmbedding" USING ivfflat (embedding vector_cosine_ops) WITH (lists = 100)`,
+      accountIdIdx: index("emailEmbedding_accountId_idx").on(table.accountId),
+      userIdIdx: index("emailEmbedding_userId_idx").on(table.userId),
+      emailIdIdx: index("emailEmbedding_emailId_idx").on(table.emailId),
+    };
+  },
+);
