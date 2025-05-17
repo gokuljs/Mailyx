@@ -26,24 +26,17 @@ export async function syncEmailsToDatabase(
   console.log(`Syncing ${emails.length} emails to database`);
   const limit = pLimit(5);
   try {
-    async function syncToDB() {
-      for (const [index, email] of emails.entries()) {
-        await upsertEmail(email, accountId, index);
+    const embeddingPromises = [];
 
-        // Process embedding after email is inserted
-        const cleanBody = processEmailText(
-          email.body ?? email.bodySnippet ?? "",
-        );
-        const cleanSubject = normalizeText(email.subject);
-        const payload = `From: ${email.from.name} <${email.from.address}>\nTo: ${email.to.map((t) => `${t.name} <${t.address}>`).join(", ")}\nSubject: ${cleanSubject}\nBody: ${cleanBody}\nSentAt: ${new Date(email.sentAt).toLocaleString()}`;
-        const bodyEmbedding = await getEmbeddings(payload);
-        await storeEmailEmbedding(email.id, bodyEmbedding, payload);
+    for (const [index, email] of emails.entries()) {
+      // First store the email
+      await upsertEmail(email, accountId, index);
 
-        await invalidatedUserThreadCache(accountId);
-      }
+      // Trigger embedding generation without awaiting
+      processEmailEmbedding(email, limit);
+
+      await invalidatedUserThreadCache(accountId);
     }
-
-    await syncToDB();
   } catch (error) {
     console.log("Error");
   }
@@ -521,4 +514,23 @@ async function storeEmailEmbedding(
   } catch (error) {
     console.log(`Failed to store embedding for email ${emailId}: ${error}`);
   }
+}
+
+// Separate function to process email embedding asynchronously
+function processEmailEmbedding(
+  email: EmailMessage,
+  limit: ReturnType<typeof pLimit>,
+) {
+  // No await here - this runs completely independently
+  limit(async () => {
+    try {
+      const cleanBody = processEmailText(email.body ?? email.bodySnippet ?? "");
+      const cleanSubject = normalizeText(email.subject);
+      const payload = `From: ${email.from.name} <${email.from.address}>\nTo: ${email.to.map((t) => `${t.name} <${t.address}>`).join(", ")}\nSubject: ${cleanSubject}\nBody: ${cleanBody}\nSentAt: ${new Date(email.sentAt).toLocaleString()}`;
+      const bodyEmbedding = await getEmbeddings(payload);
+      await storeEmailEmbedding(email.id, bodyEmbedding, payload);
+    } catch (error) {
+      console.log(`Error processing embedding for email ${email.id}:`, error);
+    }
+  });
 }
