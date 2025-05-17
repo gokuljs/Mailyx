@@ -11,6 +11,7 @@ import {
   boolean,
   jsonb,
   pgEnum,
+  vector,
 } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 
@@ -426,3 +427,18 @@ export const user = pgTable(
   },
   (table) => [unique("User_emailAddress_key").on(table.emailAddress)],
 );
+
+export const emailEmbedding = pgTable("EmailEmbedding", {
+  id: text("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  emailId: text("emailId")
+    .notNull()
+    .references(() => email.id, { onDelete: "cascade", onUpdate: "cascade" }),
+  content: text("content").notNull(),
+  embedding: vector("embedding", { dimensions: 1536 }).notNull(),
+  createdAt: timestamp("createdAt", {
+    precision: 3,
+    mode: "string",
+  }).defaultNow(),
+});
