@@ -725,10 +725,6 @@ export const accountRouter = createTRPCRouter({
       }),
     )
     .query(async ({ ctx, input }) => {
-      const account = await authorizeAccountAccess(
-        input?.accountId,
-        ctx?.auth?.userId,
-      );
       const userId = ctx?.auth?.userId;
       if (!userId) throw new Error("Unauthorized");
       const today = new Date().toDateString();
