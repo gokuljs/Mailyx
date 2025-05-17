@@ -512,28 +512,30 @@ export const accountRouter = createTRPCRouter({
 
         const threadIds = threadsWithMatchingAccount.map((t) => t.id);
 
-        // Find all emails in those threads that match the search query using PostgreSQL full-text search
+        // Convert the search query into OR-ed terms, wrapped in parentheses
+        const processedQuery = `(${searchQuery.trim().split(/\s+/).join(" OR ")})`;
+
         const matchingEmails = await db
           .select({
             threadId: schema.email.threadId,
             id: schema.email.id,
             rank: sql`ts_rank(
-              setweight(to_tsvector('english', ${schema.email.subject}), 'A') || 
-              setweight(to_tsvector('english', COALESCE(${schema.email.body}, '')), 'B') ||
-              setweight(to_tsvector('english', COALESCE(${schema.email.bodySnippet}, '')), 'C'),
-              plainto_tsquery('english', ${searchQuery})
-            )`.as("rank"),
+      setweight(to_tsvector('english', ${schema.email.subject}), 'A') || 
+      setweight(to_tsvector('english', COALESCE(${schema.email.body}, '')), 'B') ||
+      setweight(to_tsvector('english', COALESCE(${schema.email.bodySnippet}, '')), 'C'),
+      websearch_to_tsquery('english', ${processedQuery})
+    )`.as("rank"),
           })
           .from(schema.email)
           .where(
             and(
               inArray(schema.email.threadId, threadIds),
               sql`
-                setweight(to_tsvector('english', ${schema.email.subject}), 'A') || 
-                setweight(to_tsvector('english', COALESCE(${schema.email.body}, '')), 'B') ||
-                setweight(to_tsvector('english', COALESCE(${schema.email.bodySnippet}, '')), 'C')
-                @@ plainto_tsquery('english', ${searchQuery})
-              `,
+        setweight(to_tsvector('english', ${schema.email.subject}), 'A') || 
+        setweight(to_tsvector('english', COALESCE(${schema.email.body}, '')), 'B') ||
+        setweight(to_tsvector('english', COALESCE(${schema.email.bodySnippet}, '')), 'C')
+        @@ websearch_to_tsquery('english', ${processedQuery})
+      `,
             ),
           )
           .orderBy(sql`rank DESC`)
