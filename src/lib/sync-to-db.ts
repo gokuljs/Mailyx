@@ -28,34 +28,34 @@ export async function syncEmailsToDatabase(
   const orama = new OramaClient(accountId);
   await orama.init();
   try {
-    async function syncToOrama() {
-      await Promise.all(
-        emails.map((email) => {
-          return limit(async () => {
-            // Process email text with better cleanup
-            const cleanBody = processEmailText(
-              email.body ?? email.bodySnippet ?? "",
-            );
-            const cleanSubject = normalizeText(email.subject);
+    // async function syncToOrama() {
+    //   await Promise.all(
+    //     emails.map((email) => {
+    //       return limit(async () => {
+    //         // Process email text with better cleanup
+    //         const cleanBody = processEmailText(
+    //           email.body ?? email.bodySnippet ?? "",
+    //         );
+    //         const cleanSubject = normalizeText(email.subject);
 
-            // Create a structured text representation for embedding
-            const payload = `From: ${email.from.name} <${email.from.address}>\nTo: ${email.to.map((t) => `${t.name} <${t.address}>`).join(", ")}\nSubject: ${cleanSubject}\nBody: ${cleanBody}\nSentAt: ${new Date(email.sentAt).toLocaleString()}`;
-            const bodyEmbedding = await getEmbeddings(payload);
+    //         // Create a structured text representation for embedding
+    //         const payload = `From: ${email.from.name} <${email.from.address}>\nTo: ${email.to.map((t) => `${t.name} <${t.address}>`).join(", ")}\nSubject: ${cleanSubject}\nBody: ${cleanBody}\nSentAt: ${new Date(email.sentAt).toLocaleString()}`;
+    //         const bodyEmbedding = await getEmbeddings(payload);
 
-            console.log("Indexing email:", email.id);
-            await orama.insert({
-              subject: cleanSubject,
-              body: cleanBody,
-              from: `${email.from.name} <${email.from.address}>`,
-              to: email.to.map((t) => `${t.name} <${t.address}>`),
-              sentAt: new Date(email.sentAt).toLocaleString(),
-              threadId: email.threadId,
-              embeddings: bodyEmbedding,
-            });
-          });
-        }),
-      );
-    }
+    //         console.log("Indexing email:", email.id);
+    //         await orama.insert({
+    //           subject: cleanSubject,
+    //           body: cleanBody,
+    //           from: `${email.from.name} <${email.from.address}>`,
+    //           to: email.to.map((t) => `${t.name} <${t.address}>`),
+    //           sentAt: new Date(email.sentAt).toLocaleString(),
+    //           threadId: email.threadId,
+    //           embeddings: bodyEmbedding,
+    //         });
+    //       });
+    //     }),
+    //   );
+    // }
 
     async function syncToDB() {
       for (const [index, email] of emails.entries()) {
@@ -63,7 +63,7 @@ export async function syncEmailsToDatabase(
         await invalidatedUserThreadCache(accountId);
       }
     }
-    await Promise.all([syncToOrama(), syncToDB()]);
+    await Promise.all([syncToDB()]);
 
     await orama.saveIndex();
   } catch (error) {
