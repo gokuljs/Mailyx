@@ -35,7 +35,7 @@ const useAccountSwitching = () => {
             Boolean,
           ) as string[],
           shortcut: [],
-          section: "Accounts",
+          section: "",
           subtitle: account.emailAddress,
           priority: 1000,
         };

@@ -2,7 +2,17 @@ import { emailAddressSchema } from "./../../../lib/types";
 import { z } from "zod";
 import { createTRPCRouter, privateProcedure, publicProcedure } from "../trpc";
 import * as schema from "@/drizzle/schema";
-import { eq, and, count, type SQL, desc, asc, inArray } from "drizzle-orm";
+import {
+  eq,
+  and,
+  count,
+  type SQL,
+  desc,
+  asc,
+  inArray,
+  or,
+  sql,
+} from "drizzle-orm";
 
 import { Account } from "@/lib/accounts";
 import { OramaClient } from "@/lib/orama";
@@ -479,13 +489,131 @@ export const accountRouter = createTRPCRouter({
         input?.accountId,
         ctx?.auth?.userId,
       );
-      console.log("Searching Db orama");
-      const orama = new OramaClient(account?.id);
-      await orama.init();
-      const result = await orama.search({
-        term: input.query,
-      });
-      return result;
+
+      console.log("Searching with PostgreSQL");
+
+      // Extract search terms and prepare for search
+      const searchQuery = input.query.trim();
+
+      if (!searchQuery) {
+        return [];
+      }
+
+      try {
+        // Find all threads with the matching account ID first
+        const threadsWithMatchingAccount = await db
+          .select()
+          .from(schema.thread)
+          .where(eq(schema.thread.accountId, account.id));
+
+        if (threadsWithMatchingAccount.length === 0) {
+          return [];
+        }
+
+        const threadIds = threadsWithMatchingAccount.map((t) => t.id);
+
+        // Convert the search query into OR-ed terms, wrapped in parentheses
+        const processedQuery = `(${searchQuery.trim().split(/\s+/).join(" OR ")})`;
+
+        const matchingEmails = await db
+          .select({
+            threadId: schema.email.threadId,
+            id: schema.email.id,
+            rank: sql`ts_rank(
+      setweight(to_tsvector('english', ${schema.email.subject}), 'A') || 
+      setweight(to_tsvector('english', COALESCE(${schema.email.body}, '')), 'B') ||
+      setweight(to_tsvector('english', COALESCE(${schema.email.bodySnippet}, '')), 'C'),
+      websearch_to_tsquery('english', ${processedQuery})
+    )`.as("rank"),
+          })
+          .from(schema.email)
+          .where(
+            and(
+              inArray(schema.email.threadId, threadIds),
+              sql`
+        setweight(to_tsvector('english', ${schema.email.subject}), 'A') || 
+        setweight(to_tsvector('english', COALESCE(${schema.email.body}, '')), 'B') ||
+        setweight(to_tsvector('english', COALESCE(${schema.email.bodySnippet}, '')), 'C')
+        @@ websearch_to_tsquery('english', ${processedQuery})
+      `,
+            ),
+          )
+          .orderBy(sql`rank DESC`)
+          .groupBy(schema.email.threadId, schema.email.id);
+
+        if (matchingEmails.length === 0) {
+          return [];
+        }
+
+        const matchingThreadIds = matchingEmails.map((email) => email.threadId);
+
+        // Get threads based on the matching email IDs
+        const threads = await db
+          .select()
+          .from(schema.thread)
+          .where(
+            and(
+              eq(schema.thread.accountId, account.id),
+              inArray(schema.thread.id, matchingThreadIds),
+            ),
+          )
+          .limit(500);
+
+        const filteredThreadIds = threads.map((t) => t.id);
+        if (filteredThreadIds.length === 0) return [];
+
+        // Fetch email previews for those threads (excluding full body)
+        const emails = await db
+          .select({
+            threadId: schema.email.threadId,
+            Email: {
+              id: schema.email.id,
+              subject: schema.email.subject,
+              sentAt: schema.email.sentAt,
+              emailLabel: schema.email.emailLabel,
+              sysLabels: schema.email.sysLabels,
+              bodySnippet: schema.email.bodySnippet,
+            },
+            EmailAddress: {
+              name: schema.emailAddress.name,
+              address: schema.emailAddress.address,
+            },
+          })
+          .from(schema.email)
+          .where(inArray(schema.email.threadId, filteredThreadIds))
+          .orderBy(asc(schema.email.sentAt))
+          .leftJoin(
+            schema.emailAddress,
+            eq(schema.email.fromId, schema.emailAddress.id),
+          );
+
+        // Group emails by threadId
+        const groupedEmails = new Map<string, any[]>();
+        for (const row of emails) {
+          const formatted = {
+            from: row.EmailAddress,
+            bodySnippet: row.Email.bodySnippet ?? "",
+            emailLabel: row.Email.emailLabel,
+            subject: row.Email.subject,
+            sysLabels: row.Email.sysLabels,
+            id: row.Email.id,
+            sentAt: row.Email.sentAt,
+          };
+          if (!groupedEmails.has(row.threadId)) {
+            groupedEmails.set(row.threadId, []);
+          }
+          groupedEmails.get(row.threadId)!.push(formatted);
+        }
+        console.log("groupedEmails", threads);
+        // Map threads to include grouped emails
+        return threads.map((thread) => ({
+          ...thread,
+          email: groupedEmails.get(thread.id) ?? [],
+        }));
+      } catch (error) {
+        console.error("Error searching emails:", error);
+        throw new Error("Failed to search emails");
+      }
     }),
   chatBotInteraction: privateProcedure
     .input(
