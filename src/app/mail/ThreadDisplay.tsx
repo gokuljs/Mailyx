@@ -86,7 +86,8 @@ const ThreadDisplay = (props: Props) => {
       </div>
       <Separator />
       {isSearching ? (
-        <SearchDisplay />
+        // <SearchDisplay />
+        <></>
       ) : (
         <>
           {thread ? (

@@ -19,13 +19,16 @@ import AccountSwitcher from "./account-switcher";
 import SideBar from "./SideBar";
 import ThreadList from "./thread-list";
 import ThreadDisplay from "./ThreadDisplay";
-import { useLocalStorage } from "usehooks-ts";
-import SearchBar from "./SearchBar";
+import { useDebounceValue, useLocalStorage } from "usehooks-ts";
+import SearchBar, { isSearchingAtom, searchValueAtom } from "./SearchBar";
+import SearchThreadList from "./SearchThreadList";
 import AskAi from "./AskAi";
 import { api } from "@/trpc/react";
 
 import { EmptyAccounts } from "./EmptyAccounts";
 import { useUser } from "@clerk/nextjs";
+import { useAtom } from "jotai";
+import useThreads from "@/hooks/useThreads";
 
 type Props = {
   defaultLayout: number[] | undefined;
@@ -45,6 +48,8 @@ function Mail({
     enabled: isSignedIn,
   });
   const [minSizes, setMinSizes] = useState([25, 30, 30]); // Default sizes
+
+  const [isSearching, setIsSearching] = useAtom(isSearchingAtom);
 
   useEffect(() => {
     const handleResize = () => {
@@ -145,19 +150,24 @@ function Mail({
             {/* search Bar */}
             {accounts && accounts.length > 0 && <SearchBar />}
 
-            {accounts && accounts.length === 0 ? (
+            {isSearching && <SearchThreadList />}
+
+            {accounts && accounts.length === 0 && !isSearching ? (
               <EmptyAccounts />
             ) : (
               <>
-                {" "}
-                <TabsContent value="inbox">
-                  {" "}
-                  <ThreadList />
-                </TabsContent>
-                <TabsContent value="done">
-                  {" "}
-                  <ThreadList />
-                </TabsContent>
+                {!isSearching && (
+                  <>
+                    <TabsContent value="inbox">
+                      {" "}
+                      <ThreadList />
+                    </TabsContent>
+                    <TabsContent value="done">
+                      {" "}
+                      <ThreadList />
+                    </TabsContent>
+                  </>
+                )}
               </>
             )}
           </Tabs>
