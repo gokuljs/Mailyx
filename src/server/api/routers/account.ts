@@ -17,8 +17,9 @@ import {
 import { Account } from "@/lib/accounts";
 import { OramaClient } from "@/lib/orama";
 import { catchFirst } from "@/lib/redisCatchFetch";
-import { FREE_CREDITS_PER_DAY } from "@/lib/Constants";
+import { FREE_ACCOUNTS_PER_USER, FREE_CREDITS_PER_DAY } from "@/lib/Constants";
 import { db } from "@/drizzle/db";
+import redisHandler from "@/lib/redis";
 
 export const authorizeAccountAccess = async (
   accountId: string,
@@ -43,10 +44,28 @@ export const accountRouter = createTRPCRouter({
   getAccounts: privateProcedure.query(async ({ ctx }) => {
     const userId = ctx?.auth?.userId;
     const key = `accounts:user:${userId}`;
+
+    // Check subscription status
+    const subscription = await db.query.subscription.findFirst({
+      where: (fields, { eq }) => eq(fields.userId, userId),
+      columns: {
+        status: true,
+        endedAt: true,
+      },
+    });
+
+    // Check if user is a premium subscriber
+    const currentDate = new Date();
+    const endDate = subscription?.endedAt
+      ? new Date(subscription.endedAt)
+      : null;
+    const isPremium =
+      subscription?.status === "ACTIVE" && (!endDate || currentDate < endDate);
+
     const accounts = await catchFirst(
       key,
       async () => {
-        return ctx.db.query.account.findMany({
+        let query = db.query.account.findMany({
           where: (fields, { eq }) => eq(fields.userId, userId),
           columns: {
             id: true,
@@ -54,11 +73,118 @@ export const accountRouter = createTRPCRouter({
             name: true,
           },
         });
+
+        const accounts = await query;
+
+        // If not premium, return just the first account (or empty array if no accounts)
+        return isPremium ? accounts : accounts.slice(0, FREE_ACCOUNTS_PER_USER);
       },
       300,
     );
     return accounts;
   }),
+
+  deleteAccount: privateProcedure
+    .input(
+      z.object({
+        accountId: z.string(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const account = await authorizeAccountAccess(
+        input.accountId,
+        ctx.auth.userId,
+      );
+
+      console.log(`Deleting account: ${account.id} (${account.emailAddress})`);
+
+      try {
+        // Start a transaction to ensure atomicity
+        await db.transaction(async (tx) => {
+          // First delete data from all dependent tables
+          // Since EmailEmbedding has cascade delete, we don't need to handle it explicitly
+
+          // Get all threads for this account
+          const threads = await tx
+            .select({ id: schema.thread.id })
+            .from(schema.thread)
+            .where(eq(schema.thread.accountId, account.id));
+
+          const threadIds = threads.map((t) => t.id);
+
+          if (threadIds.length > 0) {
+            // Get all emails for these threads
+            const emails = await tx
+              .select({ id: schema.email.id })
+              .from(schema.email)
+              .where(inArray(schema.email.threadId, threadIds));
+
+            const emailIds = emails.map((e) => e.id);
+
+            if (emailIds.length > 0) {
+              // Delete email relationships (to, cc, bcc, etc.)
+              await tx
+                .delete(schema.toEmails)
+                .where(inArray(schema.toEmails.a, emailIds));
+
+              await tx
+                .delete(schema.ccEmails)
+                .where(inArray(schema.ccEmails.a, emailIds));
+
+              await tx
+                .delete(schema.bccEmails)
+                .where(inArray(schema.bccEmails.a, emailIds));
+
+              await tx
+                .delete(schema.replyToEmails)
+                .where(inArray(schema.replyToEmails.a, emailIds));
+
+              // Delete attachments
+              await tx
+                .delete(schema.emailAttachment)
+                .where(inArray(schema.emailAttachment.emailId, emailIds));
+
+              // Delete emails
+              await tx
+                .delete(schema.email)
+                .where(inArray(schema.email.id, emailIds));
+            }
+
+            // Delete threads
+            await tx
+              .delete(schema.thread)
+              .where(inArray(schema.thread.id, threadIds));
+          }
+
+          // Delete email addresses
+          await tx
+            .delete(schema.emailAddress)
+            .where(eq(schema.emailAddress.accountId, account.id));
+
+          // Finally delete the account
+          await tx
+            .delete(schema.account)
+            .where(eq(schema.account.id, account.id));
+        });
+
+        // Clear cached data
+        const userId = ctx.auth.userId;
+        const key = `accounts:user:${userId}`;
+
+        // Clear the Redis cache
+        try {
+          await redisHandler.del(key);
+        } catch (error) {
+          console.warn(`Failed to clear cache for key: ${key}`, error);
+        }
+
+        return { success: true, message: "Account deleted successfully" };
+      } catch (error) {
+        console.error("Error deleting account:", error);
+        throw new Error("Failed to delete account and related data");
+      }
+    }),
+
   getNumThreads: privateProcedure
     .input(
       z.object({
@@ -622,10 +748,6 @@ export const accountRouter = createTRPCRouter({
       }),
     )
     .query(async ({ ctx, input }) => {
-      const account = await authorizeAccountAccess(
-        input?.accountId,
-        ctx?.auth?.userId,
-      );
       const userId = ctx?.auth?.userId;
       if (!userId) throw new Error("Unauthorized");
       const today = new Date().toDateString();

@@ -1,6 +1,10 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import {
+  ProviderSelector,
+  type EmailProvider,
+} from "@/components/email/ProviderSelector";
 import useSubscriptionInfo from "@/hooks/useSubscriptionInfo";
 import { getAurinkoAuthUrl } from "@/lib/aruinko";
 import { api } from "@/trpc/react";
@@ -17,7 +21,28 @@ export function EmptyAccounts() {
   });
   const { isSubscribed, isLoading } = useSubscriptionInfo();
   const [isLoadingButton, setIsLoadingButton] = useState(false);
+  const [showProviderSelector, setShowProviderSelector] = useState(false);
+  const [loadingProvider, setLoadingProvider] = useState<EmailProvider | null>(
+    null,
+  );
   const { theme } = useTheme();
+
+  const handleProviderSelect = async (provider: EmailProvider) => {
+    try {
+      setIsLoadingButton(true);
+      setLoadingProvider(provider);
+      const url = await getAurinkoAuthUrl(provider, isSubscribed);
+      console.log(url);
+      if (url) window.location.href = url;
+    } catch (error) {
+      toast.error((error as Error).message);
+      console.error(error);
+    } finally {
+      setIsLoadingButton(false);
+      setLoadingProvider(null);
+      setShowProviderSelector(false);
+    }
+  };
 
   if (isLoading) return <></>;
   return (
@@ -44,35 +69,26 @@ export function EmptyAccounts() {
             </p>
 
             <Button
-              onClick={async () => {
-                try {
-                  setIsLoadingButton(true);
-                  const url = await getAurinkoAuthUrl("Google", isSubscribed);
-                  console.log(url);
-                  if (url) window.location.href = url;
-                } catch (error) {
-                  toast.error((error as Error).message);
-                  console.error(error);
-                } finally {
-                  setIsLoadingButton(false);
-                }
-              }}
+              onClick={() => setShowProviderSelector(true)}
               className="mt-2 w-full bg-stone-600 text-white hover:bg-stone-500 dark:bg-stone-700 dark:hover:bg-stone-600"
               disabled={isLoadingButton}
             >
-              {isLoadingButton ? (
-                <div className="flex items-center justify-center">
-                  <span>Connecting</span>
-                </div>
-              ) : (
-                <div className="flex items-center justify-center gap-2">
-                  Connect account
-                  <Plus className="h-4 w-4" />
-                </div>
-              )}
+              <div className="flex items-center justify-center gap-2">
+                Connect account
+                <Plus className="h-4 w-4" />
+              </div>
             </Button>
           </CardContent>
         </Card>
+
+        {showProviderSelector && (
+          <ProviderSelector
+            onSelect={handleProviderSelect}
+            onCancel={() => setShowProviderSelector(false)}
+            isLoading={isLoadingButton}
+            loadingProvider={loadingProvider}
+          />
+        )}
       </div>
     </div>
   );

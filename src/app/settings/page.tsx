@@ -12,17 +12,28 @@ import {
 import { Separator } from "@/components/ui/separator";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Loader2 } from "lucide-react";
+import { ArrowLeft, Loader2, Trash2 } from "lucide-react";
 import useSubscriptionInfo from "@/hooks/useSubscriptionInfo";
 import { api } from "@/trpc/react";
 import { toast } from "sonner";
 import { useState } from "react";
 import ChangePlanModal from "@/components/settings/ChangePlanModal";
+import DeleteAccountModal from "@/components/settings/DeleteAccountModal";
 
 export default function SettingsPage() {
   const router = useRouter();
   const { subInfo, isLoading, isSubscribed } = useSubscriptionInfo();
   const [isChangePlanModalOpen, setIsChangePlanModalOpen] = useState(false);
+  const [deleteAccountData, setDeleteAccountData] = useState<{
+    isOpen: boolean;
+    accountId: string;
+    accountEmail: string;
+  }>({
+    isOpen: false,
+    accountId: "",
+    accountEmail: "",
+  });
+
   const { mutate, isPending } =
     api.subscription.getCustomerPortalInfo.useMutation({
       onSuccess: (data) => {
@@ -36,6 +47,9 @@ export default function SettingsPage() {
     });
   // TODO: Fetch user subscription status and details
 
+  const { data: accounts, refetch: refetchAccounts } =
+    api.account.getAccounts.useQuery();
+
   const openCustomerPortal = async () => {
     if (!subInfo) return;
     try {
@@ -45,7 +59,25 @@ export default function SettingsPage() {
     }
   };
 
-  console.log(subInfo);
+  const handleDeleteAccount = (accountId: string, accountEmail: string) => {
+    setDeleteAccountData({
+      isOpen: true,
+      accountId,
+      accountEmail,
+    });
+  };
+
+  const closeDeleteModal = () => {
+    setDeleteAccountData({
+      isOpen: false,
+      accountId: "",
+      accountEmail: "",
+    });
+  };
+
+  const handleDeleteSuccess = () => {
+    refetchAccounts();
+  };
 
   return (
     <div className="min-h-screen space-y-6 p-4 pb-16 md:p-10 dark:bg-[hsl(20_14.3%_4.1%)]">
@@ -66,6 +98,63 @@ export default function SettingsPage() {
         </p>
       </div>
       <Separator className="my-6" />
+
+      {/* Connected Accounts Section */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Connected Accounts</CardTitle>
+          <CardDescription>
+            Manage your connected email accounts.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {accounts && accounts.length > 0 ? (
+            <div className="space-y-4">
+              <h3 className="mb-2 text-lg font-medium">Your Email Accounts</h3>
+              <div className="space-y-2">
+                {accounts.map((account) => (
+                  <div
+                    key={account.id}
+                    className="flex items-center justify-between rounded-lg border p-3"
+                  >
+                    <div>
+                      <p className="font-medium">{account.name}</p>
+                      <p className="text-muted-foreground text-sm">
+                        {account.emailAddress}
+                      </p>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="text-destructive hover:bg-destructive/10"
+                      onClick={() =>
+                        handleDeleteAccount(account.id, account.emailAddress)
+                      }
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+              <p className="text-muted-foreground mt-2 text-sm">
+                Deleting an account will remove all emails and data associated
+                with it.
+              </p>
+            </div>
+          ) : (
+            <div className="py-4 text-center">
+              <p className="text-muted-foreground">No accounts connected</p>
+              <Button
+                variant="outline"
+                className="mt-2"
+                onClick={() => router.push("/mail")}
+              >
+                Connect an account
+              </Button>
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Subscription Management Section */}
       <Card>
@@ -123,7 +212,6 @@ export default function SettingsPage() {
                <Link href="/pricing">View Plans</Link>
              </Button>
              */}
-            {/* TODO: Add ChangePlanModal component here */}
             {isChangePlanModalOpen && subInfo && (
               <ChangePlanModal
                 isOpen={isChangePlanModalOpen}
@@ -132,15 +220,18 @@ export default function SettingsPage() {
             )}
           </div>
         </CardContent>
-        {/* Optional Footer */}
-        {/* <CardFooter>
-           <p className="text-xs text-muted-foreground">
-             Changes might take a few moments to reflect.
-           </p>
-         </CardFooter> */}
       </Card>
 
-      {/* Add other settings sections here (e.g., Profile, Notifications) */}
+      {/* Delete Account Modal */}
+      {deleteAccountData.isOpen && (
+        <DeleteAccountModal
+          isOpen={deleteAccountData.isOpen}
+          onClose={closeDeleteModal}
+          accountId={deleteAccountData.accountId}
+          accountEmail={deleteAccountData.accountEmail}
+          onDeleteSuccess={handleDeleteSuccess}
+        />
+      )}
     </div>
   );
 }
