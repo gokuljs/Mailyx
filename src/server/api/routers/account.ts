@@ -17,7 +17,7 @@ import {
 import { Account } from "@/lib/accounts";
 import { OramaClient } from "@/lib/orama";
 import { catchFirst } from "@/lib/redisCatchFetch";
-import { FREE_CREDITS_PER_DAY } from "@/lib/Constants";
+import { FREE_ACCOUNTS_PER_USER, FREE_CREDITS_PER_DAY } from "@/lib/Constants";
 import { db } from "@/drizzle/db";
 import redisHandler from "@/lib/redis";
 
@@ -44,10 +44,28 @@ export const accountRouter = createTRPCRouter({
   getAccounts: privateProcedure.query(async ({ ctx }) => {
     const userId = ctx?.auth?.userId;
     const key = `accounts:user:${userId}`;
+
+    // Check subscription status
+    const subscription = await db.query.subscription.findFirst({
+      where: (fields, { eq }) => eq(fields.userId, userId),
+      columns: {
+        status: true,
+        endedAt: true,
+      },
+    });
+
+    // Check if user is a premium subscriber
+    const currentDate = new Date();
+    const endDate = subscription?.endedAt
+      ? new Date(subscription.endedAt)
+      : null;
+    const isPremium =
+      subscription?.status === "ACTIVE" && (!endDate || currentDate < endDate);
+
     const accounts = await catchFirst(
       key,
       async () => {
-        return ctx.db.query.account.findMany({
+        let query = db.query.account.findMany({
           where: (fields, { eq }) => eq(fields.userId, userId),
           columns: {
             id: true,
@@ -55,6 +73,11 @@ export const accountRouter = createTRPCRouter({
             name: true,
           },
         });
+
+        const accounts = await query;
+
+        // If not premium, return just the first account (or empty array if no accounts)
+        return isPremium ? accounts : accounts.slice(0, FREE_ACCOUNTS_PER_USER);
       },
       300,
     );
