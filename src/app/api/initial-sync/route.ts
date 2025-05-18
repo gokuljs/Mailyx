@@ -7,6 +7,7 @@ import { error } from "console";
 import { NextRequest, NextResponse } from "next/server";
 
 export const POST = async (req: NextRequest) => {
+  console.log("Initial sync triggered");
   const { accountId, userId } = await req.json();
   if (!accountId) {
     return NextResponse.json(
