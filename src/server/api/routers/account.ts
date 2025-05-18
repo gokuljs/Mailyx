@@ -40,6 +40,27 @@ export const authorizeAccountAccess = async (
   return account;
 };
 
+export async function invalidatedUserThreadCache(
+  accountId: string,
+  userId: String,
+) {
+  console.log("Invalidating Thread Cache");
+  const tabs = ["inbox", "draft", "sent"];
+  const doneStates = ["true", "false", "all"];
+  const keys: string[] = [];
+  for (const tab of tabs) {
+    for (const done of doneStates) {
+      keys.push(
+        `threads:user:${userId}:account:${accountId}:tab:${tab}:done:${done}`,
+      );
+    }
+  }
+
+  for (const key of keys) {
+    await redisHandler.del(key);
+  }
+}
+
 export const accountRouter = createTRPCRouter({
   getAccounts: privateProcedure.query(async ({ ctx }) => {
     const userId = ctx?.auth?.userId;
@@ -601,6 +622,7 @@ export const accountRouter = createTRPCRouter({
         inReplyTo: input?.inReplyTo,
         threadId: input?.threadId,
       });
+      invalidatedUserThreadCache(account.id, ctx.auth.userId);
     }),
 
   searchEmails: privateProcedure
