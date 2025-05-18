@@ -66,7 +66,7 @@ export const POST = async (req: NextRequest) => {
 
   // console.log("%%%%%%%%%%%%%%%");
   // console.log(JSON.stringify(emails.slice(0, 1), null, 2));
-  syncEmailsToDatabase(emails, accountId);
+  await syncEmailsToDatabase(emails, accountId);
   return NextResponse.json(
     {
       success: true,
