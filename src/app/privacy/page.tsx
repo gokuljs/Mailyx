@@ -43,18 +43,19 @@ const PrivacyPolicyPage = () => {
               <li>Cookies and analytics</li>
               <li>Legal compliance</li>
               <li>
-                Email data via Google authorization (with your permission)
+                Email data via Google and Microsoft authorization (with your
+                permission)
               </li>
             </ul>
           </div>
 
           <div>
             <h2 className="mb-3 text-2xl font-semibold text-white">
-              Google Data Access and Usage
+              Google and Microsoft Data Access and Usage
             </h2>
             <p>
-              When you connect your Google account to Mailyx, we request
-              permission to access your email data. This includes:
+              When you connect your Google or Microsoft account to Mailyx, we
+              request permission to access your email data. This includes:
             </p>
             <ul className="mt-2 list-inside list-disc">
               <li>Reading emails and attachments</li>
@@ -76,9 +77,9 @@ const PrivacyPolicyPage = () => {
             </ul>
             <p className="mt-2">
               We access this data through the Aurinko API, which serves as an
-              intermediary between Mailyx and Google&apos;s services. All data
-              access follows OAuth 2.0 security standards and respects the scope
-              of permissions you grant.
+              intermediary between Mailyx and both Google and Microsoft
+              services. All data access follows OAuth 2.0 security standards and
+              respects the scope of permissions you grant.
             </p>
           </div>
 
@@ -147,10 +148,10 @@ const PrivacyPolicyPage = () => {
               is subject to appropriate confidentiality and data protection
               standards.
             </p>
-            <p className="mt-2">Specifically regarding Google user data, we:</p>
+            <p className="mt-2">Regarding your email data, we:</p>
             <ul className="mt-2 list-inside list-disc">
               <li>Use Aurinko as our email API service provider</li>
-              <li>Do not sell your Google account data to third parties</li>
+              <li>Do not sell your account data to third parties</li>
               <li>
                 Only share data with service providers as necessary to provide
                 our services
@@ -176,7 +177,7 @@ const PrivacyPolicyPage = () => {
               <li>Statutory requirements</li>
               <li>Legal claims and disputes</li>
             </ul>
-            <p className="mt-2">For Google account data specifically:</p>
+            <p className="mt-2">For email account data specifically:</p>
             <ul className="mt-2 list-inside list-disc">
               <li>
                 Email data is primarily processed in real-time and not
@@ -186,8 +187,8 @@ const PrivacyPolicyPage = () => {
                 We cache some email data temporarily to improve performance
               </li>
               <li>
-                When you disconnect your Google account or delete your Mailyx
-                account, we remove all cached Google data
+                When you disconnect your accounts or delete your Mailyx account,
+                we remove all cached data
               </li>
               <li>
                 We retain minimal logs for security and debugging purposes for
@@ -235,16 +236,16 @@ const PrivacyPolicyPage = () => {
 
           <div>
             <h2 className="mb-3 text-2xl font-semibold text-white">
-              Revoking Google Access
+              Revoking Access to Your Accounts
             </h2>
             <p>
-              You can revoke Mailyx&apos;s access to your Google account at any
+              You can revoke Mailyx&apos;s access to your email accounts at any
               time through:
             </p>
             <ul className="mt-2 list-inside list-disc">
               <li>Disconnecting your account within the Mailyx application</li>
               <li>
-                Visiting Google&apos;s Security page at{" "}
+                For Google: Visiting Google&apos;s Security page at{" "}
                 <a
                   href="https://myaccount.google.com/permissions"
                   className="text-blue-400 hover:underline"
@@ -253,13 +254,23 @@ const PrivacyPolicyPage = () => {
                 </a>
               </li>
               <li>
+                For Microsoft: Visiting Microsoft&apos;s Account permissions
+                page at{" "}
+                <a
+                  href="https://account.live.com/consent/Manage"
+                  className="text-blue-400 hover:underline"
+                >
+                  https://account.live.com/consent/Manage
+                </a>
+              </li>
+              <li>
                 Contacting us at <strong>privacy@mailyx.com</strong> to request
                 removal
               </li>
             </ul>
             <p className="mt-2">
-              When you revoke access, we immediately stop accessing your Google
-              data and remove cached content within 30 days.
+              When you revoke access, we immediately stop accessing your data
+              and remove cached content within 30 days.
             </p>
           </div>
 

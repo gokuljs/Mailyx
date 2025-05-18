@@ -13,7 +13,7 @@ const TermsOfServicePage = () => {
           Terms and Conditions
         </h1>
         <p className="mb-12 text-center text-gray-400">
-          Last updated April 18th, 2025
+          Last updated May 1st, 2024
         </p>
 
         <section className="space-y-12 text-base leading-relaxed text-gray-300">
@@ -39,7 +39,80 @@ const TermsOfServicePage = () => {
 
           <div>
             <h2 className="mb-3 text-2xl font-semibold text-white">
-              3. Unlimited Access Software License with Termination Rights
+              3. Third-Party API Services and Data Usage
+            </h2>
+            <p>
+              When you connect Mailyx to your Google account, our use of your
+              data is subject to Google&apos;s API Services User Data Policy,
+              including the Limited Use requirements. We ensure that:
+            </p>
+            <ul className="mt-2 list-inside list-disc">
+              <li>
+                We only request access to the data necessary for the features
+                you use
+              </li>
+              <li>We do not sell your Google account data</li>
+              <li>
+                We do not use your Google user data for advertising purposes
+              </li>
+              <li>
+                We limit our use of your Google user data to providing or
+                improving user-facing features
+              </li>
+              <li>
+                We do not use or transfer your Google user data for serving
+                advertisements
+              </li>
+              <li>
+                We provide a method for you to revoke our access to your data
+              </li>
+              <li>We securely store any Google user data we maintain</li>
+            </ul>
+            <p className="mt-2">
+              You can learn more about Google&apos;s Limited Use Requirements
+              at:{" "}
+              <a
+                href="https://developers.google.com/terms/api-services-user-data-policy"
+                className="text-blue-400 hover:underline"
+              >
+                https://developers.google.com/terms/api-services-user-data-policy
+              </a>
+            </p>
+            <p className="mt-4">
+              When you connect Mailyx to your Microsoft account, our use of your
+              data is subject to Microsoft&apos;s API Terms of Use. We ensure
+              that:
+            </p>
+            <ul className="mt-2 list-inside list-disc">
+              <li>
+                We only access data necessary for the functionality of Mailyx
+              </li>
+              <li>We do not sell your Microsoft account data</li>
+              <li>
+                We handle your Microsoft data in accordance with our Privacy
+                Policy
+              </li>
+              <li>
+                We provide a method for you to disconnect your Microsoft account
+              </li>
+              <li>
+                We maintain appropriate security measures to protect your data
+              </li>
+            </ul>
+            <p className="mt-2">
+              You can learn more about Microsoft&apos;s API Terms at:{" "}
+              <a
+                href="https://learn.microsoft.com/en-us/legal/microsoft-apis/terms-of-use"
+                className="text-blue-400 hover:underline"
+              >
+                https://learn.microsoft.com/en-us/legal/microsoft-apis/terms-of-use
+              </a>
+            </p>
+          </div>
+
+          <div>
+            <h2 className="mb-3 text-2xl font-semibold text-white">
+              4. Unlimited Access Software License with Termination Rights
             </h2>
             <p>
               The Mailyx Software License facilitates the acquisition of Mailyx
@@ -65,7 +138,7 @@ const TermsOfServicePage = () => {
 
           <div>
             <h2 className="mb-3 text-2xl font-semibold text-white">
-              4. Refunds
+              5. Refunds
             </h2>
             <p>
               Due to the nature of digital products, the Mailyx boilerplate
@@ -75,7 +148,7 @@ const TermsOfServicePage = () => {
 
           <div>
             <h2 className="mb-3 text-2xl font-semibold text-white">
-              5. Disclaimer
+              6. Disclaimer
             </h2>
             <p>
               It is not warranted that Mailyx will meet your requirements or
@@ -88,7 +161,7 @@ const TermsOfServicePage = () => {
 
           <div>
             <h2 className="mb-3 text-2xl font-semibold text-white">
-              6. Warranties and Limitation of Liability
+              7. Warranties and Limitation of Liability
             </h2>
             <p>
               Mailyx does not give any warranty, guarantee or other term as to
@@ -102,7 +175,7 @@ const TermsOfServicePage = () => {
 
           <div>
             <h2 className="mb-3 text-2xl font-semibold text-white">
-              7. Responsibilities
+              8. Responsibilities
             </h2>
             <p>
               Mailyx is not responsible for what the user does with the
@@ -112,7 +185,42 @@ const TermsOfServicePage = () => {
 
           <div>
             <h2 className="mb-3 text-2xl font-semibold text-white">
-              8. Price Adjustments
+              9. Third-Party Services
+            </h2>
+            <p>
+              Mailyx integrates with third-party services such as Google and
+              Microsoft. Your use of these integrations is subject to their
+              respective terms and conditions:
+            </p>
+            <ul className="mt-2 list-inside list-disc">
+              <li>
+                Google APIs:{" "}
+                <a
+                  href="https://developers.google.com/terms"
+                  className="text-blue-400 hover:underline"
+                >
+                  https://developers.google.com/terms
+                </a>
+              </li>
+              <li>
+                Microsoft APIs:{" "}
+                <a
+                  href="https://learn.microsoft.com/en-us/legal/microsoft-apis/terms-of-use"
+                  className="text-blue-400 hover:underline"
+                >
+                  https://learn.microsoft.com/en-us/legal/microsoft-apis/terms-of-use
+                </a>
+              </li>
+            </ul>
+            <p className="mt-2">
+              We are not responsible for any changes to these third-party terms
+              or services that may affect your use of Mailyx.
+            </p>
+          </div>
+
+          <div>
+            <h2 className="mb-3 text-2xl font-semibold text-white">
+              10. Price Adjustments
             </h2>
             <p>
               As we continue to improve Mailyx and expand our offerings, the
@@ -124,7 +232,7 @@ const TermsOfServicePage = () => {
 
           <div>
             <h2 className="mb-3 text-2xl font-semibold text-white">
-              9. General Terms and Law
+              11. General Terms and Law
             </h2>
             <p>
               This Agreement is governed by the laws of Singapore. You
