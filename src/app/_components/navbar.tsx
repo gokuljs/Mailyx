@@ -57,9 +57,9 @@ const NavBar = () => {
               Contact
             </div>
           </Link>
-          <Link href="/features">
+          <Link href="/privacy">
             <div className="text-neutral-400 transition-colors duration-300 hover:text-white">
-              Features
+              Privacy
             </div>
           </Link>
           <Link href="/mail">
@@ -97,11 +97,11 @@ const NavBar = () => {
               Contact
             </Link>
             <Link
-              href="/features"
+              href="/privacy"
               className="text-neutral-400 transition-colors duration-300 hover:text-white"
               onClick={() => setIsMenuOpen(false)}
             >
-              Features
+              Privacy
             </Link>
             <Link href="/mail" onClick={() => setIsMenuOpen(false)}>
               <Button className="w-full cursor-pointer rounded-3xl border border-stone-400/30 bg-stone-700 font-semibold text-neutral-300 transition-all duration-150 hover:bg-black/80">
