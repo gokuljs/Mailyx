@@ -81,6 +81,20 @@ const PrivacyPolicyPage = () => {
               services. All data access follows OAuth 2.0 security standards and
               respects the scope of permissions you grant.
             </p>
+            <p className="mt-2">
+              <strong>Important:</strong> We do not use data obtained through
+              Google Workspace APIs to develop, improve, or train generalized AI
+              and/or machine learning models. All data is used solely for
+              providing the service functionality described above.
+            </p>
+            <p className="mt-2">
+              While Mailyx uses artificial intelligence and large language
+              models (LLMs) to help users compose emails and enhance
+              productivity, we do not use your email data to train these AI
+              models. We utilize pre-trained AI models and do not feed your
+              personal data or email content into any training datasets for AI
+              development.
+            </p>
           </div>
 
           <div>
