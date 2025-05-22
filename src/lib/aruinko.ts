@@ -8,6 +8,8 @@ import { FREE_ACCOUNTS_PER_USER, PRO_ACCOUNTS_PER_USER } from "./Constants";
 import { toast } from "sonner";
 import { count, eq } from "drizzle-orm";
 
+//  "Mail.Send Mail.Drafts Mail.Read Mail.ReadWrite Mail.All"
+
 export const getAurinkoAuthUrl = async (
   serviceType: "Google" | "Office365",
   isSubscribed: boolean,
@@ -34,7 +36,7 @@ export const getAurinkoAuthUrl = async (
     const params = new URLSearchParams({
       clientId: process.env.NEXT_AURINKO_CLIENT_ID as string,
       serviceType,
-      scopes: "Mail.Send Mail.Drafts Mail.Read Mail.ReadWrite Mail.All",
+      scopes: "Mail.Send Mail.Drafts Mail.Read",
       responseType: "code",
       returnUrl: `${process.env.NEXT_PUBLIC_URL}/api/aurinko/callback`,
     });
