@@ -6,28 +6,18 @@ import { Button } from "@/components/ui/button";
 import { Mail, CheckCircle } from "lucide-react";
 import { toast } from "sonner";
 import Link from "next/link";
-import NavBar from "../_components/navbar";
-import Footer from "../_components/footer";
 import ParticlesBackground from "../_components/Particles";
 import { GlowingEffect } from "../_components/glowing-effect";
-import { api } from "@/trpc/react";
 import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
+import { api } from "@/trpc/react";
 
-export default function WaitlistPage() {
+export default function Page() {
   const { isSignedIn, isLoaded } = useUser();
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
-
-  // Redirect authenticated users to /mail
-  useEffect(() => {
-    if (isLoaded && isSignedIn) {
-      router.push("/mail");
-    }
-  }, [isLoaded, isSignedIn, router]);
-
-  const addToWaitlistMutation = api.waitlist.addToWaitlist.useMutation({
+  const { mutate, isPending } = api.contact.manageWaitList.useMutation({
     onSuccess: () => {
       setIsSubmitted(true);
       toast.success(
@@ -36,20 +26,23 @@ export default function WaitlistPage() {
       setEmail("");
     },
     onError: (error) => {
-      console.error(error, "ssss");
       toast.error(error.message);
     },
   });
 
+  useEffect(() => {
+    if (isLoaded && isSignedIn) {
+      router.push("/mail");
+    }
+  }, [isLoaded, isSignedIn, router]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     if (!email) {
       toast.error("Please enter your email address");
       return;
     }
-
-    addToWaitlistMutation.mutate({ email });
+    mutate({ email });
   };
 
   // Show loading while checking authentication
@@ -73,10 +66,9 @@ export default function WaitlistPage() {
   return (
     <div className="relative z-10 flex min-h-screen flex-col items-center bg-black pt-60 md:px-0">
       <ParticlesBackground />
-
       {!isSubmitted ? (
         <div className="flex flex-col items-center justify-center px-2">
-          <h1 className="inline-block bg-linear-to-br from-white to-stone-500 bg-clip-text px-2 text-center text-4xl font-bold text-transparent md:px-0 md:text-6xl">
+          <h1 className="inline-bl ock bg-linear-to-br from-white to-stone-500 bg-clip-text px-2 text-center text-4xl font-bold text-transparent md:px-0 md:text-6xl">
             Join the Mailyx
           </h1>
           <div className="h-4"></div>
@@ -119,10 +111,10 @@ export default function WaitlistPage() {
 
                 <Button
                   type="submit"
-                  disabled={addToWaitlistMutation.isPending}
+                  disabled={isPending}
                   className="w-full cursor-pointer rounded-3xl border border-stone-400/30 bg-stone-700 font-semibold text-neutral-300 transition-all duration-150 hover:bg-black/80 disabled:opacity-50"
                 >
-                  {addToWaitlistMutation.isPending ? (
+                  {isPending ? (
                     <div className="flex items-center gap-2">
                       <div className="h-4 w-4 animate-spin rounded-full border-2 border-neutral-300/30 border-t-neutral-300"></div>
                       Joining Waitlist...

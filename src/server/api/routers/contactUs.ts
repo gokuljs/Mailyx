@@ -7,6 +7,16 @@ import { db } from "@/drizzle/db";
 import cuid from "cuid";
 
 export const contactRouter = createTRPCRouter({
+  manageWaitList: publicProcedure
+    .input(
+      z.object({
+        email: z.string().email(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { email } = input;
+      console.log(email);
+    }),
   sendMessage: publicProcedure
     .input(
       z.object({
