@@ -15,22 +15,39 @@ export const waitlistRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const { email } = input;
       try {
-        const existingEntry = await db
+        // Check if email already exists in user table (already a user)
+        const existingUser = await db
           .select()
-          .from(schema.waitlist)
-          .where(eq(schema.waitlist.email, email)) // Using email as userId for non-authenticated users
+          .from(schema.user)
+          .where(eq(schema.user.emailAddress, email))
           .limit(1);
 
-        if (existingEntry.length > 0) {
+        if (existingUser.length > 0) {
+          throw new Error(
+            "You're already registered! Please sign in to access Mailyx.",
+          );
+        }
+
+        // Check if email already exists in waitlist
+        const existingWaitlistEntry = await db
+          .select()
+          .from(schema.waitlist)
+          .where(eq(schema.waitlist.email, email))
+          .limit(1);
+
+        if (existingWaitlistEntry.length > 0) {
           throw new Error("Email already exists in waitlist");
         }
 
+        // Add to waitlist
         const waitlistId = cuid();
         await db.insert(schema.waitlist).values({
           id: waitlistId,
           email: email,
           approved: false,
         });
+
+        console.log(`New waitlist signup: ${email}`);
 
         return {
           success: true,
