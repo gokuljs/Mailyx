@@ -99,7 +99,7 @@ export function ProviderSelector({
               )}
             </Button>
 
-            <Button
+            {/* <Button
               onClick={() => onSelect("Office365")}
               variant="outline"
               className="group flex h-16 w-full items-center justify-between gap-4 border-stone-200 p-3 transition-all hover:border-stone-300 hover:bg-stone-50 hover:shadow-sm dark:border-stone-700 dark:hover:border-stone-600 dark:hover:bg-[hsl(20_14.3%_8%)]"
@@ -142,7 +142,7 @@ export function ProviderSelector({
                   </svg>
                 </div>
               )}
-            </Button>
+            </Button> */}
           </div>
         </CardContent>
       </Card>

@@ -38,7 +38,11 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <ClerkProvider waitlistUrl="/waitlist">
+    <ClerkProvider
+      waitlistUrl="/waitlist"
+      afterSignInUrl="/mail"
+      afterSignUpUrl="/mail"
+    >
       <html lang="en" className={`${GeistSans.variable}`}>
         <body>
           <ThemeProvider
