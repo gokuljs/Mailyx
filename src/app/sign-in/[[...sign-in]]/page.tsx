@@ -24,7 +24,7 @@ export default function Page() {
 
         <div className="border-0.75 relative z-10 rounded-md">
           <SignIn
-            afterSignInUrl="/mail"
+            fallbackRedirectUrl="/mail"
             waitlistUrl="/waitlist"
             appearance={{
               baseTheme: [dark],
