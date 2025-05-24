@@ -6,8 +6,10 @@ import BrandLogo from "@/components/BrandLogo";
 import StartMailyxButton from "./StartMailyxButton";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
+import { useUser } from "@clerk/nextjs";
 
 const NavBar = () => {
+  const { isSignedIn, isLoaded } = useUser();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
@@ -62,7 +64,7 @@ const NavBar = () => {
               Privacy
             </div>
           </Link>
-          <Link href="/mail">
+          <Link href={isSignedIn ? "/mail" : "/waitlist"}>
             <Button className="cursor-pointer rounded-3xl border border-stone-400/30 bg-stone-700 font-semibold text-neutral-300 transition-all duration-150 hover:bg-black/80">
               Get Started
             </Button>
@@ -103,7 +105,10 @@ const NavBar = () => {
             >
               Privacy
             </Link>
-            <Link href="/mail" onClick={() => setIsMenuOpen(false)}>
+            <Link
+              href={isSignedIn ? "/mail" : "/waitlist"}
+              onClick={() => setIsMenuOpen(false)}
+            >
               <Button className="w-full cursor-pointer rounded-3xl border border-stone-400/30 bg-stone-700 font-semibold text-neutral-300 transition-all duration-150 hover:bg-black/80">
                 Get Started
               </Button>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Mail, CheckCircle } from "lucide-react";
@@ -11,10 +11,21 @@ import Footer from "../_components/footer";
 import ParticlesBackground from "../_components/Particles";
 import { GlowingEffect } from "../_components/glowing-effect";
 import { api } from "@/trpc/react";
+import { useUser } from "@clerk/nextjs";
+import { useRouter } from "next/navigation";
 
 export default function WaitlistPage() {
+  const { isSignedIn, isLoaded } = useUser();
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
+
+  // Redirect authenticated users to /mail
+  useEffect(() => {
+    if (isLoaded && isSignedIn) {
+      router.push("/mail");
+    }
+  }, [isLoaded, isSignedIn, router]);
 
   const addToWaitlistMutation = api.waitlist.addToWaitlist.useMutation({
     onSuccess: () => {
@@ -39,6 +50,24 @@ export default function WaitlistPage() {
 
     addToWaitlistMutation.mutate({ email });
   };
+
+  // Show loading while checking authentication
+  if (!isLoaded) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-black">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-neutral-300/30 border-t-neutral-300"></div>
+      </div>
+    );
+  }
+
+  // Don't render waitlist content if user is signed in (they will be redirected)
+  if (isSignedIn) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-black">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-neutral-300/30 border-t-neutral-300"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="relative z-10 flex min-h-screen flex-col items-center bg-black pt-60 md:px-0">
