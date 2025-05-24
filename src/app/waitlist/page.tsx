@@ -33,7 +33,7 @@ export default function Page() {
 
         <div className="border-0.75 relative z-10 rounded-md">
           <Waitlist
-            signInUrl="/sign-in"
+            signInUrl={`${process.env.NEXT_PUBLIC_URL}/sign-in`}
             appearance={{
               baseTheme: [dark],
               variables: {
