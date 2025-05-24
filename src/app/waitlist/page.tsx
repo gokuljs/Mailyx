@@ -18,12 +18,14 @@ export default function Page() {
   const [email, setEmail] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
   const { mutate, isPending } = api.contact.manageWaitList.useMutation({
-    onSuccess: () => {
-      setIsSubmitted(true);
-      toast.success(
-        "You're on the waitlist! We'll notify you when Mailyx is ready.",
-      );
-      setEmail("");
+    onSuccess: (response) => {
+      if (response.success) {
+        setIsSubmitted(true);
+        toast.success(response.message);
+        setEmail("");
+      } else {
+        toast.error(response.message);
+      }
     },
     onError: (error) => {
       toast.error(error.message);
