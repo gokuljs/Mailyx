@@ -464,15 +464,23 @@ export const emailEmbedding = pgTable(
   },
 );
 
-export const waitlist = pgTable("waitlist", {
-  id: varchar("id", { length: 36 }).primaryKey(), // cuid() values are ~25 characters, but allow 36 for safety
-  userId: varchar("user_id", { length: 36 }).notNull(),
-  approved: boolean("approved").default(false).notNull(),
-  createdAt: timestamp("created_at", { withTimezone: true })
-    .defaultNow()
-    .notNull(),
-  updatedAt: timestamp("updated_at", { withTimezone: true })
-    .defaultNow()
-    .$onUpdate(() => new Date())
-    .notNull(),
-});
+export const waitlist = pgTable(
+  "waitlist",
+  {
+    id: varchar("id", { length: 36 }).primaryKey(), // cuid() values are ~25 characters, but allow 36 for safety
+    email: varchar("email", { length: 255 }).notNull(),
+    approved: boolean("approved").default(false).notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => {
+    return {
+      uniqueEmail: uniqueIndex("unique_email").on(table.email),
+    };
+  },
+);

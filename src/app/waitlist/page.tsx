@@ -10,11 +10,24 @@ import NavBar from "../_components/navbar";
 import Footer from "../_components/footer";
 import ParticlesBackground from "../_components/Particles";
 import { GlowingEffect } from "../_components/glowing-effect";
+import { api } from "@/trpc/react";
 
 export default function WaitlistPage() {
   const [email, setEmail] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+
+  const addToWaitlistMutation = api.waitlist.addToWaitlist.useMutation({
+    onSuccess: () => {
+      setIsSubmitted(true);
+      toast.success(
+        "You're on the waitlist! We'll notify you when Mailyx is ready.",
+      );
+      setEmail("");
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,37 +37,7 @@ export default function WaitlistPage() {
       return;
     }
 
-    setIsLoading(true);
-
-    try {
-      const response = await fetch("/api/waitlist", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Something went wrong");
-      }
-
-      setIsSubmitted(true);
-      toast.success(
-        "You&apos;re on the waitlist! We&apos;ll notify you when Mailyx is ready.",
-      );
-      setEmail("");
-    } catch (error) {
-      toast.error(
-        error instanceof Error
-          ? error.message
-          : "Something went wrong. Please try again.",
-      );
-    } finally {
-      setIsLoading(false);
-    }
+    addToWaitlistMutation.mutate({ email });
   };
 
   return (
@@ -106,10 +89,10 @@ export default function WaitlistPage() {
 
                 <Button
                   type="submit"
-                  disabled={isLoading}
+                  disabled={addToWaitlistMutation.isPending}
                   className="w-full cursor-pointer rounded-3xl border border-stone-400/30 bg-stone-700 font-semibold text-neutral-300 transition-all duration-150 hover:bg-black/80 disabled:opacity-50"
                 >
-                  {isLoading ? (
+                  {addToWaitlistMutation.isPending ? (
                     <div className="flex items-center gap-2">
                       <div className="h-4 w-4 animate-spin rounded-full border-2 border-neutral-300/30 border-t-neutral-300"></div>
                       Joining Waitlist...
