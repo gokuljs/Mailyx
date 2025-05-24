@@ -14,6 +14,7 @@ export const waitlistRouter = createTRPCRouter({
     )
     .mutation(async ({ ctx, input }) => {
       const { email } = input;
+      console.log("email", email);
       try {
         // Check if email already exists in user table (already a user)
         const existingUser = await db

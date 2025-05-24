@@ -36,6 +36,7 @@ export default function WaitlistPage() {
       setEmail("");
     },
     onError: (error) => {
+      console.error(error, "ssss");
       toast.error(error.message);
     },
   });
