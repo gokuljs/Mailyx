@@ -1,12 +1,14 @@
 "use client";
 import { useRouter } from "next/navigation";
+import { useUser } from "@clerk/nextjs";
 import { HoverBorderGradient } from "./hover-border-gradient";
 
 export default function StartMailyxButton({ text }: { text: string }) {
+  const { isSignedIn } = useUser();
   const router = useRouter();
 
   const handleClick = () => {
-    router.push("/mail");
+    router.push(isSignedIn ? "/mail" : "/waitlist");
   };
 
   return (

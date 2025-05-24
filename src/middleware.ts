@@ -11,6 +11,8 @@ const isPublicRoute = createRouteMatcher([
   "/api/paddle/webhook(.*)",
   "/pricing",
   "/contact-us",
+  "/waitlist",
+  "/api/trpc/contact(.*)",
 ]);
 
 export default clerkMiddleware(async (auth, req) => {

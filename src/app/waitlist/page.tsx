@@ -1,11 +1,22 @@
 "use client";
-import { GlowingEffect } from "@/app/_components/glowing-effect";
-import { SignUp } from "@clerk/nextjs";
+
+import { useState, useEffect } from "react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Mail, CheckCircle } from "lucide-react";
+import { toast } from "sonner";
+import Link from "next/link";
+import ParticlesBackground from "../_components/Particles";
+import { GlowingEffect } from "../_components/glowing-effect";
+import { SignIn, useUser, Waitlist } from "@clerk/nextjs";
+import { useRouter } from "next/navigation";
+import { api } from "@/trpc/react";
 import { dark } from "@clerk/themes";
 
 export default function Page() {
   return (
-    <div className="relative flex h-screen items-center justify-center bg-[#09090b]">
+    <div className="relative z-10 flex min-h-screen flex-col items-center justify-center bg-black md:px-0">
+      <ParticlesBackground />
       <div className="relative flex items-center justify-center">
         <div className="absolute inset-0">
           <GlowingEffect
@@ -21,7 +32,8 @@ export default function Page() {
         </div>
 
         <div className="border-0.75 relative z-10 rounded-md">
-          <SignUp
+          <Waitlist
+            signInUrl="/sign-in"
             appearance={{
               baseTheme: [dark],
               variables: {
@@ -30,6 +42,7 @@ export default function Page() {
                 colorText: "#ffff",
               },
             }}
+            afterJoinWaitlistUrl="/"
           />
         </div>
       </div>
