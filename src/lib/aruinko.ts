@@ -42,7 +42,6 @@ export const getAurinkoAuthUrl = async (
     });
     return `https://api.aurinko.io/v1/auth/authorize?${params.toString()}`;
   } catch (error) {
-    console.log(error);
     throw error;
   }
 };

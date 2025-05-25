@@ -57,7 +57,25 @@ export default function AccountSwitcher({ isCollapsed }: Props) {
       const url = await getAurinkoAuthUrl(provider, isSubscribed);
       if (url) window.location.href = url;
     } catch (error) {
-      toast.error((error as Error).message);
+      if (error instanceof Error) {
+        if (error.message.includes("maximum number of accounts")) {
+          toast.error(
+            "You've reached the maximum number of accounts for your plan. Please upgrade to add more accounts.",
+          );
+        } else if (error.message.includes("User not Authorized")) {
+          toast.error("Please sign in to connect your email account.");
+        } else if (error.message.includes("NEXT_AURINKO_CLIENT_ID")) {
+          toast.error(
+            "Unable to connect to email service. Please try again later.",
+          );
+        } else {
+          toast.error(
+            "Failed to connect email account. Please try again later.",
+          );
+        }
+      } else {
+        toast.error("An unexpected error occurred. Please try again later.");
+      }
       console.error(error);
     } finally {
       setIsLoadingConnection(false);
