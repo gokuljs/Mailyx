@@ -30,6 +30,7 @@ const AiComposer = (props: Props) => {
     let context = "";
     if (!props.isComposing) {
       for (const email of thread?.email ?? []) {
+        console.log(email);
         const content = `
         Subject: ${email.subject}
         From : ${email.from}
