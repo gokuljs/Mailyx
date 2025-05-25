@@ -11,7 +11,10 @@ import RenderResults from "./RenderResults";
 import { useLocalStorage } from "usehooks-ts";
 import useThemeSwitching from "./useThemeSwithcing";
 import useAccountSwitching from "./useAccountSwitching";
+import { useUser } from "@clerk/nextjs";
+
 export default function Kbar({ children }: { children: React.ReactNode }) {
+  const { isSignedIn } = useUser();
   const [tab, setTab] = useLocalStorage("mailyx-tab", "");
   const [done, setDone] = useLocalStorage("mailyx-done", false);
   const actions: Action[] = [
@@ -71,6 +74,10 @@ export default function Kbar({ children }: { children: React.ReactNode }) {
       },
     },
   ];
+
+  if (!isSignedIn) {
+    return <>{children}</>;
+  }
 
   return (
     <KBarProvider actions={actions}>
