@@ -340,7 +340,7 @@ export const accountRouter = createTRPCRouter({
           console.timeEnd("DB:getThreads");
           return threadResults;
         },
-        300,
+        100,
       );
       return threads;
     }),
