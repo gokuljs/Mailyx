@@ -29,21 +29,18 @@ const AiComposer = (props: Props) => {
     console.log("Starting Generation");
     let context = "";
     if (!props.isComposing) {
-      for (const email of thread?.email ?? []) {
-        console.log(email);
-        const content = `
-        Subject: ${email.subject}
-        From : ${email.from}
-        Sent: ${new Date(email.sentAt).toLocaleString()}
-        Body: ${turndown.turndown(email?.body ?? email.bodySnippet ?? "")}
-        `;
-        context = context + content;
-      }
+      context =
+        thread?.email
+          .map(
+            (m) =>
+              `Subject: ${m.subject}\nFrom: ${m.from.address}\n\n${turndown.turndown(m.body ?? m.bodySnippet ?? "")}`,
+          )
+          .join("\n") || "";
     }
     context =
       context +
       `
-      My name is ${account?.name} and my email is ${account?.emailAddress}
+      My name is ${account?.name}
     `;
     const { output } = await generateEmail(context, prompt);
     for await (const token of readStreamableValue(output)) {
