@@ -30,6 +30,7 @@ export async function generateEmail(context: string, prompt: string) {
       - Don't add fluff like 'Heres your email' or 'Here's your email' or anything like that.
       - Directly output the email, no need to say 'Here is your email' or anything like that.
       - No need to output subject
+      - basically your job is to write the email, no need to say anything else.
       `,
     });
 
