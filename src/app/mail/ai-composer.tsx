@@ -26,27 +26,30 @@ const AiComposer = (props: Props) => {
   const { threads, threadId, account } = useThreads();
   const thread = threads?.find((item) => item?.id === threadId);
   const aiGenerate = async () => {
-    console.log("Starting Generation");
-    let context = "";
-    if (!props.isComposing) {
+    try {
+      let context = "";
       context =
         thread?.email
           .map(
             (m) =>
-              `Subject: ${m.subject}\nFrom: ${m.from.address}\n\n${turndown.turndown(m.body ?? m.bodySnippet ?? "")}`,
+              `Subject: ${m?.subject}\nFrom: ${m?.from?.address}\n\n${turndown.turndown(m?.body ?? m?.bodySnippet ?? "")}`,
           )
           .join("\n") || "";
-    }
-    context =
-      context +
-      `
+
+      context =
+        context +
+        `
       My name is ${account?.name}
     `;
-    const { output } = await generateEmail(context, prompt);
-    for await (const token of readStreamableValue(output)) {
-      if (token) {
-        props.onGenerate(token);
+
+      const { output } = await generateEmail(context, prompt);
+      for await (const token of readStreamableValue(output)) {
+        if (token) {
+          props.onGenerate(token);
+        }
       }
+    } catch (error) {
+      console.log(error, "error");
     }
   };
 
