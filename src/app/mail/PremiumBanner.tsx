@@ -27,7 +27,7 @@ const PremiumBanner = () => {
       {isSubscribed ? (
         <BannerContent
           heading="Premium Plan"
-          subtext="Ask many questions you want with our Pro plan."
+          subtext="Ask as many questions as you want with our Pro plan."
         />
       ) : (
         <BannerContent

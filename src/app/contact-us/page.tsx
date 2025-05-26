@@ -97,7 +97,7 @@ export default function ContactUs() {
                 htmlFor="email"
                 className="block text-sm font-medium text-gray-300"
               >
-                Email <span className="text-red-500">*</span>
+                Email Address <span className="text-red-500">*</span>
               </label>
               <Input
                 id="email"
