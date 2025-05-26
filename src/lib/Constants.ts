@@ -12,11 +12,10 @@ export const plans: Tier[] = [
     description: "Great for getting started and trying basic features.",
     features: [
       "Sync 1 email account",
-      "15 chats/day",
-      "Last 30 days search",
       "Basic keyboard shortcuts",
-      "Compose Email",
-      "AI auto complete",
+      "15 chats/day",
+      "15 compose emails/day",
+      "15 AI auto completes/day",
     ],
     buttonText: "Start for Free",
     highlighted: false,
@@ -30,6 +29,8 @@ export const plans: Tier[] = [
     features: [
       "Sync up to 3 email accounts",
       "Unlimited AI Assistant",
+      "Unlimited AI auto completes",
+      "Unlimited compose emails",
       "Full AI Precision Search",
       "Priority Support",
     ],
@@ -47,6 +48,8 @@ export const plans: Tier[] = [
     features: [
       "Sync up to 3 email accounts",
       "Unlimited AI Assistant",
+      "Unlimited AI auto completes",
+      "Unlimited compose emails",
       "Full AI Precision Search",
       "Priority Support",
       "2 months free",

@@ -107,6 +107,12 @@ export default async function Home() {
               </div>
             </div>
           </div>
+
+          <div className="mx-auto mt-20 max-w-5xl">
+            <h2 className="mb-8 bg-linear-to-b from-white to-stone-600 bg-clip-text text-center text-3xl font-semibold text-transparent md:text-4xl">
+              Watch the demo
+            </h2>
+          </div>
           <Video />
           <div className="z-50 w-full bg-transparent">
             <Footer />
