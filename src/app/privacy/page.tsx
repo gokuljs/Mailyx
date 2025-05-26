@@ -91,9 +91,9 @@ const PrivacyPolicyPage = () => {
               While Mailyx uses artificial intelligence and large language
               models (LLMs) to help users compose emails and enhance
               productivity, we do not use your email data to train these AI
-              models. We utilize pre-trained AI models and do not feed your
-              personal data or email content into any training datasets for AI
-              development.
+              models. We exclusively use pre-trained AI models and never
+              incorporate your personal data or email content into any AI
+              training datasets.
             </p>
           </div>
 

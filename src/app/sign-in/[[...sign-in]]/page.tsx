@@ -6,7 +6,7 @@ import { dark, neobrutalism } from "@clerk/themes";
 
 export default function Page() {
   return (
-    <div className="relative flex h-screen items-center justify-center bg-[#09090b]">
+    <div className="relative flex h-screen items-center justify-center bg-transparent">
       <ParticlesBackground />
       <div className="relative flex items-center justify-center">
         <div className="absolute inset-0">

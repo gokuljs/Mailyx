@@ -4,6 +4,7 @@ import { GlowingEffect } from "./_components/glowing-effect";
 import NavBar from "./_components/navbar";
 import ParticlesBackground from "./_components/Particles";
 import StartMailyxButton from "./_components/StartMailyxButton";
+import Video from "./_components/Video";
 
 export default async function Home() {
   return (
@@ -18,7 +19,8 @@ export default async function Home() {
           </h1>
           <div className="h-4"></div>
           <p className="mb-8 max-w-xl px-3 text-center text-lg text-stone-600 md:px-0 md:text-xl">
-            A calm, modern email client designed for clarity, not clutter.
+            A calm, modern email client designed for clarity and focus, not
+            clutter.
           </p>
           <div className="h-8"></div>
           <div className="space-x-4">
@@ -95,8 +97,9 @@ export default async function Home() {
                         Keyboard-first Navigation
                       </h3>
                       <h2 className="font-sans text-sm/[1.125rem] text-gray-500 md:text-base/[1.375rem] md:[&_b]:font-semibold md:[&_strong]:font-semibold">
-                        Fly through your inbox using intuitive, lightning-fast
-                        shortcuts — no mouse required.
+                        Navigate through your inbox effortlessly using
+                        intuitive, lightning-fast keyboard shortcuts — no mouse
+                        required.
                       </h2>
                     </div>
                   </div>
@@ -104,6 +107,7 @@ export default async function Home() {
               </div>
             </div>
           </div>
+          <Video />
           <div className="z-50 w-full bg-transparent">
             <Footer />
           </div>

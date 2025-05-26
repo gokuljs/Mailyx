@@ -9,12 +9,14 @@ import {
 } from "kbar";
 import RenderResults from "./RenderResults";
 import { useLocalStorage } from "usehooks-ts";
-import useThemeSwitching from "./useThemeSwithcing";
 import useAccountSwitching from "./useAccountSwitching";
 import { useUser } from "@clerk/nextjs";
+import { usePathname } from "next/navigation";
+import useThemeSwitching from "./useThemeSwithcing";
 
 export default function Kbar({ children }: { children: React.ReactNode }) {
   const { isSignedIn } = useUser();
+  const pathname = usePathname();
   const [tab, setTab] = useLocalStorage("mailyx-tab", "");
   const [done, setDone] = useLocalStorage("mailyx-done", false);
   const actions: Action[] = [
@@ -31,9 +33,9 @@ export default function Kbar({ children }: { children: React.ReactNode }) {
     },
     {
       id: "draftAction",
-      name: "Draft",
+      name: "Drafts",
       shortcut: ["g", "d"],
-      keywords: "draft",
+      keywords: "drafts",
       section: "Navigation",
       subtitle: "Access your saved drafts and continue writing",
       perform: () => {
@@ -53,29 +55,29 @@ export default function Kbar({ children }: { children: React.ReactNode }) {
     },
     {
       id: "pendingAction",
-      name: "See done",
+      name: "See Done",
       shortcut: ["g", "c"],
-      keywords: "done",
+      keywords: "done, completed",
       section: "Navigation",
-      subtitle: "View the done emails",
+      subtitle: "View completed emails",
       perform: () => {
         setDone(true);
       },
     },
     {
       id: "doneAction",
-      name: "See pending",
+      name: "See Pending",
       shortcut: ["g", "p"],
-      keywords: "Pending,undone, not done",
+      keywords: "pending, undone, not done",
       section: "Navigation",
-      subtitle: "View the pending emails",
+      subtitle: "View pending emails",
       perform: () => {
         setDone(false);
       },
     },
   ];
 
-  if (!isSignedIn) {
+  if (!isSignedIn || pathname !== "/mail") {
     return <>{children}</>;
   }
 
