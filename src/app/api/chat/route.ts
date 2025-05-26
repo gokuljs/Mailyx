@@ -124,7 +124,7 @@ export async function POST(req: Request) {
       WHERE eb."accountId" = ${accountId}
         AND eb.embedding <-> ${embeddingString}::vector < 0.8
       ORDER BY similarity ASC
-      LIMIT 25
+      LIMIT 15
     `);
 
     console.log(searchResults.length, "results found");
