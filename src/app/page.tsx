@@ -4,6 +4,7 @@ import { GlowingEffect } from "./_components/glowing-effect";
 import NavBar from "./_components/navbar";
 import ParticlesBackground from "./_components/Particles";
 import StartMailyxButton from "./_components/StartMailyxButton";
+import Video from "./_components/Video";
 
 export default async function Home() {
   return (
@@ -104,6 +105,7 @@ export default async function Home() {
               </div>
             </div>
           </div>
+          <Video />
           <div className="z-50 w-full bg-transparent">
             <Footer />
           </div>
