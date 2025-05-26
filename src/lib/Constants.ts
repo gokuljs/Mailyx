@@ -15,6 +15,8 @@ export const plans: Tier[] = [
       "15 chats/day",
       "Last 30 days search",
       "Basic keyboard shortcuts",
+      "Compose Email",
+      "AI auto complete",
     ],
     buttonText: "Start for Free",
     highlighted: false,

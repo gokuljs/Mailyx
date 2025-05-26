@@ -12,9 +12,11 @@ import { useLocalStorage } from "usehooks-ts";
 import useThemeSwitching from "./useThemeSwithcing";
 import useAccountSwitching from "./useAccountSwitching";
 import { useUser } from "@clerk/nextjs";
+import { usePathname } from "next/navigation";
 
 export default function Kbar({ children }: { children: React.ReactNode }) {
   const { isSignedIn } = useUser();
+  const pathname = usePathname();
   const [tab, setTab] = useLocalStorage("mailyx-tab", "");
   const [done, setDone] = useLocalStorage("mailyx-done", false);
   const actions: Action[] = [
@@ -75,7 +77,7 @@ export default function Kbar({ children }: { children: React.ReactNode }) {
     },
   ];
 
-  if (!isSignedIn) {
+  if (!isSignedIn || pathname !== "/mail") {
     return <>{children}</>;
   }
 
