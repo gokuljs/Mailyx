@@ -22,10 +22,10 @@ const Pricing = () => {
     <>
       <div className="flex min-h-screen flex-col items-center bg-black/10 pt-40 text-white">
         <NavBar />
-        <h2 className="mb-4 flex justify-center bg-gradient-to-b from-white to-stone-400 bg-clip-text text-center text-6xl font-bold text-transparent">
+        <h2 className="mt-10 mb-4 flex justify-center bg-gradient-to-b from-white to-stone-400 bg-clip-text text-center text-3xl font-bold text-transparent sm:text-6xl">
           Simple and Affordable <br /> Pricing Plans
         </h2>
-        <p className="text-muted-foreground mx-auto mb-10 max-w-xl text-center text-xl">
+        <p className="text-muted-foreground mx-auto mb-10 max-w-xl text-center text-sm sm:text-lg">
           Start managing your inbox smarter with AI-enhanced tools.
         </p>
 
@@ -119,9 +119,9 @@ const Pricing = () => {
             </div>
           ))}
         </div>
-        <div className="z-50 w-full bg-transparent">
-          <Footer />
-        </div>
+      </div>
+      <div className="z-50 w-full bg-transparent">
+        <Footer />
       </div>
       <ParticlesBackground />
     </>
