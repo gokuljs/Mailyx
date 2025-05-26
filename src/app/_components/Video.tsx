@@ -119,7 +119,7 @@ const Video = () => {
               <img
                 src="/videobanner.png"
                 alt="Video Preview"
-                className="h-full w-full object-contain transition-all duration-1000 group-hover:scale-105"
+                className="h-full w-full object-contain transition-all duration-1000"
               />
 
               {/* Play Button */}
@@ -170,10 +170,10 @@ const Video = () => {
               if (isPlaying) setShowControls(false);
             }}
           >
-            <div className="relative aspect-video w-full overflow-hidden bg-gray-900">
+            <div className="relative aspect-video w-full overflow-hidden bg-transparent">
               <video
                 ref={videoRef}
-                className="h-full w-full bg-transparent object-contain transition-all duration-1000 group-hover:scale-105"
+                className="h-full w-full bg-transparent object-contain transition-all duration-300"
                 src="https://d2sntr9e5s2ucj.cloudfront.net/4klatestProductVideo.mp4"
                 playsInline
                 controls={false}
