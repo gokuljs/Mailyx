@@ -15,14 +15,19 @@ const Video = () => {
 
   const startVideo = async () => {
     setIsLoading(true);
-    setHasStarted(true);
     try {
+      setHasStarted(true);
+      // Small delay to ensure video element is mounted
+      await new Promise((resolve) => setTimeout(resolve, 50));
       if (videoRef.current) {
         await videoRef.current.play();
         setIsPlaying(true);
       }
     } catch (error) {
       console.error("Error playing video:", error);
+      // Reset states if video fails to play
+      setHasStarted(false);
+      setIsPlaying(false);
     } finally {
       setIsLoading(false);
     }
@@ -189,20 +194,34 @@ const Video = () => {
 
               {/* Main Play/Pause Button */}
               <div
-                className={`absolute inset-0 flex items-center justify-center transition-all duration-500 ${showControls || !isPlaying ? "opacity-100" : "opacity-0"}`}
+                className={`absolute inset-0 flex items-center justify-center transition-all duration-500 ${
+                  !isPlaying || (isHovered && showControls)
+                    ? "opacity-100"
+                    : "pointer-events-none opacity-0"
+                }`}
               >
                 <div className="relative">
-                  {/* Pulsing Ring Animation */}
-                  <div className="absolute inset-0 animate-ping rounded-full bg-white/20"></div>
-                  <div className="absolute inset-0 animate-pulse rounded-full bg-gradient-to-r from-blue-400/30 to-purple-400/30"></div>
+                  {/* Pulsing Ring Animation - Only show when paused */}
+                  {!isPlaying && (
+                    <>
+                      <div className="absolute inset-0 animate-ping rounded-full bg-white/20"></div>
+                      <div className="absolute inset-0 animate-pulse rounded-full bg-gradient-to-r from-blue-400/30 to-purple-400/30"></div>
+                    </>
+                  )}
 
                   <button
                     onClick={togglePlay}
                     disabled={isLoading}
-                    className="group/btn relative flex h-20 w-20 items-center justify-center rounded-full bg-white/10 backdrop-blur-xl transition-all duration-300 hover:scale-110 hover:bg-white/20 active:scale-95 sm:h-24 sm:w-24 lg:h-28 lg:w-28"
+                    className={`group/btn relative flex h-20 w-20 items-center justify-center rounded-full transition-all duration-300 hover:scale-110 active:scale-95 sm:h-24 sm:w-24 lg:h-28 lg:w-28 ${
+                      isPlaying
+                        ? "bg-black/20 hover:bg-black/40"
+                        : "bg-white/10 backdrop-blur-xl hover:bg-white/20"
+                    }`}
                   >
-                    {/* Button Glow Effect */}
-                    <div className="absolute inset-0 rounded-full bg-gradient-to-r from-blue-500/30 to-purple-500/30 opacity-0 transition-all duration-300 group-hover/btn:animate-pulse group-hover/btn:opacity-100"></div>
+                    {/* Button Glow Effect - Only show when paused */}
+                    {!isPlaying && (
+                      <div className="absolute inset-0 rounded-full bg-gradient-to-r from-blue-500/30 to-purple-500/30 opacity-0 transition-all duration-300 group-hover/btn:animate-pulse group-hover/btn:opacity-100"></div>
+                    )}
 
                     {isLoading ? (
                       <div className="relative">
@@ -214,7 +233,7 @@ const Video = () => {
                       </div>
                     ) : isPlaying ? (
                       <svg
-                        className="h-8 w-8 text-white transition-all duration-300 group-hover/btn:scale-110 sm:h-10 sm:w-10"
+                        className="h-8 w-8 text-white opacity-80 transition-all duration-300 group-hover/btn:scale-110 group-hover/btn:opacity-100 sm:h-10 sm:w-10"
                         fill="currentColor"
                         viewBox="0 0 24 24"
                       >
