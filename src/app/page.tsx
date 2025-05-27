@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { BackgroundBeams } from "./_components/background-beams";
 import Footer from "./_components/footer";
 import { GlowingEffect } from "./_components/glowing-effect";
@@ -107,7 +108,18 @@ export default async function Home() {
               </div>
             </div>
           </div>
-
+          <a
+            href="https://www.producthunt.com/posts/mailyx?embed=true&utm_source=badge-featured&utm_medium=badge&utm_source=badge-mailyx"
+            target="_blank"
+          >
+            <Image
+              className="mx-auto mt-20"
+              src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=970309&theme=light&t=1748385815582"
+              alt="Mailyx - Minimalist&#0032;AI&#0045;powered&#0032;email&#0032;client&#0032;for&#0032;a&#0032;calm&#0044;&#0032;focused&#0032;inbox | Product Hunt"
+              width="250"
+              height="54"
+            />
+          </a>
           <div className="mx-auto mt-20 max-w-5xl">
             <h2 className="mb-8 bg-linear-to-b from-white to-stone-600 bg-clip-text text-center text-3xl font-semibold text-transparent md:text-4xl">
               Watch the demo
